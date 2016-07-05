@@ -9,18 +9,18 @@ import java.util.Scanner;
 
 public class HtmlService
 {
-    private static String getUrlSource(String url) throws IOException
+    private static String getUrlSource(String address) throws IOException
     {
-        URL yahoo = new URL(url);
-        URLConnection yc = yahoo.openConnection();
-        BufferedReader in = new BufferedReader(new InputStreamReader(yc.getInputStream(), "UTF-8"));
+        URL url = new URL(address);
+        URLConnection conn = url.openConnection();
+        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
         String inputLine;
-        StringBuilder a = new StringBuilder();
+        StringBuilder source = new StringBuilder(); // StringBuffer - synchronized, StringBuilder - not, so is faster
         while ((inputLine = in.readLine()) != null)
-            a.append(inputLine);
+            source.append(inputLine);
         in.close();
 
-        return a.toString();
+        return source.toString();
     }
 
     public static void main(String [] args)
