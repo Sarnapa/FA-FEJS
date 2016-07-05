@@ -23,19 +23,29 @@ public class HtmlService
         return a.toString();
     }
 
+    private static void writeFromSource(String toFind, String source){
+        String tmp;
+        int tmpIndex;
+        for (int i = -1; (i = source.indexOf(toFind, i + 1)) != -1; ) {
+            tmpIndex = i+toFind.length()+2;
+            tmp = source.substring(tmpIndex,source.indexOf(34,tmpIndex));
+            System.out.println(tmp);
+        }
+    }
+
     public static void main(String [] args)
     {
-        Scanner scanner = new Scanner(System.in);
-        String s = scanner.nextLine();
+        //Scanner scanner = new Scanner(System.in);
+        //String s = scanner.nextLine();
         try
         {
-            String urlSource = getUrlSource(s);
-            System.out.println(urlSource);
+            String urlSource = getUrlSource("https://www.laczynaspilka.pl/klub/arka-gdynia-ssa,1550.html");
+            //System.out.println(urlSource);
+            writeFromSource("href",urlSource);
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
-        System.out.println("elo");
     }
 }
