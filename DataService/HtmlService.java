@@ -27,10 +27,10 @@ public class HtmlService
         return Jsoup.connect(address).get();
     }
 
-    // To get value of attribute href
+    // To get value of attribute data-url from tag tr
     public static String getUrl(Element link)
     {
-        return link.attr("href");
+        return link.attr("data-url");
     }
 
     // To get text between tags

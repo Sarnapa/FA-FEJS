@@ -9,9 +9,8 @@ import java.util.List;
 
 public class LeagueService extends HtmlService
 {
-    private final String ROW = "row";
-    private final String A = "a";
-    private final String TEAMS = "league-teams-list"; // Not complete class name but it works
+    private final String TABLE = "table-template"; // Not complete class name but it works
+    private final String ROW = "row-link";
     private String url; // League's URL
     private List<String> teamUrls = new LinkedList<>(); // List of teams' Urls
 
@@ -25,13 +24,11 @@ public class LeagueService extends HtmlService
         try
         {
             Document doc = getHtmlSource(url);
-            Elements teamsContainer = doc.getElementsByClass(TEAMS); // one element - cannot use getElementById
-            Elements rows = teamsContainer.first().getElementsByClass(ROW);
+            Elements teamsInTable = doc.getElementsByClass(TABLE); // one element - cannot use getElementById
+            Elements rows = teamsInTable.first().getElementsByClass(ROW);
             for(Element row: rows)
             {
-                Elements teamsInRow = row.getElementsByTag(A);
-                for (Element team: teamsInRow)
-                    teamUrls.add(getUrl(team));
+                teamUrls.add(getUrl(row));
             }
         }
         catch (IOException e) // TODO - obsluga

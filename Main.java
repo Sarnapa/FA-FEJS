@@ -4,7 +4,7 @@ public class Main {
 
     public static void main(String [] args)
     {
-        LeagueService league = new LeagueService("https://www.laczynaspilka.pl/druzyny/ekstraklasa,1.html");
+        LeagueService league = new LeagueService("https://www.laczynaspilka.pl/rozgrywki/ekstraklasa,1.html");
         league.getTeamUrls();
         league.writeTeamUrls();
     }
