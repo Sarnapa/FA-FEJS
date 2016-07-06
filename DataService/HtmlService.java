@@ -2,7 +2,6 @@ package DataService;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
 import java.io.IOException;
 
 public class HtmlService
@@ -25,18 +24,6 @@ public class HtmlService
     public static Document getHtmlSource(String address) throws IOException
     {
         return Jsoup.connect(address).get();
-    }
-
-    // To get value of attribute data-url from tag tr
-    public static String getUrl(Element link)
-    {
-        return link.attr("data-url");
-    }
-
-    // To get text between tags
-    public static String getText(Element e)
-    {
-        return e.text();
     }
 
     /*private static void writeFromSource(String toFind, String source){

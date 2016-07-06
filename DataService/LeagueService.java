@@ -28,7 +28,7 @@ public class LeagueService extends HtmlService
             Elements rows = teamsInTable.first().getElementsByClass(ROW);
             for(Element row: rows)
             {
-                teamUrls.add(getUrl(row));
+                teamUrls.add(row.attr("data-url"));
             }
         }
         catch (IOException e) // TODO - obsluga
