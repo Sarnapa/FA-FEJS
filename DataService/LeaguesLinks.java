@@ -10,9 +10,10 @@ import java.util.List;
 public class LeaguesLinks extends HtmlService
 {
     private static final String url = "https://www.laczynaspilka.pl/";
-    private List<String> leagueUrls = new LinkedList<String>();
+    private List<String> leaguesUrls = new LinkedList<String>();
+    private List<String> leaguesNames = new LinkedList<String>();
 
-    public void getLeagueUrls()
+    public void getLeaguesUrls()
     {
         try
         {
@@ -24,16 +25,32 @@ public class LeaguesLinks extends HtmlService
             {
                 String leagueName = span.text();
                 Element leagueUl = span.nextElementSibling();
-                String link = leagueUl.child(0).child(0).attr("href");
-                switch (leagueName) {
+                String url;
+                switch (leagueName)
+                {
                     case "Ekstraklasa":
-                        leagueUrls.add(link);
+                        url = leagueUl.child(2).child(0).attr("href");
+                        leaguesUrls.add(url);
+                        leaguesNames.add(leagueName);
                         break;
                     case "I Liga":
-                        leagueUrls.add(link);
+                        url = leagueUl.child(2).child(0).attr("href");
+                        leaguesUrls.add(url);
+                        leaguesNames.add(leagueName);
                         break;
                     case "II Liga":
-                        leagueUrls.add(link);
+                        url = leagueUl.child(2).child(0).attr("href");
+                        leaguesUrls.add(url);
+                        leaguesNames.add(leagueName);
+                        break;
+                    case "III Liga":
+                        url = leagueUl.child(2).child(0).attr("href");
+                        break;
+                    case "CLJ":
+                        url = leagueUl.child(2).child(0).attr("href");
+                        break;
+                    case "Dzieci i Młodzież":
+                        url = leagueUl.child(0).child(0).attr("href");
                         break;
                 }
             }
@@ -42,6 +59,37 @@ public class LeaguesLinks extends HtmlService
         {
             e.printStackTrace();
         }
+        getLeagues();
+    }
 
+    private static void setBasicLeague()
+    {
+
+    }
+
+    private void getLeagues()
+    {
+        for(String url: leaguesUrls)
+        {
+            LeagueService league = new LeagueService(url);
+            league.getTeamsUrls();
+            league.writeTeamUrls();
+        }
+    }
+
+    public void writeLeaguesUrls()
+    {
+        for(String league: leaguesUrls)
+        {
+            System.out.println(league);
+        }
+    }
+
+    public void writeLeaguesNames()
+    {
+        for(String name: leaguesNames)
+        {
+            System.out.println(name);
+        }
     }
 }

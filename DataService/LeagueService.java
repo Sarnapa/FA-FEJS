@@ -9,26 +9,28 @@ import java.util.List;
 
 public class LeagueService extends HtmlService
 {
-    private final String TABLE = "table-template"; // Not complete class name but it works
-    private final String ROW = "row-link";
+    private final String TEAMS = "league-teams-list"; // Not complete class name but it works
+    private final String ROW = "row";
     private String url; // League's URL
-    private List<String> teamUrls = new LinkedList<>(); // List of teams' Urls
+    private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
 
     public LeagueService(String url)
     {
         this.url = url;
     }
 
-    public void getTeamUrls()
+    public void getTeamsUrls()
     {
         try
         {
             Document doc = getHtmlSource(url);
-            Elements teamsInTable = doc.getElementsByClass(TABLE); // one element - cannot use getElementById
-            Elements rows = teamsInTable.first().getElementsByClass(ROW);
+            Element teamsContainer = doc.getElementsByClass(TEAMS).first(); // one element - cannot use getElementById
+            Elements rows = teamsContainer.getElementsByClass(ROW);
             for(Element row: rows)
             {
-                teamUrls.add(row.attr("data-url"));
+                Elements links = row.getElementsByTag("a");
+                for(Element link: links)
+                    teamsUrls.add(link.attr("href"));
             }
         }
         catch (IOException e) // TODO - obsluga
@@ -39,7 +41,7 @@ public class LeagueService extends HtmlService
 
     public void writeTeamUrls()
     {
-        for(String team: teamUrls)
+        for(String team: teamsUrls)
         {
             System.out.println(team);
         }
