@@ -45,12 +45,15 @@ public class LeaguesLinks extends HtmlService
                         break;
                     case "III Liga":
                         url = leagueUl.child(2).child(0).attr("href");
+                        getSomeUrls(url);
                         break;
                     case "CLJ":
                         url = leagueUl.child(2).child(0).attr("href");
+                        getSomeUrls(url);
                         break;
                     case "Dzieci i Młodzież":
                         url = leagueUl.child(0).child(0).attr("href");
+                        //getSomeUrlsForYouthDivisions(url);
                         break;
                 }
             }
@@ -62,10 +65,26 @@ public class LeaguesLinks extends HtmlService
         getLeagues();
     }
 
-    private static void setBasicLeague()
+    private void getSomeUrls(String url) throws IOException
     {
-
+        Document doc = getHtmlSource(url);
+        Element list = doc.getElementById("games");
+        Elements links = list.getElementsByTag("a");
+        for (Element link: links)
+        {
+            String leagueName = link.text();
+            if(!(leagueName.equals("Trzecia liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
+            {
+                leaguesUrls.add(url + link.attr("href"));
+                leaguesNames.add(leagueName);
+            }
+        }
     }
+
+    //private void getSomeUrlsForYouthDivisions(String url) throws IOException
+    //{
+    //    for(int i = 0; i<)
+    //}
 
     private void getLeagues()
     {
