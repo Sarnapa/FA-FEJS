@@ -92,8 +92,9 @@ public class LeaguesLinks extends HtmlService
     {
         for(String url: leaguesUrls)
         {
-            LeagueService league = new LeagueService(url);
-            league.getTeamsUrls();
+            Runnable league = new LeagueService(url);
+            Thread leagueThread = new Thread(league);
+            leagueThread.start();
         }
     }
 

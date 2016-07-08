@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LeagueService extends HtmlService
+public class LeagueService extends HtmlService implements Runnable
 {
     private final String TEAMS = "league-teams-list"; // Not complete class name but it works
     private final String ROW = "row";
@@ -19,7 +19,7 @@ public class LeagueService extends HtmlService
         this.url = url;
     }
 
-    public void getTeamsUrls()
+    public void run()
     {
         try
         {
@@ -32,6 +32,11 @@ public class LeagueService extends HtmlService
                 for(Element link: links)
                     teamsUrls.add(link.attr("href"));
             }
+            Thread.sleep(100);
+        }
+        catch (InterruptedException e)  // TODO - obsluga
+        {
+            e.printStackTrace();
         }
         catch (IOException e) // TODO - obsluga
         {
