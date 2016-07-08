@@ -37,9 +37,21 @@ public class LeagueService extends HtmlService
         {
             e.printStackTrace();
         }
+        getTeams();
     }
 
-    public void writeTeamUrls()
+    private void getTeams()
+    {
+        for(String url: teamsUrls)
+        {
+            TeamService team = new TeamService(url);
+            team.getPlayersUrls();
+            team.printPlayersUrls();
+        }
+    }
+
+
+    public void printTeamUrls()
     {
         for(String team: teamsUrls)
         {

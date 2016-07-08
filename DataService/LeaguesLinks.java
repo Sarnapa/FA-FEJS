@@ -51,9 +51,8 @@ public class LeaguesLinks extends HtmlService
                         url = leagueUl.child(2).child(0).attr("href");
                         getSomeUrls(url);
                         break;
-                    case "Dzieci i Młodzież":
-                        url = leagueUl.child(0).child(0).attr("href");
-                        //getSomeUrlsForYouthDivisions(url);
+                    case "Dzieci i Młodzież": // problem :(
+                        //getSomeUrlsForYouthDivisions();
                         break;
                 }
             }
@@ -81,10 +80,13 @@ public class LeaguesLinks extends HtmlService
         }
     }
 
-    //private void getSomeUrlsForYouthDivisions(String url) throws IOException
-    //{
-    //    for(int i = 0; i<)
-    //}
+    /*private void getSomeUrlsForYouthDivisions() throws IOException
+    {
+        for(int i = 1; i <= 16; ++i)
+        {
+            Document doc = getHtmlSource(url + "#" + i);
+        }
+    }*/
 
     private void getLeagues()
     {
@@ -92,11 +94,10 @@ public class LeaguesLinks extends HtmlService
         {
             LeagueService league = new LeagueService(url);
             league.getTeamsUrls();
-            league.writeTeamUrls();
         }
     }
 
-    public void writeLeaguesUrls()
+    public void printLeaguesUrls()
     {
         for(String league: leaguesUrls)
         {
@@ -104,7 +105,7 @@ public class LeaguesLinks extends HtmlService
         }
     }
 
-    public void writeLeaguesNames()
+    public void printLeaguesNames()
     {
         for(String name: leaguesNames)
         {
