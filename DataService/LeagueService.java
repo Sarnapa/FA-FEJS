@@ -51,10 +51,8 @@ public class LeagueService extends HtmlService implements Runnable
         {
             TeamService team = new TeamService(url);
             team.getPlayersUrls();
-            team.printPlayersUrls();
         }
     }
-
 
     public void printTeamUrls()
     {

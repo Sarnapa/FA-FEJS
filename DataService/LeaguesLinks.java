@@ -10,8 +10,8 @@ import java.util.List;
 public class LeaguesLinks extends HtmlService
 {
     private static final String url = "https://www.laczynaspilka.pl/";
-    private List<String> leaguesUrls = new LinkedList<String>();
-    private List<String> leaguesNames = new LinkedList<String>();
+    private List<String> leaguesUrls = new LinkedList<>();
+    private List<String> leaguesNames = new LinkedList<>();
 
     public void getLeaguesUrls()
     {

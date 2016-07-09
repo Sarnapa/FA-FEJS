@@ -12,5 +12,8 @@ public class Main {
         //LeagueService league = new LeagueService("https://www.laczynaspilka.pl/druzyny/ekstraklasa,1.html");
         //league.getTeamsUrls();
         //league.printTeamsUrls();
+        //PlayerService player = new PlayerService("https://www.laczynaspilka.pl/zawodnik/lukasz-adamczak,788487.html");
+        //player.getPlayerData();
+        //player.printPlayerData();
     }
 }
