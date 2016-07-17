@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class PlayerService extends HtmlService
 {
-    static int nextID = 1;
+    static int nextID = 2;
     private String url;
     private String firstName;
     private String lastName;

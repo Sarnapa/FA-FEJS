@@ -21,6 +21,7 @@ public class DatabaseConnection
             //System.gc();
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
             conn = DriverManager.getConnection(dbURL);
+            System.out.println(conn);
         }
         catch (Exception except)
         {
@@ -33,7 +34,8 @@ public class DatabaseConnection
         try
         {
             stmt = conn.createStatement();
-            stmt.execute("insert into PLAYERS values (" +
+            System.out.println("elo2");
+            stmt.execute("INSERT INTO APP.PLAYERS VALUES (" +
                     id + ",'" + name + "','" + surname + "')");
             stmt.close();
         }
@@ -43,6 +45,36 @@ public class DatabaseConnection
         }
     }
 
+    public static void selectPlayers()
+    {
+        try
+        {
+            stmt = conn.createStatement();
+            ResultSet results = stmt.executeQuery("SELECT * FROM APP.PLAYERS");
+            ResultSetMetaData rsmd = results.getMetaData();//column names
+            int numberCols = rsmd.getColumnCount();
+            for (int i=0; i<numberCols; i++)
+            {
+                System.out.print(rsmd.getColumnLabel(i)+"\t\t");
+            }
+
+            System.out.println("\n-------------------------------------------------");
+
+            while(results.next())
+            {
+                int id = results.getInt(1);
+                String name = results.getString(2);
+                String surname = results.getString(3);
+                System.out.println(id + "\t\t" + name + "\t\t" + surname);
+            }
+            results.close();
+            stmt.close();
+        }
+        catch (SQLException sqlExcept)
+        {
+            sqlExcept.printStackTrace();
+        }
+    }
     public static void shutdown()
     {
         try
@@ -54,6 +86,7 @@ public class DatabaseConnection
             if (conn != null)
             {
                 DriverManager.getConnection(dbURL + ";shutdown=true");
+                conn = null;
                 conn.close();
             }
         }

@@ -13,8 +13,9 @@ public class Main {
 
         database.createConnection();
         System.out.println("elo");
-        LeaguesLinks links = new LeaguesLinks(database);
-        links.getLeaguesUrls();
+        database.selectPlayers();
+        //LeaguesLinks links = new LeaguesLinks(database);
+        //links.getLeaguesUrls();
         database.shutdown();
         //TeamService team = new TeamService("https://www.laczynaspilka.pl/druzyna/gks-piast-s-a-gliwice,112982.html");
         //team.getPlayersUrls();
