@@ -9,7 +9,7 @@ import java.util.List;
 
 public class TeamService extends HtmlService
 {
-    private String url; // League's URL
+    private String url; // Team's URL
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
 
     public TeamService(String url)
@@ -19,15 +19,19 @@ public class TeamService extends HtmlService
 
     public void getPlayersUrls()
     {
-        try {
+        try
+        {
             Document doc = getHtmlSource(url);
             Element playersContainer = doc.getElementsByClass("players-list").first();
             Elements links = playersContainer.getElementsByTag("a");
-            for (Element link : links) {
+            for (Element link : links)
+            {
                 if (link.parent() == playersContainer)
                     playersUrls.add(link.attr("href"));
             }
-        } catch (IOException e) {
+        }
+        catch (IOException e)
+        {
             e.printStackTrace();
         }
         getPlayers();
