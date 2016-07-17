@@ -1,5 +1,7 @@
 package DataService;
 
+import DatabaseService.DatabaseConnection;
+import org.apache.derby.database.Database;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,10 +15,10 @@ public class LeagueService extends HtmlService implements Runnable
     private final String ROW = "row";
     private String url; // League's URL
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
-
-    public LeagueService(String url)
+    public LeagueService(String url, DatabaseConnection db)
     {
         this.url = url;
+        this.db = db;
     }
 
     public void run()
@@ -49,7 +51,7 @@ public class LeagueService extends HtmlService implements Runnable
     {
         for(String url: teamsUrls)
         {
-            TeamService team = new TeamService(url);
+            TeamService team = new TeamService(url, db);
             team.getPlayersUrls();
         }
     }

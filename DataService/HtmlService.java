@@ -1,11 +1,13 @@
 package DataService;
 
+import DatabaseService.DatabaseConnection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
 
 public class HtmlService
 {
+    protected DatabaseConnection db;
     /*private static String getUrlSource(String address) throws IOException
     {
         URL url = new URL(address);

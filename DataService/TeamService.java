@@ -1,5 +1,6 @@
 package DataService;
 
+import DatabaseService.DatabaseConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -12,9 +13,10 @@ public class TeamService extends HtmlService
     private String url; // League's URL
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
 
-    public TeamService(String url)
+    public TeamService(String url, DatabaseConnection db)
     {
         this.url = url;
+        this.db = db;
     }
 
     public void getPlayersUrls()
@@ -31,6 +33,7 @@ public class TeamService extends HtmlService
             e.printStackTrace();
         }
         getPlayers();
+        //printPlayersUrls();
     }
 
     private void getPlayers()
@@ -39,7 +42,8 @@ public class TeamService extends HtmlService
         {
             PlayerService player = new PlayerService(url);
             player.getPlayerData();
-            player.printPlayerData();
+            //player.printPlayerData();
+            player.insertIntoDB(db);
         }
     }
 

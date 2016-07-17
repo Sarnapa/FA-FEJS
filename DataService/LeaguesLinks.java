@@ -1,5 +1,6 @@
 package DataService;
 
+import DatabaseService.DatabaseConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -13,6 +14,7 @@ public class LeaguesLinks extends HtmlService
     private List<String> leaguesUrls = new LinkedList<>();
     private List<String> leaguesNames = new LinkedList<>();
 
+    public LeaguesLinks(DatabaseConnection db){ this.db = db;}
     public void getLeaguesUrls()
     {
         try
@@ -92,7 +94,7 @@ public class LeaguesLinks extends HtmlService
     {
         for(String url: leaguesUrls)
         {
-            Runnable league = new LeagueService(url);
+            Runnable league = new LeagueService(url,db);
             Thread leagueThread = new Thread(league);
             leagueThread.start();
         }
