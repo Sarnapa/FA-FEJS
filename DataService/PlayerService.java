@@ -3,7 +3,6 @@ package DataService;
 import DatabaseService.DatabaseConnection;
 import com.sun.corba.se.impl.orb.DataCollectorBase;
 import org.jsoup.nodes.Document;
-
 import javax.xml.crypto.Data;
 import java.io.IOException;
 
@@ -40,7 +39,8 @@ public class PlayerService extends HtmlService
     {
         System.out.println(firstName + " " + lastName + " " + date);
     }
-    public synchronized void insertIntoDB(DatabaseConnection database){
+    public synchronized void insertIntoDB(DatabaseConnection database)
+    {
         database.insertPlayer(nextID++,firstName,lastName,date);
     }
 }

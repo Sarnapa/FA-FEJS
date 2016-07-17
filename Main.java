@@ -1,6 +1,5 @@
 import DataService.*;
 import DatabaseService.DatabaseConnection;
-
 import java.io.PrintStream;
 
 public class Main {
@@ -10,7 +9,6 @@ public class Main {
         //PrintStream printStream = new PrintStream(new CustomOutputStream());
         //System.setOut(printStream);
         //System.setErr(printStream);
-
         database.createConnection();
         System.out.println("elo");
         database.selectPlayers();
