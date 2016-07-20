@@ -11,12 +11,12 @@ public class Main {
         //System.setOut(printStream);
         //System.setErr(printStream);
 
-        database.createConnection();
+        //database.createConnection();
         System.out.println("elo");
-        database.selectPlayers();
-        //LeaguesLinks links = new LeaguesLinks(database);
-        //links.getLeaguesUrls();
-        database.shutdown();
+        //database.selectPlayers();
+        LeaguesLinks links = new LeaguesLinks(database);
+        links.getLeaguesUrls();
+        //database.shutdown();
         //TeamService team = new TeamService("https://www.laczynaspilka.pl/druzyna/gks-piast-s-a-gliwice,112982.html");
         //team.getPlayersUrls();
         //team.printPlayersUrls();

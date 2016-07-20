@@ -9,7 +9,7 @@ import java.io.IOException;
 
 public class PlayerService extends HtmlService
 {
-    static int nextID = 2;
+    static int nextID = 0;
     private String url;
     private String firstName;
     private String lastName;
@@ -41,6 +41,8 @@ public class PlayerService extends HtmlService
         System.out.println(firstName + " " + lastName + " " + date);
     }
     public synchronized void insertIntoDB(DatabaseConnection database){
+        database.createConnection();
         database.insertPlayer(nextID++,firstName,lastName,date);
+        database.shutdown();
     }
 }

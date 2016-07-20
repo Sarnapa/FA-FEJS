@@ -1,11 +1,6 @@
 package DatabaseService;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.ResultSetMetaData;
+import java.sql.*;
 
 
 public class DatabaseConnection
@@ -14,11 +9,10 @@ public class DatabaseConnection
     private static Connection conn = null;
     private static Statement stmt = null;
 
-    public static void createConnection()
+    public static synchronized void createConnection()
     {
         try
         {
-            //System.gc();
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
             conn = DriverManager.getConnection(dbURL);
             System.out.println(conn);
@@ -33,11 +27,13 @@ public class DatabaseConnection
     {
         try
         {
-            stmt = conn.createStatement();
-            System.out.println("elo2");
-            stmt.execute("INSERT INTO APP.PLAYERS VALUES (" +
-                    id + ",'" + name + "','" + surname + "')");
-            stmt.close();
+            System.out.println(id + " " + name + " " + surname);
+            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO APP.PLAYERS VALUES (?,?,?)");
+            pstmt.setInt(1,id);
+            pstmt.setString(2,name);
+            pstmt.setString(3,surname);
+            pstmt.execute();
+            pstmt.close();
         }
         catch (SQLException sqlExcept)
         {
@@ -75,7 +71,7 @@ public class DatabaseConnection
             sqlExcept.printStackTrace();
         }
     }
-    public static void shutdown()
+    public static synchronized void shutdown()
     {
         try
         {
