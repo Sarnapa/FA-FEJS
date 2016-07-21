@@ -23,7 +23,7 @@ public class DatabaseConnection
         }
     }
 
-    public static synchronized void insertPlayer(int id, String name, String surname, String dateOfBirth)
+    public static synchronized boolean insertPlayer(int id, String name, String surname, String dateOfBirth)
     {
         try
         {
@@ -34,10 +34,12 @@ public class DatabaseConnection
             pstmt.setString(3,surname);
             pstmt.execute();
             pstmt.close();
+            return true;
         }
         catch (SQLException sqlExcept)
         {
             sqlExcept.printStackTrace();
+            return false;
         }
     }
 
@@ -82,8 +84,9 @@ public class DatabaseConnection
             if (conn != null)
             {
                 DriverManager.getConnection(dbURL + ";shutdown=true");
-                conn = null;
+                //System.gc();
                 conn.close();
+                conn = null;
             }
         }
         catch (SQLException sqlExcept)

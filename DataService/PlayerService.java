@@ -41,8 +41,13 @@ public class PlayerService extends HtmlService
         System.out.println(firstName + " " + lastName + " " + date);
     }
     public synchronized void insertIntoDB(DatabaseConnection database){
-        database.createConnection();
-        database.insertPlayer(nextID++,firstName,lastName,date);
-        database.shutdown();
+        DatabaseConnection db_tmp = new DatabaseConnection();
+        db_tmp.createConnection();
+        if(!db_tmp.insertPlayer(nextID++,firstName,lastName,date)) {
+            db_tmp = new DatabaseConnection();
+            db_tmp.createConnection();
+            db_tmp.insertPlayer(nextID++, firstName, lastName, date);
+        }
+        db_tmp.shutdown();
     }
 }
