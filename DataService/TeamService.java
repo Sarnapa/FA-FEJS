@@ -10,11 +10,14 @@ import java.util.List;
 
 public class TeamService extends HtmlService
 {
+    private String leagueName; // League's name
     private String url; // Team's URL
+    private String name; // Team's name
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
 
-    public TeamService(String url, DatabaseConnection db)
+    public TeamService(String leagueName, String url, DatabaseConnection db)
     {
+        this.leagueName = leagueName;
         this.url = url;
         this.db = db;
     }
@@ -25,6 +28,8 @@ public class TeamService extends HtmlService
         {
             Document doc = getHtmlSource(url);
             Element playersContainer = doc.getElementsByClass("players-list").first();
+            name = doc.getElementsByClass("left").get(1).text();
+            name = name.substring(0, name.lastIndexOf('|')).toUpperCase();
             Elements links = playersContainer.getElementsByTag("a");
             for (Element link : links)
             {
@@ -37,17 +42,16 @@ public class TeamService extends HtmlService
             e.printStackTrace();
         }
         getPlayers();
-        //printPlayersUrls();
     }
 
     private void getPlayers()
     {
         for(String url: playersUrls)
         {
-            PlayerService player = new PlayerService(url);
+            PlayerService player = new PlayerService(leagueName, name, url);
             player.getPlayerData();
-            //player.printPlayerData();
-            player.insertIntoDB(db);
+            player.printPlayerData();
+            //player.insertIntoDB(db);
         }
     }
 

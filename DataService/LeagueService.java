@@ -13,10 +13,13 @@ public class LeagueService extends HtmlService implements Runnable
 {
     private final String TEAMS = "league-teams-list"; // Not complete class name but it works
     private final String ROW = "row";
+    private String name; // League's name
     private String url; // League's URL
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
-    public LeagueService(String url, DatabaseConnection db)
+
+    public LeagueService(String name, String url, DatabaseConnection db)
     {
+        this.name = name;
         this.url = url;
         this.db = db;
     }
@@ -51,7 +54,7 @@ public class LeagueService extends HtmlService implements Runnable
     {
         for(String url: teamsUrls)
         {
-            TeamService team = new TeamService(url, db);
+            TeamService team = new TeamService(name, url, db);
             team.getPlayersUrls();
         }
     }

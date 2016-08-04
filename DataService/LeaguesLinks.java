@@ -5,14 +5,14 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class LeaguesLinks extends HtmlService
 {
     private static final String url = "https://www.laczynaspilka.pl/";
-    private List<String> leaguesUrls = new LinkedList<>();
-    private List<String> leaguesNames = new LinkedList<>();
+    private HashMap<String, String> leaguesMap = new HashMap<String, String>();// <name, url>
+    //private List<String> leaguesUrls = new LinkedList<>();
+    //private List<String> leaguesNames = new ArrayList<>();
 
     public LeaguesLinks(DatabaseConnection db){ this.db = db;}
     public void getLeaguesUrls()
@@ -32,18 +32,21 @@ public class LeaguesLinks extends HtmlService
                 {
                     case "Ekstraklasa":
                         url = leagueUl.child(2).child(0).attr("href");
-                        leaguesUrls.add(url);
-                        leaguesNames.add(leagueName);
+                        leaguesMap.put(leagueName, url);
+                        //leaguesUrls.add(url);
+                        //leaguesNames.add(leagueName);
                         break;
                     case "I Liga":
                         url = leagueUl.child(2).child(0).attr("href");
-                        leaguesUrls.add(url);
-                        leaguesNames.add(leagueName);
+                        leaguesMap.put(leagueName, url);
+                        //leaguesUrls.add(url);
+                        //leaguesNames.add(leagueName);
                         break;
                     case "II Liga":
                         url = leagueUl.child(2).child(0).attr("href");
-                        leaguesUrls.add(url);
-                        leaguesNames.add(leagueName);
+                        leaguesMap.put(leagueName, url);
+                        //leaguesUrls.add(url);
+                        //leaguesNames.add(leagueName);
                         break;
                     case "III Liga":
                         url = leagueUl.child(2).child(0).attr("href");
@@ -73,11 +76,12 @@ public class LeaguesLinks extends HtmlService
         Elements links = list.getElementsByTag("a");
         for (Element link: links)
         {
-            String leagueName = link.text();
-            if(!(leagueName.equals("Trzecia liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
+            String leagueName = link.text().toUpperCase();
+            if(!(leagueName.equals("Trzecia Liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
             {
-                leaguesUrls.add(url + link.attr("href"));
-                leaguesNames.add(leagueName);
+                leaguesMap.put(leagueName, url + link.attr("href"));
+                //leaguesUrls.add(url + link.attr("href"));
+                //leaguesNames.add(leagueName);
             }
         }
     }
@@ -92,27 +96,34 @@ public class LeaguesLinks extends HtmlService
 
     private void getLeagues()
     {
-        for(String url: leaguesUrls)
+        Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
+        while(keySetIterator.hasNext())
         {
-            Runnable league = new LeagueService(url,db);
+            String name = keySetIterator.next();
+            String url = leaguesMap.get(name);
+            Runnable league = new LeagueService(name, url, db);
             Thread leagueThread = new Thread(league);
             leagueThread.start();
         }
     }
 
-    public void printLeaguesUrls()
+    public void printLeaguesNames()
     {
-        for(String league: leaguesUrls)
+        Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
+        while(keySetIterator.hasNext())
         {
-            System.out.println(league);
+            System.out.println(keySetIterator.next());
         }
     }
 
-    public void printLeaguesNames()
+    public void printLeaguesUrls()
     {
-        for(String name: leaguesNames)
+        Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
+        while(keySetIterator.hasNext())
         {
-            System.out.println(name);
+            String name = keySetIterator.next();
+            String url = leaguesMap.get(name);
+            System.out.println(url);
         }
     }
 }
