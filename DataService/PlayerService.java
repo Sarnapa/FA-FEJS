@@ -32,7 +32,7 @@ public class PlayerService extends HtmlService
             firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
             lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
             date = doc.getElementsByClass("light").first().nextElementSibling().text();
-            getStats(reportsUrl);
+            getStats(name, reportsUrl);
         }
         catch (IOException e) // TODO - obsluga
         {
@@ -40,7 +40,7 @@ public class PlayerService extends HtmlService
         }
     }
 
-    private void getStats(String url) throws IOException
+    private void getStats(String name, String url) throws IOException
     {
         Document doc = getHtmlSource(url);
         Elements articles = doc.getElementsByClass("season__game");
@@ -52,7 +52,33 @@ public class PlayerService extends HtmlService
                 String minutesText = article.getElementsByClass("season__game-time").first().text();
                 if(!minutesText.equals(""))
                 {
+                    minutesText = minutesText.substring(7);
+                    int begin = Integer.parseInt(minutesText.substring(0, minutesText.lastIndexOf('-')));
+                    int end = Integer.parseInt(minutesText.substring(minutesText.lastIndexOf('-') + 1, minutesText.length()));
+                    if(begin == 0)
+                        ++firstSquad;
                     ++apps;
+                    minutes = minutes + (end - begin);
+                    Elements infoDivs = article.getElementsByClass("info");
+                    for(Element div: infoDivs)
+                    {
+                        if(div.text().contains(name))
+                        {
+                            String className = div.child(0).className();
+                            switch(className)
+                            {
+                                case "i-goal-small":
+                                    ++goals;
+                                    break;
+                                case "i-card-yellow card--small":
+                                    ++yellowCards;
+                                    break;
+                                case "i-card-red card--small":
+                                    ++redCards;
+                                    break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -60,7 +86,8 @@ public class PlayerService extends HtmlService
 
     public void printPlayerData()
     {
-        System.out.println(firstName + " " + lastName + " " + date + " " + teamName + " " + apps);
+        System.out.println(firstName + " " + lastName + " " + date + " " + teamName + " " + apps + " " +
+                firstSquad + " " + minutes + " " + goals + " " + yellowCards + " " + redCards);
     }
 
     public synchronized void insertIntoDB(DatabaseConnection database)
