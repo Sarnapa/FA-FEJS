@@ -14,7 +14,7 @@ public class LeaguesLinks extends HtmlService
     //private List<String> leaguesUrls = new LinkedList<>();
     //private List<String> leaguesNames = new ArrayList<>();
 
-    public LeaguesLinks(DatabaseConnection db){ this.db = db;}
+    public LeaguesLinks(){}
     public void getLeaguesUrls()
     {
         try
@@ -101,7 +101,7 @@ public class LeaguesLinks extends HtmlService
         {
             String name = keySetIterator.next();
             String url = leaguesMap.get(name);
-            Runnable league = new LeagueService(name, url, db);
+            Runnable league = new LeagueService(name, url);
             Thread leagueThread = new Thread(league);
             leagueThread.start();
         }

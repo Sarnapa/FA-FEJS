@@ -14,12 +14,12 @@ public class TeamService extends HtmlService
     private String url; // Team's URL
     private String name; // Team's name
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
+    private List<PlayerService> players = new ArrayList<>(); // List of players' records
 
-    public TeamService(String leagueName, String url, DatabaseConnection db)
+    public TeamService(String leagueName, String url)
     {
         this.leagueName = leagueName;
         this.url = url;
-        this.db = db;
     }
 
     public void getPlayersUrls()
@@ -29,7 +29,7 @@ public class TeamService extends HtmlService
             Document doc = getHtmlSource(url);
             Element playersContainer = doc.getElementsByClass("players-list").first();
             name = doc.getElementsByClass("left").get(1).text();
-            name = name.substring(0, name.lastIndexOf('|')).toUpperCase();
+            name = name.substring(0, name.lastIndexOf('|'));
             Elements links = playersContainer.getElementsByTag("a");
             for (Element link : links)
             {
@@ -51,8 +51,25 @@ public class TeamService extends HtmlService
             PlayerService player = new PlayerService(leagueName, name, url);
             player.getPlayerData();
             player.printPlayerData();
-            //player.insertIntoDB(db);
+            players.add(player);
+            //updateDB();
         }
+    }
+
+    public synchronized void updateDB()
+    {
+        DatabaseConnection database = new DatabaseConnection();
+        database.createConnection();
+        for(PlayerService player: players)
+        {
+            database.updatePlayer(player);
+            /*while(!database.updatePlayer(player))
+            {
+                database = new DatabaseConnection();
+                database.createConnection();
+            }*/
+        }
+        database.shutdown();
     }
 
     public void printPlayersUrls()

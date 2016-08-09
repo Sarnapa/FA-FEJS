@@ -7,19 +7,86 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import javax.xml.crypto.Data;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class PlayerService extends HtmlService
 {
     static int nextID = 0;
     private String url;
-    private String firstName, lastName, date, teamName, leagueName;
+    private int ID;
+    private String firstName, lastName, teamName, leagueName;
+    private Date date;
     private int apps, firstSquad, minutes, goals, yellowCards, redCards;
+
+    public int getID()
+    {
+        return ID;
+    }
+
+    public String getFirstName()
+    {
+        return firstName;
+    }
+
+    public String getLastName()
+    {
+        return lastName;
+    }
+
+    public String getTeamName()
+    {
+        return teamName;
+    }
+
+    public String getLeagueName()
+    {
+        return leagueName;
+    }
+
+    public Date getDate()
+    {
+        return date;
+    }
+
+    public int getApps()
+    {
+        return apps;
+    }
+
+    public int getFirstSquad()
+    {
+        return firstSquad;
+    }
+
+    public int getMinutes()
+    {
+        return minutes;
+    }
+
+    public int getGoals()
+    {
+        return goals;
+    }
+
+    public int getYellowCards()
+    {
+        return yellowCards;
+    }
+
+    public int getRedCards()
+    {
+        return redCards;
+    }
 
     public PlayerService(String leagueName, String teamName, String url)
     {
         this.leagueName = leagueName;
         this.teamName = teamName;
         this.url = url;
+        ID = Integer.parseInt(url.substring(url.lastIndexOf(',') + 1,url.lastIndexOf('.')));
     }
 
     public void getPlayerData()
@@ -29,10 +96,48 @@ public class PlayerService extends HtmlService
             Document doc = getHtmlSource(url);
             String name = doc.getElementsByClass("header--white").first().child(0).text();
             String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
-            firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
-            lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
-            date = doc.getElementsByClass("light").first().nextElementSibling().text();
+            firstName = name.substring(0, name.lastIndexOf(' ')).toLowerCase(); // begin index - inclusive, end index - exclusive
+            firstName = firstName.substring(0,1).toUpperCase() + firstName.substring(1);
+            lastName = name.substring(name.lastIndexOf(' ') + 1, name.length()).toLowerCase();
+            lastName = lastName.substring(0,1).toUpperCase() + lastName.substring(1);
+            String dateText = doc.getElementsByClass("light").first().nextElementSibling().text();
+            DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
+            date = format.parse(dateText);
             getStats(name, reportsUrl);
+        }
+        catch (ParseException e) // TODO - obsluga
+        {
+            e.printStackTrace();
+        }
+        /*catch (NullPointerException e) // GORNIK KONIN SYNDROME
+        {
+            try
+            {
+                Document doc = getHtmlSource(url);
+                String name = doc.getElementsByClass("cf").first().child(0).text();
+                String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
+                firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
+                lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
+                String dateText = doc.getElementsByClass("light").first().nextElementSibling().text();
+                DateFormat format = new SimpleDateFormat("dd.MM.yyy");
+                date = format.parse(dateText);
+                getStats(name, reportsUrl);
+                e.printStackTrace();
+            }
+            catch(ParseException parseException)
+            {
+
+            }
+            catch(IOException IOe)
+            {
+                IOe.printStackTrace();
+
+            }
+        }*/
+        catch(NullPointerException e)
+        {
+            System.out.println(leagueName + teamName);
+            e.printStackTrace();
         }
         catch (IOException e) // TODO - obsluga
         {
@@ -86,20 +191,7 @@ public class PlayerService extends HtmlService
 
     public void printPlayerData()
     {
-        System.out.println(firstName + " " + lastName + " " + date + " " + teamName + " " + apps + " " +
+        System.out.println(ID + " " + firstName + " " + lastName + " " + date + " " + teamName + " " + apps + " " +
                 firstSquad + " " + minutes + " " + goals + " " + yellowCards + " " + redCards);
-    }
-
-    public synchronized void insertIntoDB(DatabaseConnection database)
-    {
-        DatabaseConnection db_tmp = new DatabaseConnection();
-        db_tmp.createConnection();
-        if(!db_tmp.insertPlayer(nextID++,firstName,lastName,date))
-        {
-            db_tmp = new DatabaseConnection();
-            db_tmp.createConnection();
-            db_tmp.insertPlayer(nextID++, firstName, lastName, date);
-        }
-        db_tmp.shutdown();
     }
 }

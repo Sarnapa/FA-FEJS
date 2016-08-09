@@ -1,13 +1,21 @@
 package DataService;
 
 import DatabaseService.DatabaseConnection;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
 
 public class HtmlService
 {
-    protected DatabaseConnection db;
+    // To get HTML code of page
+    public static Document getHtmlSource(String address) throws IOException
+    {
+        Connection conn = Jsoup.connect(address);
+        conn.timeout(10 * 1000);
+        return conn.get();
+    }
+
     /*private static String getUrlSource(String address) throws IOException
     {
         URL url = new URL(address);
@@ -21,12 +29,6 @@ public class HtmlService
 
         return source.toString();
     }*/
-
-    // To get HTML code of page
-    public static Document getHtmlSource(String address) throws IOException
-    {
-        return Jsoup.connect(address).get();
-    }
 
     /*private static void writeFromSource(String toFind, String source){
         String tmp;

@@ -1,11 +1,12 @@
 package DatabaseService;
 
 import java.sql.*;
+import DataService.PlayerService;
 
 
 public class DatabaseConnection
 {
-    private static String dbURL = "jdbc:derby:./DatabaseService/DB;create=true;user=fafejs;password=fafejs";
+    private static String dbURL = "jdbc:derby:./Database/DB;create=true;user=fafejs;password=fafejs";
     private static Connection conn = null;
     private static Statement stmt = null;
 
@@ -13,26 +14,39 @@ public class DatabaseConnection
     {
         try
         {
-            Class.forName("org.apache.derby.jdbc.EmbeddedDriver");
-            conn = DriverManager.getConnection(dbURL);
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver"); // load the driver
+            conn = DriverManager.getConnection(dbURL); // make Derby JDBC connection
             System.out.println(conn);
         }
-        catch (Exception except)
+        catch (Exception except) // TODO - obsluga
         {
             except.printStackTrace();
         }
     }
 
-    public static synchronized boolean insertPlayer(int id, String name, String surname, String dateOfBirth)
+    public static synchronized boolean updatePlayer(PlayerService player)
     {
         try
         {
-            System.out.println(id + " " + name + " " + surname);
-            PreparedStatement pstmt = conn.prepareStatement("INSERT INTO APP.PLAYERS VALUES (?,?,?)");
-            pstmt.setInt(1,id);
-            pstmt.setString(2,name);
-            pstmt.setString(3,surname);
-            pstmt.execute();
+            int ID = player.getID();
+            String firstName = player.getFirstName();
+            String lastName = player.getLastName();
+            Date birthdate =  new java.sql.Date(player.getDate().getTime());
+            System.out.println(ID + " " + firstName + " " + lastName);
+            PreparedStatement pstmt = conn.prepareStatement("UPDATE APP.PLAYERS SET FIRST_NAME = ?, LAST_NAME = ?, BIRTHDATE = ? WHERE ID = ?");
+            pstmt.setString(1,firstName);
+            pstmt.setString(2,lastName);
+            pstmt.setDate(3,birthdate);
+            pstmt.setInt(4,ID);
+            if(pstmt.executeUpdate() < 1)
+            {
+                pstmt = conn.prepareStatement("INSERT INTO APP.PLAYERS VALUES (?,?,?,?)");
+                pstmt.setInt(1, ID);
+                pstmt.setString(2, firstName);
+                pstmt.setString(3, lastName);
+                pstmt.setDate(4, birthdate);
+                pstmt.execute();
+            }
             pstmt.close();
             return true;
         }
