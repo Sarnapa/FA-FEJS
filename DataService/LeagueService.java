@@ -1,7 +1,5 @@
 package DataService;
 
-import DatabaseService.DatabaseConnection;
-import org.apache.derby.database.Database;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -11,15 +9,12 @@ import java.util.List;
 
 public class LeagueService extends HtmlService implements Runnable
 {
-    private final String TEAMS = "league-teams-list"; // Not complete class name but it works
-    private final String ROW = "row";
     private String name; // League's name
     private String url; // League's URL
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
 
-    public LeagueService(String name, String url)
+    public LeagueService(String url)
     {
-        this.name = name;
         this.url = url;
     }
 
@@ -28,8 +23,9 @@ public class LeagueService extends HtmlService implements Runnable
         try
         {
             Document doc = getHtmlSource(url);
-            Element teamsContainer = doc.getElementsByClass(TEAMS).first(); // one element - cannot use getElementById
-            Elements rows = teamsContainer.getElementsByClass(ROW);
+            name = doc.getElementsByClass("show-drop").first().text();
+            Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
+            Elements rows = teamsContainer.getElementsByClass("row");
             for(Element row: rows)
             {
                 Elements links = row.getElementsByTag("a");
@@ -65,5 +61,10 @@ public class LeagueService extends HtmlService implements Runnable
         {
             System.out.println(team);
         }
+    }
+
+    public void printLeagueName()
+    {
+        System.out.println(name);
     }
 }

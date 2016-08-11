@@ -29,7 +29,7 @@ public class TeamService extends HtmlService
             Document doc = getHtmlSource(url);
             Element playersContainer = doc.getElementsByClass("players-list").first();
             name = doc.getElementsByClass("left").get(1).text();
-            name = name.substring(0, name.lastIndexOf('|'));
+            name = name.substring(0, name.lastIndexOf('|')).toUpperCase();
             Elements links = playersContainer.getElementsByTag("a");
             for (Element link : links)
             {
@@ -50,10 +50,10 @@ public class TeamService extends HtmlService
         {
             PlayerService player = new PlayerService(leagueName, name, url);
             player.getPlayerData();
-            player.printPlayerData();
+            //player.printPlayerData();
             players.add(player);
-            //updateDB();
         }
+        updateDB();
     }
 
     public synchronized void updateDB()
@@ -62,12 +62,12 @@ public class TeamService extends HtmlService
         database.createConnection();
         for(PlayerService player: players)
         {
-            database.updatePlayer(player);
-            /*while(!database.updatePlayer(player))
+            //database.updatePlayer(player);
+            while(!database.updatePlayer(player))
             {
                 database = new DatabaseConnection();
                 database.createConnection();
-            }*/
+            }
         }
         database.shutdown();
     }

@@ -1,11 +1,8 @@
 package DataService;
 
-import DatabaseService.DatabaseConnection;
-import com.sun.corba.se.impl.orb.DataCollectorBase;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import javax.xml.crypto.Data;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -109,35 +106,20 @@ public class PlayerService extends HtmlService
         {
             e.printStackTrace();
         }
-        /*catch (NullPointerException e) // GORNIK KONIN SYNDROME
+        catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website
         {
             try
             {
                 Document doc = getHtmlSource(url);
-                String name = doc.getElementsByClass("cf").first().child(0).text();
-                String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
+                String name = doc.getElementsByClass("cf").get(6).child(0).text();
+                name = name.substring(0, name.lastIndexOf('|') - 1); // - 1 because of 1 space
                 firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
                 lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
-                String dateText = doc.getElementsByClass("light").first().nextElementSibling().text();
-                DateFormat format = new SimpleDateFormat("dd.MM.yyy");
-                date = format.parse(dateText);
-                getStats(name, reportsUrl);
-                e.printStackTrace();
             }
-            catch(ParseException parseException)
-            {
-
-            }
-            catch(IOException IOe)
+            catch(IOException IOe) // TODO - obsluga
             {
                 IOe.printStackTrace();
-
             }
-        }*/
-        catch(NullPointerException e)
-        {
-            System.out.println(leagueName + teamName);
-            e.printStackTrace();
         }
         catch (IOException e) // TODO - obsluga
         {
