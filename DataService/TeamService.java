@@ -65,8 +65,8 @@ public class TeamService extends HtmlService
             //database.updatePlayer(player);
             while(!database.updatePlayer(player))
             {
-                database = new DatabaseConnection();
-                database.createConnection();
+                //database = new DatabaseConnection();
+                database.recreateConnection();
             }
         }
         database.shutdown();

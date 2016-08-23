@@ -6,7 +6,7 @@ import DataService.PlayerService;
 public class DatabaseConnection
 {
     private static String dbURL = "jdbc:derby:./Database/DB;create=true;user=fafejs;password=fafejs";
-    private Connection conn = null;
+    private Connection conn;
 
     public synchronized void createConnection()
     {
@@ -20,6 +20,21 @@ public class DatabaseConnection
         {
             except.printStackTrace();
         }
+    }
+
+    public synchronized void recreateConnection()
+    {
+        try
+        {
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
+            conn = DriverManager.getConnection(dbURL); // make Derby JDBC connection
+            System.out.println("Reconnect:" + conn);
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 
     public synchronized boolean updatePlayer(PlayerService player)
@@ -48,6 +63,7 @@ public class DatabaseConnection
         }
         catch (SQLException sqlExcept)
         {
+            //shutdown();
             sqlExcept.printStackTrace();
             return false;
         }
@@ -148,10 +164,7 @@ public class DatabaseConnection
         String resultTeam = "";
         while(result.next())
             resultTeam = result.getString(1);
-        if(resultTeam.equals(team))
-            return true;
-        else
-            return false;
+        return resultTeam.equals(team);
     }
 
     private void insertPlayerToLeagueTable(String league, int ID, String team, int apps, int firstSquad, int minutes, int goals, int yellowCards, int redCards) throws SQLException
@@ -204,17 +217,9 @@ public class DatabaseConnection
     {
         try
         {
-            /*if (stmt != null)
-            {
-                stmt.close();
-            }*/
-            if (conn != null)
-            {
-                DriverManager.getConnection(dbURL + ";shutdown=true");
-                //System.gc();
-                conn.close();
-                conn = null;
-            }
+            DriverManager.getConnection(dbURL + ";shutdown=true");
+            conn.close();
+            //System.gc();
         }
         catch (SQLException sqlExcept)
         {
