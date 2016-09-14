@@ -2,6 +2,7 @@ package DatabaseService;
 
 import java.sql.*;
 import DataService.PlayerService;
+import Layout.LeagueView;
 
 public class DatabaseConnection
 {
@@ -213,6 +214,28 @@ public class DatabaseConnection
             sqlExcept.printStackTrace();
         }
     }
+
+    public void updateView(LeagueView view, String leagueName){
+        try
+        {
+            Statement stmt = conn.createStatement();
+            System.out.println("SELECT * FROM APP.\"" + leagueName + "\"");
+            ResultSet results = stmt.executeQuery("SELECT * FROM APP.\"" + leagueName + "\"");
+
+            while(results.next())
+            {
+
+                view.addToPlayersList(results.getInt(1)+" "+results.getString(2)+" "+results.getInt(3)+" "+results.getInt(4)+" "+results.getInt(5)+" "+results.getInt(6)+" "+results.getInt(7)+" "+results.getInt(8));
+            }
+            results.close();
+            stmt.close();
+        }
+        catch (SQLException sqlExcept)
+        {
+            sqlExcept.printStackTrace();
+        }
+    }
+
     public synchronized void shutdown()
     {
         try

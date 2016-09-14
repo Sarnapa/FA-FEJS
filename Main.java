@@ -1,12 +1,16 @@
-import DataService.*;
-import DatabaseService.DatabaseConnection;
+import Layout.*;
 
 public class Main {
+
     public static void main(String [] args)
     {
         System.out.println("elo");
-        LeaguesLinks links = new LeaguesLinks();
-        links.getLeaguesUrls();
+        LayoutInit layout = new LayoutInit();
+
+
+        //LeaguesLinks links = new LeaguesLinks();
+        //links.getLeaguesUrls();
+
         //PlayerService player = new PlayerService("Ekstraklasa", "ZAGŁĘBIE LUBIN", "https://www.laczynaspilka.pl/zawodnik/maciej-dabrowski,287974.html");
         //PlayerService player = new PlayerService("Ekstraklasa","LEGIA WARSZAWA S.A.","https://www.laczynaspilka.pl/zawodnik/michal-kucharczyk,93963.html");
         //PlayerService player = new PlayerService("Ekstraklasa","LEGIA WARSZAWA S.A.","https://www.laczynaspilka.pl/zawodnik/mihail-aleksandrov,1212442.html");
