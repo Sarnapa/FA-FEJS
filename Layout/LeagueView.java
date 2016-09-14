@@ -1,6 +1,7 @@
 package Layout;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
@@ -10,20 +11,23 @@ import java.awt.event.ActionListener;
 public class LeagueView extends JFrame {
 
     private JComboBox leagueChoice;
-    private DefaultListModel model;
-    private JList playersList;
     private JButton updateButton;
     private JButton pdfButton;
     private JPanel rootPanel;
     private JPanel leagueChoicePanel;
     private JScrollPane playerListPane;
     private JPanel buttonPanel;
+    private JTable playersTable;
+    private DefaultTableModel tableModel;
 
     //private String[] leagues = {"CENTRALNA LIGA JUNIORÓW GR. WSCHODNIA", "CENTRALNA LIGA JUNIORÓW GR. ZACHODNIA", "DRUGA LIGA", "EKSTRAKLASA", "TRZECIA LIGA GRUPA I", "TRZECIA LIGA GRUPA II", "TRZECIA LIGA GRUPA III", "TRZECIA LIGA GRUPA IV"};
+    //private String[] columnNames ={"ID", "FIRST_NAME", "LAST_NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST_SQUAD", "MINUTES", "GOALS", "YELLOW_CARDS", "RED_CARDS"};
 
     private void createUIComponents() {
-        model = new DefaultListModel();
-        playersList = new JList(model);
+        String[] columnNames ={"ID", "FIRST_NAME", "LAST_NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST_SQUAD", "MINUTES", "GOALS", "YELLOW_CARDS", "RED_CARDS"};
+        tableModel = new DefaultTableModel(0, columnNames.length);
+        tableModel.setColumnIdentifiers(columnNames);
+        playersTable = new JTable(tableModel);
     }
 
     public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton){
@@ -34,11 +38,11 @@ public class LeagueView extends JFrame {
         return leagueChoice.getSelectedItem().toString();
     }
 
-    public void clearList(){
-        model.clear();
+    public void clearTable(){
+        tableModel.setRowCount(0);
     }
-    public void addToPlayersList(String s){
-        model.addElement(s);
+    public void addToPlayersTable(String[] s){
+        tableModel.addRow(s);
     }
 
     public void fillLeagueChoice(){
@@ -53,20 +57,11 @@ public class LeagueView extends JFrame {
 
         leagueChoice.setSelectedIndex(-1);
     }
-    private void fillList(){
-
-        String s = new String("s");
-        for(int i = 0; i<10; i++){
-            s = s + Integer.toString(i);
-            model.addElement(s);
-        }
-    }
 
     public LeagueView(){
         pack();
         setContentPane(rootPanel);
         fillLeagueChoice();
-        //fillList();
         initGUI();
     }
 

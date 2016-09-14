@@ -219,13 +219,19 @@ public class DatabaseConnection
         try
         {
             Statement stmt = conn.createStatement();
-            System.out.println("SELECT * FROM APP.\"" + leagueName + "\"");
-            ResultSet results = stmt.executeQuery("SELECT * FROM APP.\"" + leagueName + "\"");
+            //System.out.println("SELECT * FROM APP.\"" + leagueName + "\"");
+            System.out.println("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\"");
+            //ResultSet results = stmt.executeQuery("SELECT * FROM APP.\"" + leagueName + "\"");
+            ResultSet results = stmt.executeQuery("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\"");
 
             while(results.next())
             {
+                String[] temp = {Integer.toString(results.getInt(1)), results.getString(2), results.getString(3), results.getString(4), results.getString(5),
+                        Integer.toString(results.getInt(6)), Integer.toString(results.getInt(7)), Integer.toString(results.getInt(8)), Integer.toString(results.getInt(9)),
+                        Integer.toString(results.getInt(10)), Integer.toString(results.getInt(11))};
 
-                view.addToPlayersList(results.getInt(1)+" "+results.getString(2)+" "+results.getInt(3)+" "+results.getInt(4)+" "+results.getInt(5)+" "+results.getInt(6)+" "+results.getInt(7)+" "+results.getInt(8));
+                //view.addToPlayersList(results.getInt(1)+" "+results.getString(2)+" "+results.getInt(3)+" "+results.getInt(4)+" "+results.getInt(5)+" "+results.getInt(6)+" "+results.getInt(7)+" "+results.getInt(8));
+                view.addToPlayersTable(temp);
             }
             results.close();
             stmt.close();

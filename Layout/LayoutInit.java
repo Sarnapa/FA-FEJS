@@ -12,7 +12,7 @@ public class LayoutInit{
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            leagueView.clearList();
+            leagueView.clearTable();
             System.out.println(leagueView.getLeagueChoiceSelected());
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected());
         }
