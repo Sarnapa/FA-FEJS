@@ -215,14 +215,19 @@ public class DatabaseConnection
         }
     }
 
-    public void updateView(LeagueView view, String leagueName){
+    public void updateView(LeagueView view, String leagueName, String orderBy, boolean asc){
         try
         {
             Statement stmt = conn.createStatement();
-            //System.out.println("SELECT * FROM APP.\"" + leagueName + "\"");
-            System.out.println("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\"");
-            //ResultSet results = stmt.executeQuery("SELECT * FROM APP.\"" + leagueName + "\"");
-            ResultSet results = stmt.executeQuery("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\"");
+            ResultSet results;
+            if(orderBy.equals(""))
+                results = stmt.executeQuery("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\"");
+            else {
+                if(asc)
+                    results = stmt.executeQuery("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\" ORDER BY " + orderBy + " ASC");
+                else
+                    results = stmt.executeQuery("SELECT * FROM APP.PLAYERS NATURAL JOIN APP.\"" + leagueName + "\" ORDER BY " + orderBy + " DESC");
+            }
 
             while(results.next())
             {

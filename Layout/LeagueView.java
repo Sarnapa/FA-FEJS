@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
 
 /**
  * Created by Pawel on 06-Sep-16.
@@ -34,6 +35,11 @@ public class LeagueView extends JFrame {
         leagueChoice.addActionListener(listenerForLeagueChoiceButton);
     }
 
+    public void addTableHeaderListener(MouseAdapter listenerForTableHeader){
+        playersTable.getTableHeader().addMouseListener(listenerForTableHeader);
+
+    }
+
     public String getLeagueChoiceSelected() {
         return leagueChoice.getSelectedItem().toString();
     }
@@ -44,6 +50,7 @@ public class LeagueView extends JFrame {
     public void addToPlayersTable(String[] s){
         tableModel.addRow(s);
     }
+    public JTable getPlayersTable(){ return playersTable; }
 
     public void fillLeagueChoice(){
         leagueChoice.addItem("CENTRALNA LIGA JUNIOROW GR. WSCHODNIA");
