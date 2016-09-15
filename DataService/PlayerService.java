@@ -93,9 +93,9 @@ public class PlayerService extends HtmlService
             Document doc = getHtmlSource(url);
             String name = doc.getElementsByClass("header--white").first().child(0).text();
             String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
-            firstName = name.substring(0, name.lastIndexOf(' ')).toLowerCase(); // begin index - inclusive, end index - exclusive
+            firstName = name.substring(0, name.indexOf(' ')).toLowerCase(); // begin index - inclusive, end index - exclusive
             firstName = firstName.substring(0,1).toUpperCase() + firstName.substring(1);
-            lastName = name.substring(name.lastIndexOf(' ') + 1, name.length()).toLowerCase();
+            lastName = name.substring(name.indexOf(' ') + 1, name.length()).toLowerCase();
             lastName = lastName.substring(0,1).toUpperCase() + lastName.substring(1);
             String dateText = doc.getElementsByClass("light").first().nextElementSibling().text();
             DateFormat format = new SimpleDateFormat("dd.MM.yyyy");

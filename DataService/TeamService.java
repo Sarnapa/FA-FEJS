@@ -56,7 +56,7 @@ public class TeamService extends HtmlService
         updateDB();
     }
 
-    public synchronized void updateDB()
+    public void updateDB()
     {
         DatabaseConnection database = new DatabaseConnection();
         database.createConnection();

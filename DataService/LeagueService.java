@@ -32,17 +32,16 @@ public class LeagueService extends HtmlService implements Runnable
                 for(Element link: links)
                     teamsUrls.add(link.attr("href"));
             }
-            Thread.sleep(100);
+            getTeams();
         }
-        catch (InterruptedException e)  // TODO - obsluga
+        /*catch (InterruptedException e)  // TODO - obsluga
         {
             e.printStackTrace();
-        }
+        }*/
         catch (IOException e) // TODO - obsluga
         {
             e.printStackTrace();
         }
-        getTeams();
     }
 
     private void getTeams()
@@ -53,7 +52,6 @@ public class LeagueService extends HtmlService implements Runnable
             team.getPlayersUrls();
         }
     }
-
 
     public void printTeamUrls()
     {

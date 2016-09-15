@@ -53,8 +53,8 @@ public class LeagueView extends JFrame {
     public JTable getPlayersTable(){ return playersTable; }
 
     public void fillLeagueChoice(){
-        leagueChoice.addItem("CENTRALNA LIGA JUNIOROW GR. WSCHODNIA");
-        leagueChoice.addItem("CENTRALNA LIGA JUNIOROW GR. ZACHODNIA");
+        leagueChoice.addItem("CENTRALNA LIGA JUNIORÓW GR. WSCHODNIA");
+        leagueChoice.addItem("CENTRALNA LIGA JUNIORÓW GR. ZACHODNIA");
         leagueChoice.addItem("DRUGA LIGA");
         leagueChoice.addItem("EKSTRAKLASA");
         leagueChoice.addItem("TRZECIA LIGA GRUPA I");
@@ -65,14 +65,16 @@ public class LeagueView extends JFrame {
         leagueChoice.setSelectedIndex(-1);
     }
 
-    public LeagueView(){
+    public LeagueView()
+    {
         pack();
         setContentPane(rootPanel);
         fillLeagueChoice();
         initGUI();
     }
 
-    private void initGUI(){
+    private void initGUI()
+    {
         setTitle("FA-FEJS");
         setSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
