@@ -1,6 +1,5 @@
 package DataService;
 
-import DatabaseService.DatabaseConnection;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -9,11 +8,26 @@ import java.io.IOException;
 public class HtmlService
 {
     // To get HTML code of page
-    public static Document getHtmlSource(String address) throws IOException
+    public static Document getHtmlSource(String address)
     {
-        Connection conn = Jsoup.connect(address);
-        conn.timeout(10 * 1000);
-        return conn.get();
+        try
+        {
+            for (int i = 0; i < 5; ++i) // 5 attempts - if statusCode is not equal 200
+            {
+                Connection conn = Jsoup.connect(address);
+                conn.timeout(10 * 1000);
+                Connection.Response resp = conn.execute();
+                if (resp.statusCode() == 200)
+                    return conn.get();
+            }
+            System.out.println("Nie można pobrać danych z adresu: " + address);
+            return null;
+        }
+        catch (IOException e)
+        {
+            System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
+            return null;
+        }
     }
 
     /*private static String getUrlSource(String address) throws IOException

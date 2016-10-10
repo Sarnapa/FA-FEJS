@@ -4,6 +4,10 @@ import java.sql.*;
 import DataService.PlayerService;
 import Layout.LeagueView;
 
+import javax.activation.DataSource;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 public class DatabaseConnection
 {
     private static String dbURL = "jdbc:derby:./Database/DB;create=true;user=fafejs;password=fafejs";
@@ -37,14 +41,15 @@ public class DatabaseConnection
             duv = new DatabaseUpdateView(conn);
             System.out.println("Reconnect:" + conn);
         }
-        catch(Exception e)
+
+        catch(Exception e) // TODO - obsluga
         {
             e.printStackTrace();
         }
 
     }
 
-    public boolean updatePlayer(PlayerService player)
+    public synchronized boolean updatePlayer(PlayerService player)
     {
         try
         {
@@ -64,14 +69,30 @@ public class DatabaseConnection
             int goals = player.getGoals();
             int yellowCards = player.getYellowCards();
             int redCards = player.getRedCards();
+            System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
             duc.updatePlayersTable(ID, firstName, lastName, birthdate);
             duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
             return true;
         }
-        catch (SQLException sqlExcept)
+        catch (SQLIntegrityConstraintViolationException sqlE)
+        {
+            System.out.println(sqlE.getMessage());
+            return true; // to avoid inserting bad data
+        }
+        catch (SQLException e)
         {
             //shutdown();
-            sqlExcept.printStackTrace();
+            while (e != null)
+            {
+                System.out.println("\n----- SQLException -----");
+                System.out.println("  SQLState:   " + e.getSQLState());
+                System.out.println("  Error Code: " + e.getErrorCode());
+                System.out.println("  Message:    " + e.getMessage());
+                e.printStackTrace(System.out);
+                e = e.getNextException();
+            }
+            // for stack dumps, refer to derby.log or add
+            //e.printStackTrace(System.out); above
             return false;
         }
     }
@@ -87,7 +108,7 @@ public class DatabaseConnection
         return sb.toString();
     }
 
-    public void updateView(LeagueView view, String leagueName, String orderBy, boolean desc)
+    public synchronized void updateView(LeagueView view, String leagueName, String orderBy, boolean desc)
     {
         duv.updateView(view, leagueName, orderBy, desc);
     }

@@ -22,11 +22,11 @@ public class TeamService extends HtmlService
         this.url = url;
     }
 
-    public void getPlayersUrls()
+    public void getPlayersUrls() throws InterruptedException
     {
-        try
+        Document doc = getHtmlSource(url);
+        if(doc != null)
         {
-            Document doc = getHtmlSource(url);
             Element playersContainer = doc.getElementsByClass("players-list").first();
             name = doc.getElementsByClass("left").get(1).text();
             name = name.substring(0, name.lastIndexOf('|')).toUpperCase();
@@ -34,37 +34,37 @@ public class TeamService extends HtmlService
             for (Element link : links)
             {
                 if (link.parent() == playersContainer)
-                    playersUrls.add(link.attr("href"));
+                        playersUrls.add(link.attr("href"));
             }
+            getPlayers();
         }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        getPlayers();
     }
 
-    private void getPlayers()
+    private void getPlayers() throws InterruptedException
     {
         for(String url: playersUrls)
         {
             PlayerService player = new PlayerService(leagueName, name, url);
             player.getPlayerData();
             //player.printPlayerData();
-            players.add(player);
+            if(player.getLastName() != null)
+                players.add(player);
+            Thread.sleep(10);
         }
         updateDB();
     }
 
-    public void updateDB()
+    public void updateDB() throws InterruptedException
     {
         DatabaseConnection database = new DatabaseConnection();
         database.createConnection();
         for(PlayerService player: players)
         {
+            //player.printPlayerData();
             //database.updatePlayer(player);
             while(!database.updatePlayer(player))
             {
+                Thread.sleep(10);
                 //database = new DatabaseConnection();
                 database.recreateConnection();
             }

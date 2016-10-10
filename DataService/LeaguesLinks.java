@@ -15,14 +15,13 @@ public class LeaguesLinks extends HtmlService
 
     public LeaguesLinks()
     {
-
     }
 
     public void getLeaguesUrls()
     {
-        try
+        Document doc = getHtmlSource(url);
+        if(doc != null)
         {
-            Document doc = getHtmlSource(url);
             Element menu = doc.getElementsByClass("main-category").first(); // one element
             Element leaguesMenu = menu.child(5); // 5 in menu (not 4 because we have one extra tags <li>)
             Elements leagueSpans = leaguesMenu.getElementsByTag("span");
@@ -64,32 +63,29 @@ public class LeaguesLinks extends HtmlService
                         break;
                 }
             }
+            getLeagues();
         }
-        catch (IOException e) // TODO - obsluga
-        {
-            e.printStackTrace();
-        }
-        getLeagues();
     }
 
-    private void getSomeUrls(String url) throws IOException
+    private void getSomeUrls(String url)
     {
         Document doc = getHtmlSource(url);
-        Element list = doc.getElementById("games");
-        Elements links = list.getElementsByTag("a");
-        for (Element link: links)
+        if(doc != null)
         {
-            String leagueName = link.text();
-            if(!(leagueName.equals("Trzecia Liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
-            {
-                //leaguesMap.put(leagueName, url + link.attr("href"));
-                leaguesUrls.add(url + link.attr("href"));
-                //leaguesNames.add(leagueName);
+            Element list = doc.getElementById("games");
+            Elements links = list.getElementsByTag("a");
+            for (Element link : links) {
+                String leagueName = link.text();
+                if (!(leagueName.equals("Trzecia Liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\""))) {
+                    //leaguesMap.put(leagueName, url + link.attr("href"));
+                    leaguesUrls.add(url + link.attr("href"));
+                    //leaguesNames.add(leagueName);
+                }
             }
         }
     }
 
-    /*private void getSomeUrlsForYouthDivisions() throws IOException
+    /*private void getSomeUrlsForYouthDivisions()
     {
         for(int i = 1; i <= 16; ++i)
         {

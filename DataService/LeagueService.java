@@ -23,28 +23,26 @@ public class LeagueService extends HtmlService implements Runnable
         try
         {
             Document doc = getHtmlSource(url);
-            name = doc.getElementsByClass("show-drop").first().text();
-            Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
-            Elements rows = teamsContainer.getElementsByClass("row");
-            for(Element row: rows)
+            if(doc != null)
             {
-                Elements links = row.getElementsByTag("a");
-                for(Element link: links)
-                    teamsUrls.add(link.attr("href"));
+                name = doc.getElementsByClass("show-drop").first().text();
+                Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
+                Elements rows = teamsContainer.getElementsByClass("row");
+                for (Element row : rows) {
+                    Elements links = row.getElementsByTag("a");
+                    for (Element link : links)
+                        teamsUrls.add(link.attr("href"));
+                }
+                getTeams();
             }
-            getTeams();
         }
-        /*catch (InterruptedException e)  // TODO - obsluga
+        catch (InterruptedException e)  // TODO - obsluga
         {
-            e.printStackTrace();
-        }*/
-        catch (IOException e) // TODO - obsluga
-        {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
-    private void getTeams()
+    private void getTeams() throws InterruptedException
     {
         for(String url: teamsUrls)
         {
