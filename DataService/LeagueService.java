@@ -10,12 +10,14 @@ import java.util.List;
 public class LeagueService extends HtmlService implements Runnable
 {
     private String name; // League's name
+    private String tableName; // sometimes League's name from website differs from table's name
     private String url; // League's URL
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
 
-    public LeagueService(String url)
+    public LeagueService(String url, String tableName)
     {
         this.url = url;
+        this.tableName = tableName;
     }
 
     public void run()
@@ -25,10 +27,20 @@ public class LeagueService extends HtmlService implements Runnable
             Document doc = getHtmlSource(url);
             if(doc != null)
             {
-                name = doc.getElementsByClass("show-drop").first().text();
+                if(tableName == null)
+                {
+                    name = doc.getElementsByClass("show-drop").first().text();
+                    tableName = name;
+                }
+                else
+                {
+                    String nameText = doc.getElementsByClass("header-menu").first().text();
+                    name = nameText.substring(9, nameText.indexOf('(') - 1);
+                }
                 Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
                 Elements rows = teamsContainer.getElementsByClass("row");
-                for (Element row : rows) {
+                for (Element row : rows)
+                {
                     Elements links = row.getElementsByTag("a");
                     for (Element link : links)
                         teamsUrls.add(link.attr("href"));
@@ -38,7 +50,7 @@ public class LeagueService extends HtmlService implements Runnable
         }
         catch (InterruptedException e)  // TODO - obsluga
         {
-            Thread.currentThread().interrupt();
+            //Thread.currentThread().interrupt();
         }
     }
 
@@ -46,7 +58,7 @@ public class LeagueService extends HtmlService implements Runnable
     {
         for(String url: teamsUrls)
         {
-            TeamService team = new TeamService(name, url);
+            TeamService team = new TeamService(name, tableName, url);
             team.getPlayersUrls();
         }
     }

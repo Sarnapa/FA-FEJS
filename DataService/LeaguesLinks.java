@@ -4,14 +4,18 @@ import DatabaseService.DatabaseConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import javax.swing.*;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
 public class LeaguesLinks extends HtmlService
 {
     private static final String url = "https://www.laczynaspilka.pl/";
-    //private HashMap<String, String> leaguesMap = new HashMap<String, String>();// <name, url>
-    private LinkedList<String> leaguesUrls = new LinkedList<>();
+    private LinkedList<String> leaguesUrls = new LinkedList<>(); // Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
+    private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
 
     public LeaguesLinks()
     {
@@ -58,11 +62,9 @@ public class LeaguesLinks extends HtmlService
                         url = leagueUl.child(2).child(0).attr("href");
                         getSomeUrls(url);
                         break;
-                    case "Dzieci i Młodzież": // problem :(
-                        //getSomeUrlsForYouthDivisions();
-                        break;
                 }
             }
+            get4LeagueUrls();
             getLeagues();
         }
     }
@@ -85,6 +87,28 @@ public class LeaguesLinks extends HtmlService
         }
     }
 
+    private void get4LeagueUrls()
+    {
+        try
+        {
+            File file = new File("4liga.txt");
+            Scanner fileReading = new Scanner(file);
+            String tableName, url;
+            while (fileReading.hasNextLine())
+            {
+                String line = fileReading.nextLine();
+                int firstColonIndex = line.indexOf(':');
+                tableName = line.substring(0, firstColonIndex);
+                url = line.substring(firstColonIndex + 1, line.length());
+                fourthDivision.put(tableName, url);
+            }
+        }
+        catch (FileNotFoundException e) // TODO - obsluga
+        {
+            e.printStackTrace();
+        }
+    }
+
     /*private void getSomeUrlsForYouthDivisions()
     {
         for(int i = 1; i <= 16; ++i)
@@ -96,11 +120,21 @@ public class LeaguesLinks extends HtmlService
     private void getLeagues()
     {
         for(String url: leaguesUrls)
+            startLeagueThread(url, null);
+        Iterator<String> keySetIterator = fourthDivision.keySet().iterator();
+        while(keySetIterator.hasNext())
         {
-            Runnable league = new LeagueService(url);
-            Thread leagueThread = new Thread(league);
-            leagueThread.start();
+            String tableName = keySetIterator.next();
+            String url = fourthDivision.get(tableName);
+            startLeagueThread(url, tableName);
         }
+    }
+
+    private static void startLeagueThread(String url, String tableName)
+    {
+        Runnable league = new LeagueService(url, tableName);
+        Thread leagueThread = new Thread(league);
+        leagueThread.start();
     }
 
     public void printLeaguesUrls()
@@ -110,4 +144,16 @@ public class LeaguesLinks extends HtmlService
             System.out.println(url);
         }
     }
+
+    public void printFourthDivisionUrls()
+    {
+        Iterator<String> keySetIterator = fourthDivision.keySet().iterator();
+        while(keySetIterator.hasNext())
+        {
+            String tableName = keySetIterator.next();
+            String url = fourthDivision.get(tableName);
+            System.out.println(tableName + ": " + url);
+        }
+    }
+
 }

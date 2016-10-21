@@ -61,7 +61,7 @@ public class DatabaseConnection
                 birthdate =  new java.sql.Date(player.getDate().getTime());
             else
                 birthdate = null;
-            String league = newLeagueName(player.getLeagueName()).toUpperCase();
+            String league = newLeagueName(player.getTableName()).toUpperCase();
             String team = player.getTeamName();
             int apps = player.getApps();
             int firstSquad = player.getFirstSquad();
@@ -81,7 +81,6 @@ public class DatabaseConnection
         }
         catch (SQLException e)
         {
-            //shutdown();
             while (e != null)
             {
                 System.out.println("\n----- SQLException -----");

@@ -10,24 +10,30 @@ public class HtmlService
     // To get HTML code of page
     public static Document getHtmlSource(String address)
     {
-        try
+        int i = 0;
+        while(i < 10)
         {
-            for (int i = 0; i < 5; ++i) // 5 attempts - if statusCode is not equal 200
+            try
             {
                 Connection conn = Jsoup.connect(address);
                 conn.timeout(10 * 1000);
                 Connection.Response resp = conn.execute();
                 if (resp.statusCode() == 200)
                     return conn.get();
+                ++i;
             }
-            System.out.println("Nie można pobrać danych z adresu: " + address);
-            return null;
+            catch (IOException e)
+            {
+                ++i;
+                if(i == 10)
+                {
+                    System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
+                    return null;
+                }
+            }
         }
-        catch (IOException e)
-        {
-            System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
-            return null;
-        }
+        System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: Inny HTML Status niż 200");
+        return null;
     }
 
     /*private static String getUrlSource(String address) throws IOException

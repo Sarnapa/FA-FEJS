@@ -13,7 +13,7 @@ public class PlayerService extends HtmlService
 {
     private String url;
     private int ID;
-    private String firstName, lastName, teamName, leagueName;
+    private String firstName, lastName, teamName, leagueName, tableName;
     private Date date;
     private int apps, firstSquad, minutes, goals, yellowCards, redCards;
 
@@ -40,6 +40,11 @@ public class PlayerService extends HtmlService
     public String getLeagueName()
     {
         return leagueName;
+    }
+
+    public String getTableName()
+    {
+        return tableName;
     }
 
     public Date getDate()
@@ -77,9 +82,10 @@ public class PlayerService extends HtmlService
         return redCards;
     }
 
-    public PlayerService(String leagueName, String teamName, String url)
+    public PlayerService(String leagueName, String tableName, String teamName, String url)
     {
         this.leagueName = leagueName;
+        this.tableName = tableName;
         this.teamName = teamName;
         this.url = url;
         ID = Integer.parseInt(url.substring(url.lastIndexOf(',') + 1,url.lastIndexOf('.')));
@@ -114,9 +120,12 @@ public class PlayerService extends HtmlService
             if (doc != null)
             {
                 String name = doc.getElementsByClass("cf").get(6).child(0).text();
-                name = name.substring(0, name.lastIndexOf('|') - 1); // - 1 because of 1 space
-                firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
-                lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
+                if(name.lastIndexOf('|') >= 0)
+                {
+                    name = name.substring(0, name.lastIndexOf('|') - 1); // - 1 because of 1 space
+                    firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
+                    lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
+                }
             }
         }
     }
@@ -127,9 +136,22 @@ public class PlayerService extends HtmlService
         if(doc != null)
         {
             Elements articles = doc.getElementsByClass("season__game");
-            for (Element article : articles) {
+            for (Element article : articles)
+            {
                 String leagueText = article.getElementsByClass("event").first().text();
-                if (leagueText.toLowerCase().contains(leagueName.toLowerCase())) {
+                Element teamNamesContainer = article.getElementsByClass("teams").first();
+                Elements teamNameTexts = teamNamesContainer.getElementsByTag("a");
+                boolean isCorrectTeam = false;
+                for(int i = 0; i < teamNameTexts.size(); ++i)
+                {
+                    if(teamNameTexts.get(i).text().toLowerCase().equals(teamName.toLowerCase()))
+                    {
+                        isCorrectTeam = true;
+                        break;
+                    }
+                }
+                if (leagueText.toLowerCase().contains(leagueName.toLowerCase()) && isCorrectTeam)
+                {
                     String minutesText = article.getElementsByClass("season__game-time").first().text();
                     if (!minutesText.equals("")) {
                         minutesText = minutesText.substring(7);
