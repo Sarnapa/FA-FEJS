@@ -20,15 +20,29 @@ public class LeagueView extends JFrame {
     private JPanel buttonPanel;
     private JTable playersTable;
     private DefaultTableModel tableModel;
+    private MyGlassPane glassPane;
+
+    class MyGlassPane extends JComponent{
+        protected void paintComponent(Graphics g) {
+            g.setColor(new Color(250,250,250,150));
+            g.fillRect(0,0,getWidth()-1, getHeight()-1);
+        }
+    }
 
     //private String[] leagues = {"CENTRALNA LIGA JUNIORÓW GR. WSCHODNIA", "CENTRALNA LIGA JUNIORÓW GR. ZACHODNIA", "DRUGA LIGA", "EKSTRAKLASA", "TRZECIA LIGA GRUPA I", "TRZECIA LIGA GRUPA II", "TRZECIA LIGA GRUPA III", "TRZECIA LIGA GRUPA IV"};
     //private String[] columnNames ={"ID", "FIRST_NAME", "LAST_NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST_SQUAD", "MINUTES", "GOALS", "YELLOW_CARDS", "RED_CARDS"};
 
     private void createUIComponents() {
         String[] columnNames ={"ID", "FIRST_NAME", "LAST_NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST_SQUAD", "MINUTES", "GOALS", "YELLOW_CARDS", "RED_CARDS"};
-        tableModel = new DefaultTableModel(0, columnNames.length);
+        tableModel = new DefaultTableModel(0, columnNames.length){
+            @Override
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return false;
+            }
+        };
         tableModel.setColumnIdentifiers(columnNames);
         playersTable = new JTable(tableModel);
+        glassPane = new MyGlassPane();
     }
 
     public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton){
@@ -37,7 +51,20 @@ public class LeagueView extends JFrame {
 
     public void addTableHeaderListener(MouseAdapter listenerForTableHeader){
         playersTable.getTableHeader().addMouseListener(listenerForTableHeader);
+    }
 
+    public void addUpdateButtonListener(ActionListener listenerForUpdateButton){
+        updateButton.addActionListener(listenerForUpdateButton);
+    }
+
+    public void disableView(){
+        setEnabled(false);
+        glassPane.setVisible(true);
+    }
+
+    public void enableView(){
+        setEnabled(true);
+        glassPane.setVisible(false);
     }
 
     public String getLeagueChoiceSelected() {
@@ -78,6 +105,7 @@ public class LeagueView extends JFrame {
         setTitle("FA-FEJS");
         setSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setGlassPane(glassPane);
         setVisible(true);
     }
 }

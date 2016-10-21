@@ -7,6 +7,7 @@ import java.awt.event.*;
 public class LayoutInit{
     private LeagueView leagueView;
     private boolean desc = false;
+    private UpdateView updateView;
 
     class LeagueChoiceListener implements ActionListener {
 
@@ -30,6 +31,27 @@ public class LayoutInit{
         }
     }
 
+    class UpdateButtonListener implements ActionListener {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            leagueView.disableView();
+            updateView = new UpdateView();
+            updateView.addUpdateWindowListener(new UpdateWindowListener());
+        }
+    }
+
+
+    class UpdateWindowListener extends WindowAdapter {
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            leagueView.enableView();
+            updateView.dispose();
+        }
+
+    }
+
     private static void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc){
         DatabaseConnection db = new DatabaseConnection();
         db.createConnection();
@@ -41,5 +63,6 @@ public class LayoutInit{
         leagueView = new LeagueView();
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
+        leagueView.addUpdateButtonListener(new UpdateButtonListener());
     }
 }
