@@ -16,6 +16,8 @@ public class LeaguesLinks extends HtmlService
     private static final String url = "https://www.laczynaspilka.pl/";
     private LinkedList<String> leaguesUrls = new LinkedList<>(); // Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
     private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
+    private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url>
+
 
     public LeaguesLinks()
     {
@@ -65,6 +67,7 @@ public class LeaguesLinks extends HtmlService
                 }
             }
             get4LeagueUrls();
+            getYouthLeagueUrls();
             getLeagues();
         }
     }
@@ -89,9 +92,19 @@ public class LeaguesLinks extends HtmlService
 
     private void get4LeagueUrls()
     {
+        getDataFromFile("4liga.txt");
+    }
+
+    private void getYouthLeagueUrls()
+    {
+        getDataFromFile("ligi_mlodziezowe.txt");
+    }
+
+    private void getDataFromFile(String fileName)
+    {
         try
         {
-            File file = new File("4liga.txt");
+            File file = new File(fileName);
             Scanner fileReading = new Scanner(file);
             String tableName, url;
             while (fileReading.hasNextLine())
@@ -100,7 +113,13 @@ public class LeaguesLinks extends HtmlService
                 int firstColonIndex = line.indexOf(':');
                 tableName = line.substring(0, firstColonIndex);
                 url = line.substring(firstColonIndex + 1, line.length());
-                fourthDivision.put(tableName, url);
+                //StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
+                //System.out.println(stackTraceElements[2].getMethodName());
+                //if(stackTraceElements[1].getMethodName().equals("get4LeagueUrls"))
+                if(fileName.equals("4liga.txt"))
+                    fourthDivision.put(tableName, url);
+                else
+                    youthDivision.put(tableName, url);
             }
         }
         catch (FileNotFoundException e) // TODO - obsluga
@@ -109,23 +128,22 @@ public class LeaguesLinks extends HtmlService
         }
     }
 
-    /*private void getSomeUrlsForYouthDivisions()
-    {
-        for(int i = 1; i <= 16; ++i)
-        {
-            Document doc = getHtmlSource(url + "#" + i);
-        }
-    }*/
-
     private void getLeagues()
     {
-        for(String url: leaguesUrls)
-            startLeagueThread(url, null);
+        /*for(String url: leaguesUrls)
+            startLeagueThread(url, null);*/
         Iterator<String> keySetIterator = fourthDivision.keySet().iterator();
-        while(keySetIterator.hasNext())
+        /*while(keySetIterator.hasNext())
         {
             String tableName = keySetIterator.next();
             String url = fourthDivision.get(tableName);
+            startLeagueThread(url, tableName);
+        }*/
+        keySetIterator = youthDivision.keySet().iterator();
+        while(keySetIterator.hasNext())
+        {
+            String tableName = keySetIterator.next();
+            String url = youthDivision.get(tableName);
             startLeagueThread(url, tableName);
         }
     }
@@ -153,6 +171,19 @@ public class LeaguesLinks extends HtmlService
             String tableName = keySetIterator.next();
             String url = fourthDivision.get(tableName);
             System.out.println(tableName + ": " + url);
+        }
+    }
+
+    public void printYouthDivisionUrls()
+    {
+        Iterator<String> keySetIterator = youthDivision.keySet().iterator();
+        int i = 1;
+        while(keySetIterator.hasNext())
+        {
+            String tableName = keySetIterator.next();
+            String url = youthDivision.get(tableName);
+            System.out.println(i + " " + tableName + ": " + url);
+            ++i;
         }
     }
 

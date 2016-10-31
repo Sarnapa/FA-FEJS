@@ -27,7 +27,8 @@ public class HtmlService
                 ++i;
                 if(i == 10)
                 {
-                    System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
+                    //System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
+                    e.printStackTrace();
                     return null;
                 }
             }

@@ -12,6 +12,7 @@ public class Main {
 
         LeaguesLinks links = new LeaguesLinks();
         links.getLeaguesUrls();
+        //links.printYouthDivisionUrls();
 
         //PlayerService player = new PlayerService("Ekstraklasa", "ZAGŁĘBIE LUBIN", "https://www.laczynaspilka.pl/zawodnik/maciej-dabrowski,287974.html");
         //PlayerService player = new PlayerService("Ekstraklasa","LEGIA WARSZAWA S.A.","https://www.laczynaspilka.pl/zawodnik/michal-kucharczyk,93963.html");
