@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.Semaphore;
 
 public class LeaguesLinks extends HtmlService
 {
@@ -17,7 +18,7 @@ public class LeaguesLinks extends HtmlService
     private LinkedList<String> leaguesUrls = new LinkedList<>(); // Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
     private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
     private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url>
-
+    private static Semaphore sem = new Semaphore(5);
 
     public LeaguesLinks()
     {
@@ -130,27 +131,35 @@ public class LeaguesLinks extends HtmlService
 
     private void getLeagues()
     {
-        /*for(String url: leaguesUrls)
-            startLeagueThread(url, null);*/
+        for(String url: leaguesUrls)
+            startLeagueThread(url, null);
         Iterator<String> keySetIterator = fourthDivision.keySet().iterator();
-        /*while(keySetIterator.hasNext())
+        while(keySetIterator.hasNext())
         {
             String tableName = keySetIterator.next();
             String url = fourthDivision.get(tableName);
             startLeagueThread(url, tableName);
-        }*/
+        }
         keySetIterator = youthDivision.keySet().iterator();
         while(keySetIterator.hasNext())
         {
             String tableName = keySetIterator.next();
             String url = youthDivision.get(tableName);
-            startLeagueThread(url, tableName);
+            startYouthLeagueThread(url, tableName);
         }
     }
 
     private static void startLeagueThread(String url, String tableName)
     {
-        Runnable league = new LeagueService(url, tableName);
+        Runnable league = new LeagueService(url, tableName, null);
+        Thread leagueThread = new Thread(league);
+        leagueThread.start();
+    }
+
+    private static void startYouthLeagueThread(String url, String tableName)
+    {
+        sem.acquireUninterruptibly();
+        Runnable league = new LeagueService(url, tableName, sem);
         Thread leagueThread = new Thread(league);
         leagueThread.start();
     }

@@ -93,9 +93,9 @@ public class PlayerService extends HtmlService
 
     public void getPlayerData()
     {
+        Document doc = getHtmlSource(url);
         try
         {
-            Document doc = getHtmlSource(url);
             if(doc != null)
             {
                 String name = doc.getElementsByClass("header--white").first().child(0).text();
@@ -114,18 +114,26 @@ public class PlayerService extends HtmlService
         {
             e.printStackTrace();
         }
-        catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website
+        catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website or AKADEMIA MLODYCH ORLOW SYNDROME
         {
-            Document doc = getHtmlSource(url);
             if (doc != null)
             {
                 String name = doc.getElementsByClass("cf").get(6).child(0).text();
-                if(name.lastIndexOf('|') >= 0)
+                if(!name.substring(0, name.indexOf(' ')).equals("Profil")) // 1 case - GORNIK KONIN SYNDROME, 2 case - AKADEMIA MLODYCH ORLOW SYNDROME
                 {
-                    name = name.substring(0, name.lastIndexOf('|') - 1); // - 1 because of 1 space
-                    firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
-                    lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
+                    if (name.lastIndexOf('|') >= 0)
+                    {
+                        name = name.substring(0, name.lastIndexOf('|') - 1); // - 1 because of 1 space
+                        firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
+                        lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
+                    }
                 }
+                else
+                    {
+                        name = doc.getElementsByClass("head-black").first().text();
+                        firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
+                        lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
+                    }
             }
         }
     }

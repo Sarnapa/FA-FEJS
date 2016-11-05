@@ -8,16 +8,18 @@ import java.io.IOException;
 public class HtmlService
 {
     // To get HTML code of page
-    public static Document getHtmlSource(String address)
+    public static  Document getHtmlSource(String address)
     {
         int i = 0;
         while(i < 10)
         {
+            Connection conn;
+            Connection.Response resp;
             try
             {
-                Connection conn = Jsoup.connect(address);
+                conn = Jsoup.connect(address);
                 conn.timeout(10 * 1000);
-                Connection.Response resp = conn.execute();
+                resp = conn.execute();
                 if (resp.statusCode() == 200)
                     return conn.get();
                 ++i;

@@ -53,7 +53,7 @@ public class TeamService extends HtmlService
                 players.add(player);
             Thread.sleep(10);
         }
-        //updateDB();
+        updateDB();
     }
 
     public void updateDB() throws InterruptedException

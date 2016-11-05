@@ -6,18 +6,21 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public class LeagueService extends HtmlService implements Runnable
 {
     private String name; // League's name
     private String tableName; // sometimes League's name from website differs from table's name
     private String url; // League's URL
+    private static Semaphore sem;
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
 
-    public LeagueService(String url, String tableName)
+    public LeagueService(String url, String tableName, Semaphore sem)
     {
         this.url = url;
         this.tableName = tableName;
+        this.sem = sem;
     }
 
     public void run()
@@ -44,6 +47,7 @@ public class LeagueService extends HtmlService implements Runnable
                     }
                     else
                     {
+                        sem.release();
                         String nameText = doc.getElementsByClass("name-year").first().text();
                         name = nameText.substring(0, nameText.lastIndexOf(':'));
                         getYouthTeamsUrls(doc);
