@@ -39,6 +39,7 @@ public class LayoutInit{
             leagueView.disableView();
             updateView = new UpdateView();
             updateView.addUpdateWindowListener(new UpdateWindowListener());
+            fillUpdateTable(updateView, getLeaguesNames());
         }
     }
 
@@ -52,6 +53,12 @@ public class LayoutInit{
         }
 
     }
+    private static void fillUpdateTable(UpdateView uv, List<String> names) {
+        for (String s : names) {
+            if (!s.equals("PLAYERS"))
+                uv.addToLeaguesList(s);
+        }
+    }
 
     private static void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc){
         DatabaseConnection db = new DatabaseConnection();
@@ -60,19 +67,24 @@ public class LayoutInit{
         db.shutdown();
     }
 
-    private static void getLeaguesNames(LeagueView lv){
+    private static List<String> getLeaguesNames(){
         DatabaseConnection db = new DatabaseConnection();
         db.createConnection();
         List<String> names = db.getTablesNames();
-        for(String s: names) {
-            if(!s.equals("PLAYERS"))
+        db.shutdown();
+        return names;
+    }
+
+    private static void fillLeagueChoice(LeagueView lv, List<String> names) {
+        for (String s : names) {
+            if (!s.equals("PLAYERS"))
                 lv.addLeagueChoiceElement(s);
         }
-        db.shutdown();
     }
+
     public LayoutInit(){
         leagueView = new LeagueView();
-        getLeaguesNames(leagueView);
+        fillLeagueChoice(leagueView, getLeaguesNames());
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
