@@ -1,6 +1,9 @@
 package DatabaseService;
 
 import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
 import DataService.PlayerService;
 import Layout.LeagueView;
 
@@ -110,6 +113,23 @@ public class DatabaseConnection
     public synchronized void updateView(LeagueView view, String leagueName, String orderBy, boolean desc)
     {
         duv.updateView(view, leagueName, orderBy, desc);
+    }
+
+    public List<String> getTablesNames(){
+        try {
+            DatabaseMetaData metadata = conn.getMetaData();
+            List<String> names = new ArrayList<>();
+            String[] types = {"TABLE"};
+            ResultSet rs = metadata.getTables(null, null, "%", types);
+            while(rs.next()) {
+                names.add(rs.getString(3)); // column 3 is table name
+            }
+            rs.close();
+            return names;
+        } catch(SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public synchronized void shutdown()

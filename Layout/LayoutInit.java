@@ -3,6 +3,7 @@ package Layout;
 import DatabaseService.DatabaseConnection;
 
 import java.awt.event.*;
+import java.util.List;
 
 public class LayoutInit{
     private LeagueView leagueView;
@@ -59,8 +60,19 @@ public class LayoutInit{
         db.shutdown();
     }
 
+    private static void getLeaguesNames(LeagueView lv){
+        DatabaseConnection db = new DatabaseConnection();
+        db.createConnection();
+        List<String> names = db.getTablesNames();
+        for(String s: names) {
+            if(!s.equals("PLAYERS"))
+                lv.addLeagueChoiceElement(s);
+        }
+        db.shutdown();
+    }
     public LayoutInit(){
         leagueView = new LeagueView();
+        getLeaguesNames(leagueView);
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());

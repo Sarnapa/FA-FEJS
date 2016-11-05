@@ -29,11 +29,9 @@ public class LeagueView extends JFrame {
         }
     }
 
-    //private String[] leagues = {"CENTRALNA LIGA JUNIORÓW GR. WSCHODNIA", "CENTRALNA LIGA JUNIORÓW GR. ZACHODNIA", "DRUGA LIGA", "EKSTRAKLASA", "TRZECIA LIGA GRUPA I", "TRZECIA LIGA GRUPA II", "TRZECIA LIGA GRUPA III", "TRZECIA LIGA GRUPA IV"};
-    //private String[] columnNames ={"ID", "FIRST_NAME", "LAST_NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST_SQUAD", "MINUTES", "GOALS", "YELLOW_CARDS", "RED_CARDS"};
 
     private void createUIComponents() {
-        String[] columnNames ={"ID", "FIRST_NAME", "LAST_NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST_SQUAD", "MINUTES", "GOALS", "YELLOW_CARDS", "RED_CARDS"};
+        String[] columnNames ={"ID", "FIRST NAME", "LAST NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST SQUAD", "MINUTES", "GOALS", "YELLOW CARDS", "RED CARDS"};
         tableModel = new DefaultTableModel(0, columnNames.length){
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -79,16 +77,8 @@ public class LeagueView extends JFrame {
     }
     public JTable getPlayersTable(){ return playersTable; }
 
-    public void fillLeagueChoice(){
-        leagueChoice.addItem("CENTRALNA LIGA JUNIORÓW GR. WSCHODNIA");
-        leagueChoice.addItem("CENTRALNA LIGA JUNIORÓW GR. ZACHODNIA");
-        leagueChoice.addItem("DRUGA LIGA");
-        leagueChoice.addItem("EKSTRAKLASA");
-        leagueChoice.addItem("TRZECIA LIGA GRUPA I");
-        leagueChoice.addItem("TRZECIA LIGA GRUPA II");
-        leagueChoice.addItem("TRZECIA LIGA GRUPA III");
-        leagueChoice.addItem("TRZECIA LIGA GRUPA IV");
-
+    public void addLeagueChoiceElement(String s){
+        leagueChoice.addItem(s);
         leagueChoice.setSelectedIndex(-1);
     }
 
@@ -96,7 +86,6 @@ public class LeagueView extends JFrame {
     {
         pack();
         setContentPane(rootPanel);
-        fillLeagueChoice();
         initGUI();
     }
 
