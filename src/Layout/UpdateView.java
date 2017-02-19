@@ -3,6 +3,7 @@ package Layout;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 
 /**
@@ -11,7 +12,6 @@ import java.awt.event.WindowAdapter;
 public class UpdateView extends JFrame{
     private JPanel rootPanel;
     private JButton updateButton;
-    private JButton exitButton;
     private JList leaguesList;
     private JScrollPane leaguesListPane;
     private DefaultListModel listModel;
@@ -29,7 +29,6 @@ public class UpdateView extends JFrame{
         pack();
         setContentPane(rootPanel);
         updateButton.setText("Update");
-        exitButton.setText("Close");
         leaguesList.setBorder(new EmptyBorder(5,5,5,5));
         rootPanel.setBorder(new EmptyBorder(5,5,5,5));
         initGUI();
@@ -38,6 +37,15 @@ public class UpdateView extends JFrame{
     public void addUpdateWindowListener(WindowAdapter listenerForUpdateWindow){
         addWindowListener(listenerForUpdateWindow);
     }
+
+    public void addUpdateListener(ActionListener listenerForUpdate){
+        updateButton.addActionListener(listenerForUpdate);
+    }
+
+    java.util.List<String> getSelectedLeagues(){
+        return leaguesList.getSelectedValuesList();
+    }
+
     private void initGUI() {
         setTitle("FA-FEJS Data updater");
         setSize(new Dimension(350, 600));

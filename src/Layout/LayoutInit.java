@@ -11,7 +11,6 @@ public class LayoutInit{
     private UpdateView updateView;
 
     class LeagueChoiceListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             leagueView.clearTable();
@@ -33,19 +32,18 @@ public class LayoutInit{
     }
 
     class UpdateButtonListener implements ActionListener {
-
         @Override
         public void actionPerformed(ActionEvent e) {
             leagueView.disableView();
             updateView = new UpdateView();
             updateView.addUpdateWindowListener(new UpdateWindowListener());
+            updateView.addUpdateListener(new UpdateListener());
             fillUpdateTable(updateView, getLeaguesNames());
         }
     }
 
 
     class UpdateWindowListener extends WindowAdapter {
-
         @Override
         public void windowClosing(WindowEvent e) {
             leagueView.enableView();
@@ -57,6 +55,15 @@ public class LayoutInit{
         for (String s : names) {
             if (!s.equals("PLAYERS"))
                 uv.addToLeaguesList(s);
+        }
+    }
+
+    class UpdateListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for(String s: updateView.getSelectedLeagues()){
+                System.out.println(s);
+            }
         }
     }
 
