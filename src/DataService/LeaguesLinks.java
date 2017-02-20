@@ -19,9 +19,14 @@ public class LeaguesLinks extends HtmlService
     private static final int THREADS_NUMBER = 5;
     //private static final Semaphore mutex = new Semaphore(0);
     private static final Object someObject = new Object();
+    private List<String> selectedLeagues;
 
     public LeaguesLinks()
     {
+    }
+
+    public LeaguesLinks(List<String> list){
+        selectedLeagues = list;
     }
 
     public void getLeaguesUrls()
@@ -43,19 +48,22 @@ public class LeaguesLinks extends HtmlService
                 {
                     case "Ekstraklasa":
                         url = leagueUl.child(2).child(0).attr("href");
-                        leaguesMap.put("Ekstraklasa", url);
+                        if(selectedLeagues.contains("EKSTRAKLASA"))
+                            leaguesMap.put("Ekstraklasa", url);
                         //leaguesUrls.add(url);
                         //leaguesNames.add(leagueName);
                         break;
                     case "I Liga":
                         url = leagueUl.child(2).child(0).attr("href");
-                        leaguesMap.put("Pierwsza Liga", url);
+                        if(selectedLeagues.contains("PIERWSZA LIGA"))
+                            leaguesMap.put("Pierwsza Liga", url);
                         //leaguesUrls.add(url);
                         //leaguesNames.add(leagueName);
                         break;
                     case "II Liga":
                         url = leagueUl.child(2).child(0).attr("href");
-                        leaguesMap.put("Druga Liga", url);
+                        if(selectedLeagues.contains("DRUGA LIGA"))
+                            leaguesMap.put("Druga Liga", url);
                         //leaguesUrls.add(url);
                         //leaguesNames.add(leagueName);
                         break;
@@ -89,7 +97,8 @@ public class LeaguesLinks extends HtmlService
                 String leagueName = link.text();
                 if (!(leagueName.equals("Trzecia Liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
                 {
-                    leaguesMap.put(leagueName, url + link.attr("href"));
+                    if(selectedLeagues.contains(leagueName.toUpperCase()))
+                        leaguesMap.put(leagueName, url + link.attr("href"));
                     //leaguesUrls.add(url + link.attr("href"));
                     //leaguesNames.add(leagueName);
                 }
@@ -123,10 +132,12 @@ public class LeaguesLinks extends HtmlService
                 //StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
                 //System.out.println(stackTraceElements[2].getMethodName());
                 //if(stackTraceElements[1].getMethodName().equals("get4LeagueUrls"))
-                if(fileName.equals("4liga.txt"))
-                    fourthDivision.put(tableName, url);
-                else
-                    youthDivision.put(tableName, url);
+                if(selectedLeagues.contains(fileName.toUpperCase())){
+                    if (fileName.equals("4liga.txt"))
+                        fourthDivision.put(tableName, url);
+                    else
+                        youthDivision.put(tableName, url);
+                }
             }
         }
         catch (FileNotFoundException e) // TODO - obsluga

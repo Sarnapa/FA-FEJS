@@ -1,5 +1,6 @@
 package Layout;
 
+import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 
 import java.awt.event.*;
@@ -64,6 +65,8 @@ public class LayoutInit{
             for(String s: updateView.getSelectedLeagues()){
                 System.out.println(s);
             }
+            LeaguesLinks leaguesLinks = new LeaguesLinks(updateView.getSelectedLeagues());
+            leaguesLinks.getLeaguesUrls();
         }
     }
 

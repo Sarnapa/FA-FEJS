@@ -10,10 +10,10 @@ public class Main {
     public static void main(String [] args)
     {
         System.out.println("elo");
-        //LayoutInit layout = new LayoutInit();
+        LayoutInit layout = new LayoutInit();
 
-        LeaguesLinks links = new LeaguesLinks();
-        links.getLeaguesUrls();
+        //LeaguesLinks links = new LeaguesLinks();
+        //links.getLeaguesUrls();
         //links.printAllLeagues();
 
         //PlayerService player = new PlayerService("Ekstraklasa", "ZAGŁĘBIE LUBIN", "https://www.laczynaspilka.pl/zawodnik/maciej-dabrowski,287974.html");

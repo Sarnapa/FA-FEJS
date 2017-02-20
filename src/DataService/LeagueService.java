@@ -107,7 +107,7 @@ public class LeagueService extends HtmlService implements Runnable
         for(String url: teamsUrls)
         {
             TeamService team = new TeamService(name, tableName, url);
-            //team.getPlayersUrls();
+            team.getPlayersUrls();
         }
         //printTeamUrls();
     }
