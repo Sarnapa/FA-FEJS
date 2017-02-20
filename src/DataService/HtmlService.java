@@ -8,34 +8,37 @@ import java.io.IOException;
 public class HtmlService
 {
     // To get HTML code of page
-    public static  Document getHtmlSource(String address)
+    public static Document getHtmlSource(String address)
     {
         int i = 0;
+        Connection conn;
+        Connection.Response resp = null;
         while(i < 10)
         {
-            Connection conn;
-            Connection.Response resp;
             try
             {
+                long startTime = System.currentTimeMillis();
                 conn = Jsoup.connect(address);
-                conn.timeout(10 * 1000);
+                conn.timeout(10 * 1000).ignoreHttpErrors(true);
                 resp = conn.execute();
                 if (resp.statusCode() == 200)
+                {
+                    System.out.print(address + " ");
+                    System.out.println(System.currentTimeMillis() - startTime);
                     return conn.get();
+                }
                 ++i;
             }
             catch (IOException e)
             {
-                ++i;
-                if(i == 10)
-                {
-                    //System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
-                    e.printStackTrace();
-                    return null;
-                }
+                System.out.println("kupka");
+                //System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
+                e.printStackTrace();
+                return null;
             }
         }
-        System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: Inny HTML Status niż 200");
+        if(resp != null)
+            System.out.println("Nie można pobrać danych z adresu: " + address + "Kod HTML:  " + resp.statusCode() + " Wiadomość: " + resp.statusMessage());
         return null;
     }
 
