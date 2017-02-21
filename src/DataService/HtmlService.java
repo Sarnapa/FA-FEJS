@@ -19,7 +19,7 @@ public class HtmlService
             {
                 long startTime = System.currentTimeMillis();
                 conn = Jsoup.connect(address);
-                conn.timeout(10 * 1000).ignoreHttpErrors(true);
+                conn.timeout(0).ignoreHttpErrors(true);
                 resp = conn.execute();
                 if (resp.statusCode() == 200)
                 {

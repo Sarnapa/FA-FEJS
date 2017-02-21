@@ -8,6 +8,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Random;
 
 public class PlayerService extends HtmlService
 {
@@ -93,7 +94,9 @@ public class PlayerService extends HtmlService
 
     public void getPlayerData()
     {
-        Document doc = getHtmlSource(url);
+        Random generator = new Random();
+        int rand = generator.nextInt(15555);
+        Document doc = getHtmlSource(url + "?_=" + rand);
         try
         {
             if(doc != null)
@@ -140,7 +143,9 @@ public class PlayerService extends HtmlService
 
     private void getStats(String name, String url)
     {
-        Document doc = getHtmlSource(url);
+        Random generator = new Random();
+        int rand = generator.nextInt(15555);
+        Document doc = getHtmlSource(url + "?_=" + rand);
         if(doc != null)
         {
             Elements articles = doc.getElementsByClass("season__game");

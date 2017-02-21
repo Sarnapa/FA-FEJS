@@ -31,7 +31,9 @@ public class LeaguesLinks extends HtmlService
 
     public void getLeaguesUrls()
     {
-        Document doc = getHtmlSource(url);
+        Random generator = new Random();
+        int rand = generator.nextInt(15555);
+        Document doc = getHtmlSource(url + "?_=" + rand);
         if(doc != null)
         {
             Element menu = doc.getElementsByClass("main-category").first(); // one element
@@ -85,7 +87,9 @@ public class LeaguesLinks extends HtmlService
 
     private void getSomeUrls(String url)
     {
-        Document doc = getHtmlSource(url);
+        Random generator = new Random();
+        int rand = generator.nextInt(15555);
+        Document doc = getHtmlSource(url + "?_=" + rand);
         if(doc != null)
         {
             Element list = doc.getElementById("games");
@@ -150,7 +154,6 @@ public class LeaguesLinks extends HtmlService
     {
         try
         {
-            System.out.println(leaguesMap.size());
             int currentThreadsNumber = 0;
             String tableName, url;
             Iterator<String> keySetIterator = leaguesMap.keySet().iterator();

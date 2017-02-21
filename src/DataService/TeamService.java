@@ -7,6 +7,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class TeamService extends HtmlService
 {
@@ -26,7 +27,9 @@ public class TeamService extends HtmlService
 
     public void getPlayersUrls() throws InterruptedException
     {
-        Document doc = getHtmlSource(url);
+        Random generator = new Random();
+        int rand = generator.nextInt(15555);
+        Document doc = getHtmlSource(url + "?_=" + rand);
         if(doc != null)
         {
             Element playersContainer = doc.getElementsByClass("players-list").first();

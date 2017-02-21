@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.Semaphore;
 
 public class LeagueService extends HtmlService implements Runnable
@@ -31,7 +32,9 @@ public class LeagueService extends HtmlService implements Runnable
         //long startTime = System.currentTimeMillis();
         try
         {
-            Document doc = getHtmlSource(url);
+            Random generator = new Random();
+            int rand = generator.nextInt(15555);
+            Document doc = getHtmlSource(url + "?_=" + rand);
             if(doc != null)
             {
                 if(isNormalLeague)
