@@ -4,22 +4,28 @@ import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
+import java.util.Random;
 
 public class HtmlService
 {
     // To get HTML code of page
     public static Document getHtmlSource(String address)
     {
+        address = address + "?_=ts";
         int i = 0;
+        int timeout = 30 * 1000;
         Connection conn;
         Connection.Response resp = null;
-        while(i < 10)
+        while(i < 5)
         {
             try
             {
                 long startTime = System.currentTimeMillis();
+                //Random generator = new Random();
+                //int rand = generator.nextInt(15555);
                 conn = Jsoup.connect(address);
-                conn.timeout(0).ignoreHttpErrors(true);
+                conn.timeout(timeout).ignoreHttpErrors(true);
                 resp = conn.execute();
                 if (resp.statusCode() == 200)
                 {
@@ -29,6 +35,12 @@ public class HtmlService
                 }
                 ++i;
             }
+            catch (SocketTimeoutException ste)
+            {
+                ++i;
+                System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: Przekroczony Timeout: " + ste.getMessage());
+                ste.printStackTrace();
+            }
             catch (IOException e)
             {
                 System.out.println("kupka");
@@ -37,9 +49,12 @@ public class HtmlService
                 return null;
             }
         }
-        if(resp != null)
-            System.out.println("Nie można pobrać danych z adresu: " + address + "Kod HTML:  " + resp.statusCode() + " Wiadomość: " + resp.statusMessage());
-        return null;
+        //finally
+        //{
+            if (resp != null)
+                System.out.println("Nie można pobrać danych z adresu: " + address + " Kod HTML:  " + resp.statusCode() + " Wiadomość: " + resp.statusMessage());
+            return null;
+        //}
     }
 
     /*private static String getUrlSource(String address) throws IOException

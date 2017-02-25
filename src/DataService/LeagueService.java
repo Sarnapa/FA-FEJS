@@ -32,9 +32,7 @@ public class LeagueService extends HtmlService implements Runnable
         //long startTime = System.currentTimeMillis();
         try
         {
-            Random generator = new Random();
-            int rand = generator.nextInt(15555);
-            Document doc = getHtmlSource(url + "?_=" + rand);
+            Document doc = getHtmlSource(url);
             if(doc != null)
             {
                 if(isNormalLeague)

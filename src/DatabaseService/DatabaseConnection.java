@@ -64,7 +64,8 @@ public class DatabaseConnection
                 birthdate =  new java.sql.Date(player.getDate().getTime());
             else
                 birthdate = null;
-            String league = newLeagueName(player.getTableName()).toUpperCase();
+            //String league = newLeagueName(player.getTableName()).toUpperCase();
+            String league = player.getTableName().toUpperCase();
             String team = player.getTeamName();
             int apps = player.getApps();
             int firstSquad = player.getFirstSquad();
@@ -97,17 +98,6 @@ public class DatabaseConnection
             //e.printStackTrace(System.out); above
             return false;
         }
-    }
-
-    private static String newLeagueName(String league) // String without ""
-    {
-        int first = league.indexOf('\"');
-        if(first == -1)
-            return league;
-        int second = league.lastIndexOf('\"');
-        StringBuffer sb = new StringBuffer(league.length() - 2);
-        sb.append(league.substring(0, first)).append(league.substring(first + 1, second)).append(league.substring(second + 1));
-        return sb.toString();
     }
 
     public synchronized void updateView(LeagueView view, String leagueName, String orderBy, boolean desc)

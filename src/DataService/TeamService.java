@@ -27,9 +27,7 @@ public class TeamService extends HtmlService
 
     public void getPlayersUrls() throws InterruptedException
     {
-        Random generator = new Random();
-        int rand = generator.nextInt(15555);
-        Document doc = getHtmlSource(url + "?_=" + rand);
+        Document doc = getHtmlSource(url);
         if(doc != null)
         {
             Element playersContainer = doc.getElementsByClass("players-list").first();

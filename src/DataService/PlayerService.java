@@ -94,9 +94,7 @@ public class PlayerService extends HtmlService
 
     public void getPlayerData()
     {
-        Random generator = new Random();
-        int rand = generator.nextInt(15555);
-        Document doc = getHtmlSource(url + "?_=" + rand);
+        Document doc = getHtmlSource(url);
         try
         {
             if(doc != null)
@@ -143,9 +141,7 @@ public class PlayerService extends HtmlService
 
     private void getStats(String name, String url)
     {
-        Random generator = new Random();
-        int rand = generator.nextInt(15555);
-        Document doc = getHtmlSource(url + "?_=" + rand);
+        Document doc = getHtmlSource(url);
         if(doc != null)
         {
             Elements articles = doc.getElementsByClass("season__game");

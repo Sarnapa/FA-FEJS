@@ -5,9 +5,11 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.Semaphore;
 
 public class LeaguesLinks extends HtmlService
@@ -31,13 +33,11 @@ public class LeaguesLinks extends HtmlService
 
     public void getLeaguesUrls()
     {
-        Random generator = new Random();
-        int rand = generator.nextInt(15555);
-        Document doc = getHtmlSource(url + "?_=" + rand);
+        Document doc = getHtmlSource(url);
         if(doc != null)
         {
             Element menu = doc.getElementsByClass("main-category").first(); // one element
-            Element leaguesMenu = menu.child(5); // 5 in menu (not 4 because we have one extra tags <li>)
+            Element leaguesMenu = menu.child(5); // 6 in menu (not 5 because we have one extra tags <li>)
             Elements leagueSpans = leaguesMenu.getElementsByTag("span");
             //for(int i = 0; i < leagueSpans.size(); ++i)
             for (Element span : leagueSpans)
@@ -46,26 +46,27 @@ public class LeaguesLinks extends HtmlService
                 String leagueName = span.text(); // this leagueName is only valid on the main page ('I Liga and II liga' case)
                 Element leagueUl = span.nextElementSibling();
                 String url;
+                //System.out.println(leagueName);
                 switch (leagueName)
                 {
                     case "Ekstraklasa":
                         url = leagueUl.child(2).child(0).attr("href");
                         if(selectedLeagues.contains("EKSTRAKLASA"))
-                            leaguesMap.put("Ekstraklasa", url);
+                            leaguesMap.put("EKSTRAKLASA", url);
                         //leaguesUrls.add(url);
                         //leaguesNames.add(leagueName);
                         break;
                     case "I Liga":
                         url = leagueUl.child(2).child(0).attr("href");
                         if(selectedLeagues.contains("PIERWSZA LIGA"))
-                            leaguesMap.put("Pierwsza Liga", url);
+                            leaguesMap.put("PIERWSZA LIGA", url);
                         //leaguesUrls.add(url);
                         //leaguesNames.add(leagueName);
                         break;
                     case "II Liga":
                         url = leagueUl.child(2).child(0).attr("href");
                         if(selectedLeagues.contains("DRUGA LIGA"))
-                            leaguesMap.put("Druga Liga", url);
+                            leaguesMap.put("DRUGA LIGA", url);
                         //leaguesUrls.add(url);
                         //leaguesNames.add(leagueName);
                         break;
@@ -87,9 +88,7 @@ public class LeaguesLinks extends HtmlService
 
     private void getSomeUrls(String url)
     {
-        Random generator = new Random();
-        int rand = generator.nextInt(15555);
-        Document doc = getHtmlSource(url + "?_=" + rand);
+        Document doc = getHtmlSource(url);
         if(doc != null)
         {
             Element list = doc.getElementById("games");
@@ -101,8 +100,9 @@ public class LeaguesLinks extends HtmlService
                 String leagueName = link.text();
                 if (!(leagueName.equals("Trzecia Liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
                 {
-                    if(selectedLeagues.contains(leagueName.toUpperCase()))
-                        leaguesMap.put(leagueName, url + link.attr("href"));
+                    String tableName = newLeagueName(leagueName).toUpperCase();
+                    if(selectedLeagues.contains(tableName))
+                        leaguesMap.put(tableName, url + link.attr("href"));
                     //leaguesUrls.add(url + link.attr("href"));
                     //leaguesNames.add(leagueName);
                 }
@@ -131,12 +131,13 @@ public class LeaguesLinks extends HtmlService
             {
                 String line = fileReading.nextLine();
                 int firstColonIndex = line.indexOf(':');
-                tableName = line.substring(0, firstColonIndex);
+                tableName = line.substring(0, firstColonIndex).toUpperCase();
                 url = line.substring(firstColonIndex + 1, line.length());
                 //StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
                 //System.out.println(stackTraceElements[2].getMethodName());
                 //if(stackTraceElements[1].getMethodName().equals("get4LeagueUrls"))
-                if(selectedLeagues.contains(fileName.toUpperCase())){
+                if(selectedLeagues.contains(tableName))
+                {
                     if (fileName.equals("4liga.txt"))
                         fourthDivision.put(tableName, url);
                     else
@@ -152,6 +153,7 @@ public class LeaguesLinks extends HtmlService
 
     private void getLeagues()
     {
+        System.out.println(leaguesMap.size() + " " + fourthDivision.size() + " " + youthDivision.size());
         try
         {
             int currentThreadsNumber = 0;
@@ -249,6 +251,17 @@ public class LeaguesLinks extends HtmlService
             }
         }
     }**/
+
+    private static String newLeagueName(String league) // String without ""
+    {
+        int first = league.indexOf('\"');
+        if(first == -1)
+            return league;
+        int second = league.lastIndexOf('\"');
+        StringBuffer sb = new StringBuffer(league.length() - 2);
+        sb.append(league.substring(0, first)).append(league.substring(first + 1, second)).append(league.substring(second + 1));
+        return sb.toString();
+    }
 
     public void printLeaguesMap()
     {
