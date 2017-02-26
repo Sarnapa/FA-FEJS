@@ -54,6 +54,7 @@ public class DatabaseConnection
 
     public synchronized boolean updatePlayer(PlayerService player)
     {
+        boolean isUpdate = false;
         try
         {
             int ID = player.getID();
@@ -76,18 +77,18 @@ public class DatabaseConnection
             System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
             duc.updatePlayersTable(ID, firstName, lastName, birthdate);
             duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
-            return true;
+            isUpdate = true;
         }
         catch (SQLIntegrityConstraintViolationException sqlE)
         {
             System.out.println(sqlE.getMessage());
-            return true; // to avoid inserting bad data
+            isUpdate = true; // to avoid inserting bad data
         }
         catch (SQLException e)
         {
             while (e != null)
             {
-                System.out.println("\n----- SQLException -----");
+                System.out.println("Thread: " + Thread.currentThread().getId() + "\n----- SQLException -----");
                 System.out.println("  SQLState:   " + e.getSQLState());
                 System.out.println("  Error Code: " + e.getErrorCode());
                 System.out.println("  Message:    " + e.getMessage());
@@ -96,7 +97,11 @@ public class DatabaseConnection
             }
             // for stack dumps, refer to derby.log or add
             //e.printStackTrace(System.out); above
-            return false;
+            isUpdate = false;
+        }
+        finally
+        {
+            return isUpdate;
         }
     }
 

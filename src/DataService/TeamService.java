@@ -49,12 +49,12 @@ public class TeamService extends HtmlService
         {
             PlayerService player = new PlayerService(leagueName, tableName, name, url);
             player.getPlayerData();
-            player.printPlayerData();
+            //player.printPlayerData();
             if(player.getLastName() != null)
                 players.add(player);
             Thread.sleep(10);
         }
-        //updateDB();
+        updateDB();
     }
 
     public void updateDB() throws InterruptedException

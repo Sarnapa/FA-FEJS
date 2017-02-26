@@ -12,7 +12,7 @@ public class HtmlService
     // To get HTML code of page
     public static Document getHtmlSource(String address)
     {
-        address = address + "?_=ts";
+        //address = address + "?_=ts";
         int i = 0;
         int timeout = 30 * 1000;
         Connection conn;
@@ -24,12 +24,14 @@ public class HtmlService
                 long startTime = System.currentTimeMillis();
                 //Random generator = new Random();
                 //int rand = generator.nextInt(15555);
-                conn = Jsoup.connect(address);
+                conn = Jsoup.connect(address).userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/53.0.2785.143 Chrome/53.0.2785.143 Safari/537.36");
+                conn.referrer("http://www.google.com");
+                //conn = Jsoup.connect(address);
                 conn.timeout(timeout).ignoreHttpErrors(true);
                 resp = conn.execute();
                 if (resp.statusCode() == 200)
                 {
-                    System.out.print(address + " ");
+                    System.out.print(Thread.currentThread().getId() + " " + address + " ");
                     System.out.println(System.currentTimeMillis() - startTime);
                     return conn.get();
                 }
@@ -38,7 +40,7 @@ public class HtmlService
             catch (SocketTimeoutException ste)
             {
                 ++i;
-                System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: Przekroczony Timeout: " + ste.getMessage());
+                System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + ste.getMessage() + " Próba: " + i);
                 ste.printStackTrace();
             }
             catch (IOException e)

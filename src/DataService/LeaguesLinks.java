@@ -18,7 +18,7 @@ public class LeaguesLinks extends HtmlService
     private HashMap<String, String> leaguesMap = new HashMap<String, String>(); // <table_name, url> - Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
     private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
     private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url>
-    private static final int THREADS_NUMBER = 5;
+    private static final int THREADS_NUMBER = 10;
     //private static final Semaphore mutex = new Semaphore(0);
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
