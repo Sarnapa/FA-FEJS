@@ -111,7 +111,8 @@ public class DatabaseConnection
     }
 
     public List<String> getTablesNames(){
-        try {
+        try
+        {
             DatabaseMetaData metadata = conn.getMetaData();
             List<String> names = new ArrayList<>();
             String[] types = {"TABLE"};

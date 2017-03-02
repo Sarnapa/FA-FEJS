@@ -1,8 +1,13 @@
 import DataService.PlayerService;
 import DatabaseService.DatabaseConnection;
+import DatabaseService.DatabaseUpdateContent;
+import DatabaseService.DatabaseUpdateView;
+import DatabaseService.Player;
 import Layout.*;
 import DataService.LeaguesLinks;
 
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -10,8 +15,50 @@ public class Main {
     public static void main(String [] args)
     {
         System.out.println("elo");
-        LayoutInit layout = new LayoutInit();
-
+        //LayoutInit layout = new LayoutInit();
+        try
+        {
+            Class.forName("org.apache.derby.jdbc.EmbeddedDriver"); // load the driver
+        }
+        catch (ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        Connection conn = null; // make Derby JDBC connection
+        try
+        {
+            conn = DriverManager.getConnection("jdbc:derby:./DB;create=true;user=fafejs;password=fafejs");
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+        }
+        DatabaseUpdateView duv = new DatabaseUpdateView(conn);
+        List<String> names = new ArrayList<>();
+        try
+        {
+            DatabaseMetaData metadata = conn.getMetaData();
+            String[] types = {"TABLE"};
+            ResultSet rs = metadata.getTables(null, null, "%", types);
+            while(rs.next())
+            {
+                String name = rs.getString(3); // column 3 is table name
+                if(!name.equals("PLAYERS"))
+                    names.add(name);
+            }
+            rs.close();
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        List<Player> players = new ArrayList<Player>();
+        players.add(duv.getPlayerRows(766143, names));
+        players.add(duv.getPlayerRows(142770, names));
+        players.add(duv.getPlayerRows(668255, names));
+        players.add(duv.getPlayerRows(709511, names));
+        PDFCreator pdfCreator = new PDFCreator(players);
+        pdfCreator.generatePDF("pdf1");
         //LeaguesLinks links = new LeaguesLinks();
         //links.getLeaguesUrls();
         //links.printAllLeagues();
