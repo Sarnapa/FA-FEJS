@@ -55,6 +55,10 @@ public class LeagueView extends JFrame {
         updateButton.addActionListener(listenerForUpdateButton);
     }
 
+    public void addPDFButtonListener(ActionListener listenerForPDFButton){
+       pdfButton.addActionListener(listenerForPDFButton);
+    }
+
     public void disableView(){
         setEnabled(false);
         glassPane.setVisible(true);
@@ -67,6 +71,26 @@ public class LeagueView extends JFrame {
 
     public String getLeagueChoiceSelected() {
         return leagueChoice.getSelectedItem().toString();
+    }
+
+    public java.util.List<String> getRowAt(int row) {
+        int colNumber = playersTable.getColumnCount();
+        java.util.List<String> result = new java.util.ArrayList<>();
+
+        for (int i = 0; i < colNumber; i++) {
+            result.add(tableModel.getValueAt(row, i).toString());
+        }
+
+        return result;
+    }
+
+    public java.util.List<java.util.List<String>> getSelectedPlayers(){
+        java.util.List<java.util.List<String>> result = new java.util.ArrayList<>();
+        int[] players = playersTable.getSelectedRows();
+        for(int i: players){
+            result.add(getRowAt(i));
+        }
+        return result;
     }
 
     public void clearTable(){

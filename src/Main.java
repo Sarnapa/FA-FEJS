@@ -15,7 +15,9 @@ public class Main {
     public static void main(String [] args)
     {
         System.out.println("elo");
-        //LayoutInit layout = new LayoutInit();
+        LayoutInit layout = new LayoutInit();
+
+        /*
         try
         {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver"); // load the driver
@@ -59,6 +61,9 @@ public class Main {
         players.add(duv.getPlayerRows(709511, names));
         PDFCreator pdfCreator = new PDFCreator(players);
         pdfCreator.generatePDF("pdf1");
+        */
+
+
         //LeaguesLinks links = new LeaguesLinks();
         //links.getLeaguesUrls();
         //links.printAllLeagues();

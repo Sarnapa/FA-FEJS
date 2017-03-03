@@ -67,6 +67,22 @@ public class LayoutInit{
             }
             LeaguesLinks leaguesLinks = new LeaguesLinks(updateView.getSelectedLeagues());
             leaguesLinks.getLeaguesUrls();
+            System.out.println("KONIEC");
+        }
+    }
+
+    class CreatePDFListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            List<List<String>> players = leagueView.getSelectedPlayers();
+            String tmp = new String();
+            for(List<String> player:players){
+                for(String str: player){
+                    tmp = tmp+str+" ";
+                }
+                System.out.println(tmp);
+                tmp = "";
+            }
         }
     }
 
@@ -98,5 +114,6 @@ public class LayoutInit{
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
+        leagueView.addPDFButtonListener(new CreatePDFListener());
     }
 }

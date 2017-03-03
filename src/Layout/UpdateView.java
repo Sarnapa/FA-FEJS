@@ -42,7 +42,7 @@ public class UpdateView extends JFrame{
         updateButton.addActionListener(listenerForUpdate);
     }
 
-    java.util.List<String> getSelectedLeagues(){
+    public java.util.List<String> getSelectedLeagues(){
         return leaguesList.getSelectedValuesList();
     }
 

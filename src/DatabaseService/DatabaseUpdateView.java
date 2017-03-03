@@ -89,9 +89,9 @@ public class DatabaseUpdateView
             ResultSet results = stmt.executeQuery(query);
             while(results.next())
             {
-                String[] temp = {Integer.toString(results.getInt(1)), results.getString(2), results.getString(3), results.getString(4), results.getString(5),
-                        Integer.toString(results.getInt(6)), Integer.toString(results.getInt(7)), Integer.toString(results.getInt(8)), Integer.toString(results.getInt(9)),
-                        Integer.toString(results.getInt(10)), Integer.toString(results.getInt(11))};
+                    String[] temp = {Integer.toString(results.getInt(1)), results.getString(2), results.getString(3), results.getString(4), results.getString(5),
+                            Integer.toString(results.getInt(6)), Integer.toString(results.getInt(7)), Integer.toString(results.getInt(8)), Integer.toString(results.getInt(9)),
+                            Integer.toString(results.getInt(10)), Integer.toString(results.getInt(11))};
 
                 //view.addToPlayersList(results.getInt(1)+" "+results.getString(2)+" "+results.getInt(3)+" "+results.getInt(4)+" "+results.getInt(5)+" "+results.getInt(6)+" "+results.getInt(7)+" "+results.getInt(8));
                 view.addToPlayersTable(temp);
