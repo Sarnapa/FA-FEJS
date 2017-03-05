@@ -2,12 +2,9 @@ package Layout;
 
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
-import DatabaseService.DatabaseUpdateView;
 import DatabaseService.Player;
 
 import java.awt.event.*;
-import java.sql.DatabaseMetaData;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +12,7 @@ public class LayoutInit{
     private LeagueView leagueView;
     private boolean desc = false;
     private UpdateView updateView;
+    private List<Player> selectedPlayersToPdf = new ArrayList<Player>();
 
     class LeagueChoiceListener implements ActionListener {
         @Override
@@ -79,6 +77,18 @@ public class LayoutInit{
     class CreatePDFListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            if(selectedPlayersToPdf.size() > 0)
+            {
+                PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
+                pdfCreator.generatePDF("pdf1");
+                selectedPlayersToPdf.clear();
+            }
+        }
+    }
+
+    class AddPlayersListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
             int[] players_ids = leagueView.getSelectedPlayers();
             for(int i:players_ids){
                 System.out.println(i);
@@ -87,14 +97,12 @@ public class LayoutInit{
             {
                 DatabaseConnection db = new DatabaseConnection();
                 db.createConnection();
-                List<Player> players = new ArrayList<Player>();
                 List<String> names = db.getTablesNames();
                 names.remove("PLAYERS");
                 for (int i : players_ids) {
-                    players.add(db.getDuv().getPlayerRows(i, names));
+                    selectedPlayersToPdf.add(db.getDuv().getPlayerRows(i, names));
                 }
-                PDFCreator pdfCreator = new PDFCreator(players);
-                pdfCreator.generatePDF("pdf1");
+                db.shutdown();
             }
         }
     }
@@ -128,5 +136,6 @@ public class LayoutInit{
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
         leagueView.addPDFButtonListener(new CreatePDFListener());
+        leagueView.addPlayersButtonListener(new AddPlayersListener());
     }
 }

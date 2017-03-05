@@ -19,6 +19,7 @@ public class LeagueView extends JFrame {
     private JScrollPane playerListPane;
     private JPanel buttonPanel;
     private JTable playersTable;
+    private JButton addPlayersButton;
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
 
@@ -69,6 +70,9 @@ public class LeagueView extends JFrame {
 
     public void addPDFButtonListener(ActionListener listenerForPDFButton){
        pdfButton.addActionListener(listenerForPDFButton);
+    }
+    public void addPlayersButtonListener(ActionListener listenerForPlayersButton){
+        addPlayersButton.addActionListener(listenerForPlayersButton);
     }
 
     public void disableView(){
