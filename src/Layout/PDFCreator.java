@@ -13,6 +13,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
+import com.sun.javafx.font.FontFactory;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -65,8 +66,8 @@ public class PDFCreator
 
     private void createPlayerParagraph(Player player) throws IOException
     {
-        PdfFont font = PdfFontFactory.createFont(FontConstants.TIMES_ROMAN);
-        PdfFont bold = PdfFontFactory.createFont(FontConstants.TIMES_BOLD);
+        PdfFont font = PdfFontFactory.createFont(FontConstants.TIMES_ROMAN, "CP1250", true);
+        PdfFont bold = PdfFontFactory.createFont(FontConstants.TIMES_BOLD, "CP1250", true);
         String firstName = player.getFirstName();
         String lastName = player.getLastName();
         Date date = player.getDate();

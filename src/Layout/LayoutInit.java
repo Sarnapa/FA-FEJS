@@ -83,16 +83,19 @@ public class LayoutInit{
             for(int i:players_ids){
                 System.out.println(i);
             }
-            DatabaseConnection db = new DatabaseConnection();
-            db.createConnection();
-            List<Player> players = new ArrayList<Player>();
-            List<String> names = db.getTablesNames();
-            names.remove("PLAYERS");
-            for(int i:players_ids) {
-                players.add(db.getDuv().getPlayerRows(i, names));
+            if(players_ids.length > 0)
+            {
+                DatabaseConnection db = new DatabaseConnection();
+                db.createConnection();
+                List<Player> players = new ArrayList<Player>();
+                List<String> names = db.getTablesNames();
+                names.remove("PLAYERS");
+                for (int i : players_ids) {
+                    players.add(db.getDuv().getPlayerRows(i, names));
+                }
+                PDFCreator pdfCreator = new PDFCreator(players);
+                pdfCreator.generatePDF("pdf1");
             }
-            PDFCreator pdfCreator = new PDFCreator(players);
-            pdfCreator.generatePDF("pdf1");
         }
     }
 
