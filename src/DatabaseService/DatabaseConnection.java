@@ -128,6 +128,10 @@ public class DatabaseConnection
         return null;
     }
 
+    public DatabaseUpdateView getDuv() {
+        return duv;
+    }
+
     public synchronized void shutdown()
     {
         try

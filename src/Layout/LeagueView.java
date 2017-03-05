@@ -41,6 +41,18 @@ public class LeagueView extends JFrame {
         tableModel.setColumnIdentifiers(columnNames);
         playersTable = new JTable(tableModel);
         glassPane = new MyGlassPane();
+        //changes selection method. there's no need to hold ctrl.
+        playersTable.setSelectionModel(new DefaultListSelectionModel() {
+            @Override
+            public void setSelectionInterval(int x, int y) {
+                if(super.isSelectedIndex(x)) {
+                    super.removeSelectionInterval(x, y);
+                }
+                else {
+                    super.addSelectionInterval(x, y);
+                }
+            }
+        });
     }
 
     public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton){
@@ -84,11 +96,11 @@ public class LeagueView extends JFrame {
         return result;
     }
 
-    public java.util.List<java.util.List<String>> getSelectedPlayers(){
-        java.util.List<java.util.List<String>> result = new java.util.ArrayList<>();
+    public int[] getSelectedPlayers(){
         int[] players = playersTable.getSelectedRows();
-        for(int i: players){
-            result.add(getRowAt(i));
+        int[] result = new int[players.length];
+        for(int i = 0;i < players.length;i++){
+            result[i] = (int)playersTable.getValueAt(players[i], 0);
         }
         return result;
     }
@@ -96,7 +108,7 @@ public class LeagueView extends JFrame {
     public void clearTable(){
         tableModel.setRowCount(0);
     }
-    public void addToPlayersTable(String[] s){
+    public void addToPlayersTable(Object[] s){
         tableModel.addRow(s);
     }
     public JTable getPlayersTable(){ return playersTable; }
