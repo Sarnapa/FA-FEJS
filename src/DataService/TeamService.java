@@ -27,7 +27,7 @@ public class TeamService extends HtmlService
 
     public void getPlayersUrls() throws InterruptedException
     {
-        Document doc = getHtmlSource(url);
+        Document doc = getHtmlSource(url, false);
         if(doc != null)
         {
             Element playersContainer = doc.getElementsByClass("players-list").first();

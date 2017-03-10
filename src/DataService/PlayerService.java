@@ -93,7 +93,7 @@ public class PlayerService extends HtmlService
 
     public void getPlayerData()
     {
-        Document doc = getHtmlSource(url);
+        Document doc = getHtmlSource(url, false);
         try
         {
             if(doc != null)
@@ -140,7 +140,7 @@ public class PlayerService extends HtmlService
 
     private void getStats(String name, String url)
     {
-        Document doc = getHtmlSource(url);
+        Document doc = getHtmlSource(url, false);
         if(doc != null)
         {
             Elements articles = doc.getElementsByClass("season__game");

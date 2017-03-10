@@ -1,16 +1,13 @@
 package DataService;
 
-import DatabaseService.DatabaseConnection;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.Semaphore;
 
 public class LeaguesLinks extends HtmlService
 {
@@ -19,7 +16,6 @@ public class LeaguesLinks extends HtmlService
     private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
     private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url>
     private static final int THREADS_NUMBER = 10;
-    //private static final Semaphore mutex = new Semaphore(0);
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
 
@@ -33,42 +29,33 @@ public class LeaguesLinks extends HtmlService
 
     public void getLeaguesUrls()
     {
-        Document doc = getHtmlSource(url);
+        Document doc = getHtmlSource(url, false);
         if(doc != null)
         {
             Element menu = doc.getElementsByClass("main-category").first(); // one element
             Element leaguesMenu = menu.child(5); // 6 in menu (not 5 because we have one extra tags <li>)
             Elements leagueSpans = leaguesMenu.getElementsByTag("span");
-            //for(int i = 0; i < leagueSpans.size(); ++i)
             for (Element span : leagueSpans)
             {
-                //Element span = leagueSpans.get(i);
                 String leagueName = span.text(); // this leagueName is only valid on the main page ('I Liga and II liga' case)
                 Element leagueUl = span.nextElementSibling();
                 String url;
-                //System.out.println(leagueName);
                 switch (leagueName)
                 {
                     case "Ekstraklasa":
                         url = leagueUl.child(2).child(0).attr("href");
                         if(selectedLeagues.contains("EKSTRAKLASA"))
                             leaguesMap.put("EKSTRAKLASA", url);
-                        //leaguesUrls.add(url);
-                        //leaguesNames.add(leagueName);
                         break;
                     case "I Liga":
                         url = leagueUl.child(2).child(0).attr("href");
                         if(selectedLeagues.contains("PIERWSZA LIGA"))
                             leaguesMap.put("PIERWSZA LIGA", url);
-                        //leaguesUrls.add(url);
-                        //leaguesNames.add(leagueName);
                         break;
                     case "II Liga":
                         url = leagueUl.child(2).child(0).attr("href");
                         if(selectedLeagues.contains("DRUGA LIGA"))
                             leaguesMap.put("DRUGA LIGA", url);
-                        //leaguesUrls.add(url);
-                        //leaguesNames.add(leagueName);
                         break;
                     case "III Liga":
                         url = leagueUl.child(2).child(0).attr("href");
@@ -88,23 +75,19 @@ public class LeaguesLinks extends HtmlService
 
     private void getSomeUrls(String url)
     {
-        Document doc = getHtmlSource(url);
+        Document doc = getHtmlSource(url, false);
         if(doc != null)
         {
             Element list = doc.getElementById("games");
             Elements links = list.getElementsByTag("a");
-            //for(int i = 0; i < links.size(); ++i)
             for (Element link : links)
             {
-                //Element link = links.get(i);
                 String leagueName = link.text();
                 if (!(leagueName.equals("Trzecia Liga") || leagueName.equals("Centralna Liga Juniorów \"Faza Finałowa\"")))
                 {
                     String tableName = newLeagueName(leagueName).toUpperCase();
                     if(selectedLeagues.contains(tableName))
                         leaguesMap.put(tableName, url + link.attr("href"));
-                    //leaguesUrls.add(url + link.attr("href"));
-                    //leaguesNames.add(leagueName);
                 }
             }
         }
@@ -157,7 +140,7 @@ public class LeaguesLinks extends HtmlService
         try
         {
             int currentThreadsNumber = 0;
-            String tableName, url;
+            /*String tableName, url;
             Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
             while (keySetIterator.hasNext())
             {
@@ -194,7 +177,7 @@ public class LeaguesLinks extends HtmlService
                     --currentThreadsNumber;
                 }
             }
-            /*keySetIterator = youthDivision.keySet().iterator();
+            keySetIterator = youthDivision.keySet().iterator();
             while (keySetIterator.hasNext())
             {
                 tableName = keySetIterator.next();
@@ -212,9 +195,9 @@ public class LeaguesLinks extends HtmlService
                     --currentThreadsNumber;
                 }
             }*/
-            //synchFunction(leaguesMap, currentThreadsNumber, true);
-            //synchFunction(fourthDivision, currentThreadsNumber, false);
-            //synchFunction(youthDivision, currentThreadsNumber, false);
+            synchFunction(leaguesMap, currentThreadsNumber, true, false);
+            synchFunction(fourthDivision, currentThreadsNumber, false, false);
+            synchFunction(youthDivision, currentThreadsNumber, false, true);
         }
         catch (InterruptedException e)
         {
@@ -222,14 +205,14 @@ public class LeaguesLinks extends HtmlService
         }
     }
 
-    private static void startLeagueThread(String url, String tableName, boolean isNormalLeague)
+    private static void startLeagueThread(String url, String tableName, boolean isNormalLeague, boolean isJSON)
     {
-        Runnable league = new LeagueService(url, tableName, someObject, isNormalLeague);
+        Runnable league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON);
         Thread leagueThread = new Thread(league);
         leagueThread.start();
     }
 
-    /**private void synchFunction(HashMap<String, String> map, int currentThreadsNumber, boolean isNormalLeague) throws InterruptedException
+    private void synchFunction(HashMap<String, String> map, int currentThreadsNumber, boolean isNormalLeague, boolean isJSON) throws InterruptedException
     {
         String tableName, url;
         Iterator<String> keySetIterator = map.keySet().iterator();
@@ -237,7 +220,7 @@ public class LeaguesLinks extends HtmlService
         {
             tableName = keySetIterator.next();
             url = map.get(tableName);
-            startLeagueThread(url, tableName, isNormalLeague);
+            startLeagueThread(url, tableName, isNormalLeague, isJSON);
             ++currentThreadsNumber;
             if (currentThreadsNumber == THREADS_NUMBER)
             {
@@ -250,7 +233,7 @@ public class LeaguesLinks extends HtmlService
                 --currentThreadsNumber;
             }
         }
-    }**/
+    }
 
     private static String newLeagueName(String league) // String without ""
     {

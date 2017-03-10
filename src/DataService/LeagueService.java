@@ -17,22 +17,24 @@ public class LeagueService extends HtmlService implements Runnable
     //private static Semaphore mutex;
     private static Object someObject;
     private boolean isNormalLeague; // Normal league = Ekstraklasa, I liga, II liga, III Liga, CLJ
+    private boolean isJSON;
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
 
-    public LeagueService(String url, String tableName, Object someObject, boolean isNormalLeague)
+    public LeagueService(String url, String tableName, Object someObject, boolean isNormalLeague, boolean isJSON)
     {
         this.url = url;
         this.tableName = tableName;
         this.someObject = someObject;
         this.isNormalLeague = isNormalLeague;
+        this.isJSON = isJSON;
     }
 
     public void run()
     {
-        //long startTime = System.currentTimeMillis();
+        Document doc = null;
         try
         {
-            Document doc = getHtmlSource(url);
+            doc = getHtmlSource(url, isJSON);
             if(doc != null)
             {
                 if(isNormalLeague)
@@ -57,12 +59,11 @@ public class LeagueService extends HtmlService implements Runnable
                     }
                 }
                 getTeams();
-                //System.out.println(System.currentTimeMillis() - startTime);
             }
         }
         catch (InterruptedException e)  // TODO - obsluga
         {
-            //Thread.currentThread().interrupt();
+            Thread.currentThread().interrupt();
         }
         finally
         {
