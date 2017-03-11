@@ -12,7 +12,10 @@ public class LayoutInit{
     private LeagueView leagueView;
     private boolean desc = false;
     private UpdateView updateView;
+    private UpdateProgress progress;
     private List<Player> selectedPlayersToPdf = new ArrayList<Player>();
+
+    /** Main window listeners **/
 
     class LeagueChoiceListener implements ActionListener {
         @Override
@@ -34,6 +37,7 @@ public class LayoutInit{
             desc = !desc;
         }
     }
+        /** Buttons listeners **/
 
     class UpdateButtonListener implements ActionListener {
         @Override
@@ -43,34 +47,6 @@ public class LayoutInit{
             updateView.addUpdateWindowListener(new UpdateWindowListener());
             updateView.addUpdateListener(new UpdateListener());
             fillUpdateTable(updateView, getLeaguesNames());
-        }
-    }
-
-
-    class UpdateWindowListener extends WindowAdapter {
-        @Override
-        public void windowClosing(WindowEvent e) {
-            leagueView.enableView();
-            updateView.dispose();
-        }
-
-    }
-    private static void fillUpdateTable(UpdateView uv, List<String> names) {
-        for (String s : names) {
-            if (!s.equals("PLAYERS"))
-                uv.addToLeaguesList(s);
-        }
-    }
-
-    class UpdateListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            for(String s: updateView.getSelectedLeagues()){
-                System.out.println(s);
-            }
-            LeaguesLinks leaguesLinks = new LeaguesLinks(updateView.getSelectedLeagues());
-            leaguesLinks.getLeaguesUrls();
-            System.out.println("KONIEC");
         }
     }
 
@@ -107,6 +83,43 @@ public class LayoutInit{
         }
     }
 
+    /** Update window listeners **/
+
+    class UpdateWindowListener extends WindowAdapter {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            leagueView.enableView();
+            updateView.dispose();
+        }
+    }
+
+    class UpdateListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            updateView.disableView();
+            progress = new UpdateProgress();
+            progress.addProgressListener(new ProgressListener());
+            for(String s: updateView.getSelectedLeagues()){
+                System.out.println(s);
+            }
+            startUpdate(updateView.getSelectedLeagues());
+        }
+    }
+
+    /** Progress window listeners **/
+
+    class ProgressListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            /** KILL THREADS HERE   **/
+            updateView.enableView();
+            progress.dispose();
+        }
+    }
+
+
+    /** Main window functions **/
+
     private static void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc){
         DatabaseConnection db = new DatabaseConnection();
         db.createConnection();
@@ -129,6 +142,30 @@ public class LayoutInit{
         }
     }
 
+    /** Update window functions **/
+
+    private void fillUpdateTable(UpdateView uv, List<String> names) {
+        for (String s : names) {
+            if (!s.equals("PLAYERS"))
+                uv.addToLeaguesList(s);
+        }
+    }
+
+    private void startUpdate(List<String> list){
+        LeaguesLinks leaguesLinks = new LeaguesLinks(list, this);
+        leaguesLinks.getLeaguesUrls();
+    }
+
+    /** Progress window functions **/
+
+    public void updateTeamsCount(){
+        progress.updateTeamsCount();
+    }
+
+    public void updateLeaguesCount(){
+        progress.updateLeaguesCount();
+    }
+    /** Controller **/
     public LayoutInit(){
         leagueView = new LeagueView();
         fillLeagueChoice(leagueView, getLeaguesNames());

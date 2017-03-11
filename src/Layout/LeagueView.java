@@ -1,6 +1,7 @@
 package Layout;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -22,14 +23,6 @@ public class LeagueView extends JFrame {
     private JButton addPlayersButton;
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
-
-    class MyGlassPane extends JComponent{
-        protected void paintComponent(Graphics g) {
-            g.setColor(new Color(250,250,250,150));
-            g.fillRect(0,0,getWidth()-1, getHeight()-1);
-        }
-    }
-
 
     private void createUIComponents() {
         String[] columnNames ={"ID", "FIRST NAME", "LAST NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST SQUAD", "MINUTES", "GOALS", "YELLOW CARDS", "RED CARDS"};

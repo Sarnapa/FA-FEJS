@@ -18,13 +18,15 @@ public class LeaguesLinks extends HtmlService
     private static final int THREADS_NUMBER = 10;
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
+    private static Layout.LayoutInit controller;
 
     public LeaguesLinks()
     {
     }
 
-    public LeaguesLinks(List<String> list){
+    public LeaguesLinks(List<String> list, Layout.LayoutInit _controller){
         selectedLeagues = list;
+        controller = _controller;
     }
 
     public void getLeaguesUrls()
@@ -207,7 +209,7 @@ public class LeaguesLinks extends HtmlService
 
     private static void startLeagueThread(String url, String tableName, boolean isNormalLeague, boolean isJSON)
     {
-        Runnable league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON);
+        Runnable league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON, controller);
         Thread leagueThread = new Thread(league);
         leagueThread.start();
     }

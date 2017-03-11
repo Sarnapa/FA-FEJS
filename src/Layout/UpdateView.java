@@ -15,12 +15,25 @@ public class UpdateView extends JFrame{
     private JList leaguesList;
     private JScrollPane leaguesListPane;
     private DefaultListModel listModel;
+    private MyGlassPane glassPane;
 
     private void createUIComponents() {
+        glassPane = new MyGlassPane();
         listModel = new DefaultListModel();
         leaguesList = new JList(listModel);
         leaguesListPane = new JScrollPane(leaguesList);
-}
+    }
+
+    public void disableView(){
+        setEnabled(false);
+        glassPane.setVisible(true);
+    }
+
+    public void enableView(){
+        setEnabled(true);
+        glassPane.setVisible(false);
+    }
+
     public void addToLeaguesList(String s){
         listModel.addElement(s);
     }
@@ -49,6 +62,7 @@ public class UpdateView extends JFrame{
     private void initGUI() {
         setTitle("FA-FEJS Data updater");
         setSize(new Dimension(350, 600));
+        setGlassPane(glassPane);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setVisible(true);
     }

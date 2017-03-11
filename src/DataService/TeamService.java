@@ -17,7 +17,6 @@ public class TeamService extends HtmlService
     private String name; // Team's name
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
     private List<PlayerService> players = new ArrayList<>(); // List of players' records
-
     public TeamService(String leagueName, String tableName, String url)
     {
         this.leagueName = leagueName;

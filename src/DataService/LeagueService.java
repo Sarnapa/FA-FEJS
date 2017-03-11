@@ -19,14 +19,16 @@ public class LeagueService extends HtmlService implements Runnable
     private boolean isNormalLeague; // Normal league = Ekstraklasa, I liga, II liga, III Liga, CLJ
     private boolean isJSON;
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
+    private static Layout.LayoutInit controller;
 
-    public LeagueService(String url, String tableName, Object someObject, boolean isNormalLeague, boolean isJSON)
+    public LeagueService(String url, String tableName, Object someObject, boolean isNormalLeague, boolean isJSON, Layout.LayoutInit _controller)
     {
         this.url = url;
         this.tableName = tableName;
         this.someObject = someObject;
         this.isNormalLeague = isNormalLeague;
         this.isJSON = isJSON;
+        this.controller = _controller;
     }
 
     public void run()
@@ -110,7 +112,9 @@ public class LeagueService extends HtmlService implements Runnable
         {
             TeamService team = new TeamService(name, tableName, url);
             team.getPlayersUrls();
+            controller.updateTeamsCount();
         }
+        controller.updateLeaguesCount();
         //printTeamUrls();
     }
 
