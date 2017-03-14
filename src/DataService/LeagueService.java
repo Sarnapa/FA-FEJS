@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 
-public class LeagueService extends HtmlService implements Runnable
+public class LeagueService implements Runnable
 {
     private String name; // League's name
     private String tableName; // sometimes League's name from website differs from table's name
@@ -36,7 +36,12 @@ public class LeagueService extends HtmlService implements Runnable
         Document doc = null;
         try
         {
-            doc = getHtmlSource(url, isJSON);
+            if(Thread.currentThread().interrupted())
+            {
+                System.out.println("Interruption, BITCH");
+                throw new InterruptedException();
+            }
+            doc = HtmlService.getHtmlSource(url, isJSON);
             if(doc != null)
             {
                 if(isNormalLeague)
@@ -65,6 +70,7 @@ public class LeagueService extends HtmlService implements Runnable
         }
         catch (InterruptedException e)  // TODO - obsluga
         {
+            System.out.println("no kurcze");
             Thread.currentThread().interrupt();
         }
         finally
@@ -76,31 +82,56 @@ public class LeagueService extends HtmlService implements Runnable
         }
     }
 
-    private void getUrls(Document doc)
+    private void getUrls(Document doc) throws InterruptedException
     {
+        if(Thread.currentThread().interrupted())
+        {
+            System.out.println("Interruption, BITCH");
+            throw new InterruptedException();
+        }
         Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
         Elements rows = teamsContainer.getElementsByClass("row");
         //for(int i = 0; i < rows.size(); ++i)
         for (Element row : rows)
         {
+            if(Thread.currentThread().interrupted())
+            {
+                System.out.println("Interruption, BITCH");
+                throw new InterruptedException();
+            }
             //Element row = rows.get(i);
             Elements links = row.getElementsByTag("a");
             //for(int j = 0; j < links.size(); ++j)
             for (Element link : links)
             {
+                if(Thread.currentThread().interrupted())
+                {
+                    System.out.println("Interruption, BITCH");
+                    throw new InterruptedException();
+                }
                 //Element link = links.get(j);
                 teamsUrls.add(link.attr("href"));
             }
         }
     }
 
-    private void getYouthTeamsUrls(Document doc)
+    private void getYouthTeamsUrls(Document doc) throws InterruptedException
     {
+        if(Thread.currentThread().interrupted())
+        {
+            System.out.println("Interruption, BITCH");
+            throw new InterruptedException();
+        }
         Element teamsTable = doc.getElementsByClass("table-template").first();
         Elements rows = teamsTable.getElementsByClass("row-link");
         //for(int i = 0; i < rows.size(); ++i)
         for (Element row : rows)
         {
+            if(Thread.currentThread().interrupted())
+            {
+                System.out.println("Interruption, BITCH");
+                throw new InterruptedException();
+            }
             //Element row = rows.get(i);
             teamsUrls.add(row.attr("data-url"));
         }
@@ -110,6 +141,11 @@ public class LeagueService extends HtmlService implements Runnable
     {
         for(String url: teamsUrls)
         {
+            if(Thread.currentThread().interrupted())
+            {
+                System.out.println("Interruption, BITCH");
+                throw new InterruptedException();
+            }
             TeamService team = new TeamService(name, tableName, url);
             team.getPlayersUrls();
             controller.updateTeamsCount();

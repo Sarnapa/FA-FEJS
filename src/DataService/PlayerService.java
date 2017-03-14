@@ -9,7 +9,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PlayerService extends HtmlService
+public class PlayerService
 {
     private String url;
     private int ID;
@@ -91,13 +91,18 @@ public class PlayerService extends HtmlService
         ID = Integer.parseInt(url.substring(url.lastIndexOf(',') + 1,url.lastIndexOf('.')));
     }
 
-    public void getPlayerData()
+    public void getPlayerData() throws InterruptedException
     {
-        Document doc = getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false);
         try
         {
             if(doc != null)
             {
+                if(Thread.currentThread().interrupted())
+                {
+                    System.out.println("Interruption, BITCH");
+                    throw new InterruptedException();
+                }
                 String name = doc.getElementsByClass("header--white").first().child(0).text();
                 String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
                 firstName = name.substring(0, name.indexOf(' ')).toLowerCase(); // begin index - inclusive, end index - exclusive
@@ -138,11 +143,16 @@ public class PlayerService extends HtmlService
         }
     }
 
-    private void getStats(String name, String url)
+    private void getStats(String name, String url) throws  InterruptedException
     {
-        Document doc = getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false);
         if(doc != null)
         {
+            if(Thread.currentThread().interrupted())
+            {
+                System.out.println("Interruption, BITCH");
+                throw new InterruptedException();
+            }
             Elements articles = doc.getElementsByClass("season__game");
             for (Element article : articles)
             {

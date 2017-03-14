@@ -9,13 +9,15 @@ import java.io.FileNotFoundException;
 import java.util.*;
 import java.util.List;
 
-public class LeaguesLinks extends HtmlService
+public class LeaguesLinks
 {
     private static final String url = "https://www.laczynaspilka.pl/";
     private HashMap<String, String> leaguesMap = new HashMap<String, String>(); // <table_name, url> - Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
     private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
-    private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url>
+    private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url
     private static final int THREADS_NUMBER = 10;
+    //private ArrayList<LeagueService> runnableList = new ArrayList<>();
+    private ArrayList<Thread> threadsList = new ArrayList<Thread>();
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
     private static Layout.LayoutInit controller;
@@ -31,7 +33,7 @@ public class LeaguesLinks extends HtmlService
 
     public void getLeaguesUrls()
     {
-        Document doc = getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false);
         if(doc != null)
         {
             Element menu = doc.getElementsByClass("main-category").first(); // one element
@@ -77,7 +79,7 @@ public class LeaguesLinks extends HtmlService
 
     private void getSomeUrls(String url)
     {
-        Document doc = getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false);
         if(doc != null)
         {
             Element list = doc.getElementById("games");
@@ -203,14 +205,16 @@ public class LeaguesLinks extends HtmlService
         }
         catch (InterruptedException e)
         {
-            e.printStackTrace();
+            Thread.currentThread().interrupt();
         }
     }
 
-    private static void startLeagueThread(String url, String tableName, boolean isNormalLeague, boolean isJSON)
+    private void startLeagueThread(String url, String tableName, boolean isNormalLeague, boolean isJSON)
     {
         Runnable league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON, controller);
         Thread leagueThread = new Thread(league);
+        //runnableList.add(league);
+        threadsList.add(leagueThread);
         leagueThread.start();
     }
 
@@ -233,6 +237,23 @@ public class LeaguesLinks extends HtmlService
                     System.out.println("Po blokadzie");
                 }
                 --currentThreadsNumber;
+            }
+        }
+    }
+
+    public void killLeagueThreads()
+    {
+        for(Thread t: threadsList)
+        {
+            t.stop();
+            //t.interrupt();
+            try
+            {
+                t.join();
+            }
+            catch (InterruptedException e) //TODO - obsluga
+            {
+                Thread.currentThread().interrupt();
             }
         }
     }

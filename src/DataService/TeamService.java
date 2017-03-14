@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class TeamService extends HtmlService
+public class TeamService
 {
     private String leagueName; // League's name
     private String tableName; // Table's name in database
@@ -17,6 +17,7 @@ public class TeamService extends HtmlService
     private String name; // Team's name
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
     private List<PlayerService> players = new ArrayList<>(); // List of players' records
+
     public TeamService(String leagueName, String tableName, String url)
     {
         this.leagueName = leagueName;
@@ -26,37 +27,57 @@ public class TeamService extends HtmlService
 
     public void getPlayersUrls() throws InterruptedException
     {
-        Document doc = getHtmlSource(url, false);
-        if(doc != null)
-        {
-            Element playersContainer = doc.getElementsByClass("players-list").first();
-            name = doc.getElementsByClass("left").get(1).text();
-            name = name.substring(0, name.lastIndexOf('|') - 1).toUpperCase();
-            Elements links = playersContainer.getElementsByTag("a");
-            for (Element link : links)
-            {
-                if (link.parent() == playersContainer)
+        //try {
+            Document doc = HtmlService.getHtmlSource(url, false);
+            if (doc != null) {
+                if(Thread.currentThread().interrupted())
+                {
+                    System.out.println("Interruption, BITCH");
+                    throw new InterruptedException();
+                }
+                Element playersContainer = doc.getElementsByClass("players-list").first();
+                name = doc.getElementsByClass("left").get(1).text();
+                name = name.substring(0, name.lastIndexOf('|') - 1).toUpperCase();
+                Elements links = playersContainer.getElementsByTag("a");
+                for (Element link : links) {
+                    if(Thread.currentThread().interrupted())
+                    {
+                        System.out.println("Interruption, BITCH");
+                        throw new InterruptedException();
+                    }
+                    System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
+                    if (link.parent() == playersContainer)
                         playersUrls.add(link.attr("href"));
+                }
+                getPlayers();
             }
-            getPlayers();
-        }
+        //}
+        //catch(InterruptedException ex)
+        //{
+          //  System.out.println(";___;");
+        //}
     }
 
     private void getPlayers() throws InterruptedException
     {
         for(String url: playersUrls)
         {
+            if(Thread.currentThread().interrupted())
+            {
+                System.out.println("Interruption, BITCH");
+                throw new InterruptedException();
+            }
+            System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
             PlayerService player = new PlayerService(leagueName, tableName, name, url);
             player.getPlayerData();
             //player.printPlayerData();
             if(player.getLastName() != null)
                 players.add(player);
-            Thread.sleep(10);
         }
         updateDB();
     }
 
-    public void updateDB() throws InterruptedException
+    public void updateDB()
     {
         DatabaseConnection database = new DatabaseConnection();
         database.createConnection();
@@ -66,7 +87,6 @@ public class TeamService extends HtmlService
             //database.updatePlayer(player);
             while(!database.updatePlayer(player))
             {
-                Thread.sleep(10);
                 //database = new DatabaseConnection();
                 database.recreateConnection();
             }

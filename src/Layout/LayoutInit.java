@@ -17,6 +17,7 @@ public class LayoutInit{
     private UpdateProgress progress;
     private List<Player> selectedPlayersToPdf = new ArrayList<Player>();
     private ArrayList<Integer> players_ids = new ArrayList<>();
+    private LeaguesLinks leaguesLinks;
 
     /** Main window listeners **/
 
@@ -121,11 +122,11 @@ public class LayoutInit{
         @Override
         public void actionPerformed(ActionEvent e) {
             /** KILL THREADS HERE   **/
+            leaguesLinks.killLeagueThreads();
             updateView.enableView();
             progress.dispose();
         }
     }
-
 
     /** Main window functions **/
 
@@ -161,7 +162,7 @@ public class LayoutInit{
     }
 
     private void startUpdate(List<String> list){
-        LeaguesLinks leaguesLinks = new LeaguesLinks(list, this);
+        leaguesLinks = new LeaguesLinks(list, this);
         leaguesLinks.getLeaguesUrls();
     }
 
