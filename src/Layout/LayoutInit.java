@@ -3,10 +3,10 @@ package Layout;
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
+import javafx.util.Pair;
 
 import java.awt.event.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.lang.Thread.sleep;
 
@@ -27,6 +27,17 @@ public class LayoutInit{
             leagueView.clearTable();
             System.out.println(leagueView.getLeagueChoiceSelected());
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
+
+            leagueView.disableView();
+            Map<Integer, Integer> selected = leagueView.getSelectedToPDF();
+            Iterator it = selected.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry)it.next();
+                int tmp_ind = leagueView.getRowWithValue((int)pair.getKey());
+                selected.put((int)pair.getKey(), tmp_ind);
+            }
+            leagueView.refresh();
+            leagueView.enableView();
         }
     }
 
@@ -81,15 +92,17 @@ public class LayoutInit{
     class AddPlayersListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            for(int i: leagueView.getSelectedPlayers()){
-                if(!players_ids.contains(i))
-                    players_ids.add(i);
+            Map<Integer, Integer> selected = leagueView.getSelectedPlayers();
+            Iterator it = selected.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry tmp = (Map.Entry)it.next();
+                System.out.println(tmp.getKey() + " " + tmp.getValue());
+                if(!players_ids.contains(tmp.getKey())) {
+                    players_ids.add((int)tmp.getKey());
+                }
+                leagueView.getSelectedToPDF().put((int)tmp.getKey(), (int)tmp.getValue());
             }
-            for(int i:players_ids){
-                System.out.println(i);
-                //leagueView.addToSelected(i);
-            }
-            //leagueView.refresh();
+            leagueView.refresh();
         }
     }
 

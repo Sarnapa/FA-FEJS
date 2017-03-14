@@ -1,5 +1,7 @@
 package Layout;
 
+import javafx.util.Pair;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -9,8 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 import static java.lang.Thread.sleep;
 
@@ -31,70 +32,21 @@ public class LeagueView extends JFrame {
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
 
-    private ArrayList<Integer> selectedToPDF = new ArrayList<>();
+    //private ArrayList<Pair<Integer, Integer>> selectedToPDF = new ArrayList<>();
+    private HashMap<Integer, Integer> selectedToPDF = new HashMap<>();
 
-    class CustomRenderer extends DefaultTableCellRenderer //implements TableCellRenderer
-    {
-        public Component getTableCellRendererComponent(JTable table, Object value,
-                                                       boolean isSelected, boolean hasFocus, int row, int column) {
-            Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            Color foreground, background;
-            foreground = null;
-            background = null;
+    private  class MyTableCellRenderer extends DefaultTableCellRenderer {
 
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected,  hasFocus, row, column);
 
-
-            if(isSelected){
-                foreground = Color.blue;
-                background = Color.white;
-            }else{
-                if (selectedToPDF.contains(row)) {
-                    foreground = Color.red;
-                    background = Color.white;
-                } else {
-                    foreground = Color.white;
-                    background = Color.blue;
-                }
+            if (selectedToPDF.containsValue(row)) {
+                setForeground(Color.red);
+            } else {
+                setForeground(Color.black);
             }
-
-            /*else {
-                Random random = new Random();
-
-             */
-
-                /*
-                switch(row%6) {
-                    case 1:
-                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        break;
-                    case 2:
-                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        break;
-                    case 3:
-                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        break;
-                    case 4:
-                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        break;
-                    case 5:
-                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        break;
-                    case 6:
-                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
-                        break;
-                    default:
-                        break;
-                }*/
-            //}
-            renderer.setForeground(foreground);
-            renderer.setBackground(background);
-            return renderer;
+            return (this);
         }
     }
 
@@ -108,6 +60,7 @@ public class LeagueView extends JFrame {
         };
         tableModel.setColumnIdentifiers(columnNames);
         playersTable = new JTable(tableModel);
+        playersTable.setDefaultRenderer(Object.class, new MyTableCellRenderer());
         //playersTable.setDefaultRenderer(Object.class, new CustomRenderer());
         glassPane = new MyGlassPane();
         //changes selection method. there's no need to hold ctrl.
@@ -123,6 +76,23 @@ public class LeagueView extends JFrame {
             }
         });
     }
+
+
+    public int getRowWithValue(int x){
+        int rowCount = playersTable.getRowCount();
+        for(int i = 0; i < rowCount; i++){
+            if(playersTable.getValueAt(i, 0).equals(x)){
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    public HashMap<Integer, Integer> getSelectedToPDF() {
+        return selectedToPDF;
+    }
+
+
 
     public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton){
         leagueChoice.addActionListener(listenerForLeagueChoiceButton);
@@ -144,8 +114,6 @@ public class LeagueView extends JFrame {
     }
 
     public void disableView(){
-
-
         setEnabled(false);
         glassPane.setVisible(true);
     }
@@ -170,13 +138,13 @@ public class LeagueView extends JFrame {
         return result;
     }
 
-    public int[] getSelectedPlayers(){
+    public HashMap<Integer, Integer> getSelectedPlayers(){
+        HashMap<Integer, Integer> tmp = new HashMap<>();
         int[] players = playersTable.getSelectedRows();
-        int[] result = new int[players.length];
-        for(int i = 0;i < players.length;i++){
-            result[i] = (int)playersTable.getValueAt(players[i], 0);
+        for(int i = 0; i < players.length; i++){
+            tmp.put((int)playersTable.getValueAt(players[i],0), (players[i]));
         }
-        return result;
+        return tmp;
     }
 
     public void clearTable(){
