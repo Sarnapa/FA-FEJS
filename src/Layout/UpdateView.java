@@ -22,6 +22,19 @@ public class UpdateView extends JFrame{
         listModel = new DefaultListModel();
         leaguesList = new JList(listModel);
         leaguesListPane = new JScrollPane(leaguesList);
+        leaguesList.setSelectionModel(new DefaultListSelectionModel() {
+            @Override
+            public void setSelectionInterval(int x, int y) {
+                if(super.isSelectedIndex(x)) {
+                    super.removeSelectionInterval(x, y);
+                }
+                else {
+                    super.addSelectionInterval(x, y);
+                }
+            }
+        });
+
+
     }
 
     public void disableView(){

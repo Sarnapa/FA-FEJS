@@ -2,10 +2,17 @@ package Layout;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Random;
+
+import static java.lang.Thread.sleep;
 
 /**
  * Created by Pawel on 06-Sep-16.
@@ -24,6 +31,73 @@ public class LeagueView extends JFrame {
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
 
+    private ArrayList<Integer> selectedToPDF = new ArrayList<>();
+
+    class CustomRenderer extends DefaultTableCellRenderer //implements TableCellRenderer
+    {
+        public Component getTableCellRendererComponent(JTable table, Object value,
+                                                       boolean isSelected, boolean hasFocus, int row, int column) {
+            Component renderer = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            Color foreground, background;
+            foreground = null;
+            background = null;
+
+
+
+            if(isSelected){
+                foreground = Color.blue;
+                background = Color.white;
+            }else{
+                if (selectedToPDF.contains(row)) {
+                    foreground = Color.red;
+                    background = Color.white;
+                } else {
+                    foreground = Color.white;
+                    background = Color.blue;
+                }
+            }
+
+            /*else {
+                Random random = new Random();
+
+             */
+
+                /*
+                switch(row%6) {
+                    case 1:
+                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        break;
+                    case 2:
+                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        break;
+                    case 3:
+                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        break;
+                    case 4:
+                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        break;
+                    case 5:
+                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        break;
+                    case 6:
+                        foreground = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        background = new Color(random.nextFloat(), random.nextFloat(), random.nextFloat());
+                        break;
+                    default:
+                        break;
+                }*/
+            //}
+            renderer.setForeground(foreground);
+            renderer.setBackground(background);
+            return renderer;
+        }
+    }
+
     private void createUIComponents() {
         String[] columnNames ={"ID", "FIRST NAME", "LAST NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST SQUAD", "MINUTES", "GOALS", "YELLOW CARDS", "RED CARDS"};
         tableModel = new DefaultTableModel(0, columnNames.length){
@@ -34,6 +108,7 @@ public class LeagueView extends JFrame {
         };
         tableModel.setColumnIdentifiers(columnNames);
         playersTable = new JTable(tableModel);
+        //playersTable.setDefaultRenderer(Object.class, new CustomRenderer());
         glassPane = new MyGlassPane();
         //changes selection method. there's no need to hold ctrl.
         playersTable.setSelectionModel(new DefaultListSelectionModel() {
@@ -69,6 +144,8 @@ public class LeagueView extends JFrame {
     }
 
     public void disableView(){
+
+
         setEnabled(false);
         glassPane.setVisible(true);
     }
@@ -113,6 +190,10 @@ public class LeagueView extends JFrame {
     public void addLeagueChoiceElement(String s){
         leagueChoice.addItem(s);
         leagueChoice.setSelectedIndex(-1);
+    }
+
+    public void refresh(){
+        playersTable.repaint();
     }
 
     public LeagueView()

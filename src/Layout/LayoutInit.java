@@ -8,12 +8,15 @@ import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class LayoutInit{
     private LeagueView leagueView;
     private boolean desc = false;
     private UpdateView updateView;
     private UpdateProgress progress;
     private List<Player> selectedPlayersToPdf = new ArrayList<Player>();
+    private ArrayList<Integer> players_ids = new ArrayList<>();
 
     /** Main window listeners **/
 
@@ -53,23 +56,7 @@ public class LayoutInit{
     class CreatePDFListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(selectedPlayersToPdf.size() > 0)
-            {
-                PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
-                pdfCreator.generatePDF("pdf1");
-                selectedPlayersToPdf.clear();
-            }
-        }
-    }
-
-    class AddPlayersListener implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            int[] players_ids = leagueView.getSelectedPlayers();
-            for(int i:players_ids){
-                System.out.println(i);
-            }
-            if(players_ids.length > 0)
+            if(players_ids.size() > 0)
             {
                 DatabaseConnection db = new DatabaseConnection();
                 db.createConnection();
@@ -80,6 +67,28 @@ public class LayoutInit{
                 }
                 db.shutdown();
             }
+            if(selectedPlayersToPdf.size() > 0)
+            {
+                PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
+                pdfCreator.generatePDF("pdf1");
+                selectedPlayersToPdf.clear();
+            }
+            //leagueView.refresh();
+        }
+    }
+
+    class AddPlayersListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            for(int i: leagueView.getSelectedPlayers()){
+                if(!players_ids.contains(i))
+                    players_ids.add(i);
+            }
+            for(int i:players_ids){
+                System.out.println(i);
+                //leagueView.addToSelected(i);
+            }
+            //leagueView.refresh();
         }
     }
 
@@ -168,7 +177,9 @@ public class LayoutInit{
     /** Controller **/
     public LayoutInit(){
         leagueView = new LeagueView();
+        leagueView.disableView();
         fillLeagueChoice(leagueView, getLeaguesNames());
+        leagueView.enableView();
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
