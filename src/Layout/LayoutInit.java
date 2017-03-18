@@ -24,20 +24,25 @@ public class LayoutInit{
     class LeagueChoiceListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            leagueView.clearTable();
-            System.out.println(leagueView.getLeagueChoiceSelected());
-            getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+                //@Override
+                //public void run() {
+                    leagueView.clearTable();
+                    System.out.println(leagueView.getLeagueChoiceSelected());
+                    getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
 
-            leagueView.disableView();
-            Map<Integer, Integer> selected = leagueView.getSelectedToPDF();
-            Iterator it = selected.entrySet().iterator();
-            while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                int tmp_ind = leagueView.getRowWithValue((int)pair.getKey());
-                selected.put((int)pair.getKey(), tmp_ind);
-            }
-            leagueView.refresh();
-            leagueView.enableView();
+                    leagueView.disableView();
+                    Map<Integer, Integer> selected = leagueView.getSelectedToPDF();
+                    Iterator it = selected.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry pair = (Map.Entry)it.next();
+                        int tmp_ind = leagueView.getRowWithValue((int)pair.getKey());
+                        selected.put((int)pair.getKey(), tmp_ind);
+                    }
+                    leagueView.refresh();
+                    leagueView.enableView();
+                //}
+            //});
         }
     }
 
@@ -47,7 +52,12 @@ public class LayoutInit{
             int col = leagueView.getPlayersTable().columnAtPoint(e.getPoint());
             /*String name = leagueView.getPlayersTable().getColumnName(col);
             System.out.println("Column index selected " + col + " " + name);*/
-            leagueView.clearTable();
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+                //@Override
+                //public void run() {
+                    leagueView.clearTable();
+                //}
+            //});
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), leagueView.getPlayersTable().getColumnName(col), desc);
             desc = !desc;
         }
@@ -56,12 +66,21 @@ public class LayoutInit{
 
     class UpdateButtonListener implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent e) {
-            leagueView.disableView();
-            updateView = new UpdateView();
-            updateView.addUpdateWindowListener(new UpdateWindowListener());
-            updateView.addUpdateListener(new UpdateListener());
-            fillUpdateTable(updateView, getLeaguesNames());
+        public void actionPerformed(ActionEvent e)
+        {
+            if (LeaguesLinks.checkHostConnection())
+            {
+                //java.awt.EventQueue.invokeLater(new Runnable() {
+                    //@Override
+                    //public void run() {
+                        leagueView.disableView();
+                        updateView = new UpdateView();
+                        updateView.addUpdateWindowListener(new UpdateWindowListener());
+                        updateView.addUpdateListener(new UpdateListener());
+                        fillUpdateTable(updateView, getLeaguesNames());
+                    //}
+                //});
+            }
         }
     }
 
@@ -85,7 +104,12 @@ public class LayoutInit{
                 pdfCreator.generatePDF("pdf1");
                 selectedPlayersToPdf.clear();
             }
-            //leagueView.refresh();
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+               // @Override
+                //public void run() {
+                    leagueView.refresh();
+                //}
+            //});
         }
     }
 
@@ -102,7 +126,12 @@ public class LayoutInit{
                 }
                 leagueView.getSelectedToPDF().put((int)tmp.getKey(), (int)tmp.getValue());
             }
-            leagueView.refresh();
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+                //@Override
+                //public void run() {
+                    leagueView.refresh();
+                //}
+           //});
         }
     }
 
@@ -111,20 +140,30 @@ public class LayoutInit{
     class UpdateWindowListener extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {
-            leagueView.enableView();
-            updateView.dispose();
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+                //@Override
+                //public void run() {
+                    leagueView.enableView();
+                    updateView.dispose();
+                //}
+            //});
         }
     }
 
     class UpdateListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            updateView.disableView();
-            progress = new UpdateProgress();
-            progress.addProgressListener(new ProgressListener());
-            for(String s: updateView.getSelectedLeagues()){
-                System.out.println(s);
-            }
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+               // @Override
+                //public void run() {
+                    updateView.disableView();
+                    progress = new UpdateProgress();
+                    progress.addProgressListener(new ProgressListener());
+                    for(String s: updateView.getSelectedLeagues()){
+                        System.out.println(s);
+                    }
+                //}
+            //});
             startUpdate(updateView.getSelectedLeagues());
         }
     }
@@ -134,10 +173,14 @@ public class LayoutInit{
     class ProgressListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            /** KILL THREADS HERE   **/
             leaguesLinks.killLeagueThreads();
-            updateView.enableView();
-            progress.dispose();
+            //java.awt.EventQueue.invokeLater(new Runnable() {
+               // @Override
+                //public void run() {
+                    updateView.enableView();
+                    progress.dispose();
+                //}
+            //});
         }
     }
 
@@ -188,12 +231,19 @@ public class LayoutInit{
     public void updateLeaguesCount(){
         progress.updateLeaguesCount();
     }
+
     /** Controller **/
-    public LayoutInit(){
+    public LayoutInit()
+    {
         leagueView = new LeagueView();
-        leagueView.disableView();
-        fillLeagueChoice(leagueView, getLeaguesNames());
-        leagueView.enableView();
+       // java.awt.EventQueue.invokeLater(new Runnable() {
+       //     @Override
+        //    public void run() {
+        //        leagueView.disableView();
+                fillLeagueChoice(leagueView, getLeaguesNames());
+                leagueView.enableView();
+        //    }
+        //});
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());

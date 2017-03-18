@@ -98,11 +98,6 @@ public class PlayerService
         {
             if(doc != null)
             {
-                if(Thread.currentThread().interrupted())
-                {
-                    System.out.println("Interruption, BITCH");
-                    throw new InterruptedException();
-                }
                 String name = doc.getElementsByClass("header--white").first().child(0).text();
                 String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
                 firstName = name.substring(0, name.indexOf(' ')).toLowerCase(); // begin index - inclusive, end index - exclusive
@@ -148,11 +143,6 @@ public class PlayerService
         Document doc = HtmlService.getHtmlSource(url, false);
         if(doc != null)
         {
-            if(Thread.currentThread().interrupted())
-            {
-                System.out.println("Interruption, BITCH");
-                throw new InterruptedException();
-            }
             Elements articles = doc.getElementsByClass("season__game");
             for (Element article : articles)
             {

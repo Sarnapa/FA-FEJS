@@ -6,25 +6,22 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.*;
 import java.util.*;
 import java.util.List;
 
 public class LeaguesLinks
 {
     private static final String url = "https://www.laczynaspilka.pl/";
-    private HashMap<String, String> leaguesMap = new HashMap<String, String>(); // <table_name, url> - Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
-    private HashMap<String, String> fourthDivision = new HashMap<String, String>(); // <table_name, url>
-    private HashMap<String, String> youthDivision = new HashMap<String, String>(); // <table_name, url
+    private HashMap<String, String> leaguesMap = new HashMap<>(); // <table_name, url> - Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
+    private HashMap<String, String> fourthDivision = new HashMap<>(); // <table_name, url>
+    private HashMap<String, String> youthDivision = new HashMap<>(); // <table_name, url
     private static final int THREADS_NUMBER = 10;
-    //private ArrayList<LeagueService> runnableList = new ArrayList<>();
-    private ArrayList<Thread> threadsList = new ArrayList<Thread>();
+    private ArrayList<Thread> threadsList = new ArrayList<>();
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
     private static Layout.LayoutInit controller;
-
-    public LeaguesLinks()
-    {
-    }
 
     public LeaguesLinks(List<String> list, Layout.LayoutInit _controller){
         selectedLeagues = list;
@@ -144,61 +141,6 @@ public class LeaguesLinks
         try
         {
             int currentThreadsNumber = 0;
-            /*String tableName, url;
-            Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
-            while (keySetIterator.hasNext())
-            {
-                tableName = keySetIterator.next();
-                url = leaguesMap.get(tableName);
-                startLeagueThread(url, tableName, true);
-                ++currentThreadsNumber;
-                if (currentThreadsNumber == THREADS_NUMBER)
-                {
-                    synchronized(someObject)
-                    {
-                        System.out.println("Blokada");
-                        someObject.wait();
-                        System.out.println("Po blokadzie");
-                    }
-                    --currentThreadsNumber;
-                }
-            }
-            keySetIterator = fourthDivision.keySet().iterator();
-            while (keySetIterator.hasNext())
-            {
-                tableName = keySetIterator.next();
-                url = fourthDivision.get(tableName);
-                startLeagueThread(url, tableName, false);
-                ++currentThreadsNumber;
-                if (currentThreadsNumber == THREADS_NUMBER)
-                {
-                    synchronized(someObject)
-                    {
-                        System.out.println("Blokada");
-                        someObject.wait();
-                        System.out.println("Po blokadzie");
-                    }
-                    --currentThreadsNumber;
-                }
-            }
-            keySetIterator = youthDivision.keySet().iterator();
-            while (keySetIterator.hasNext())
-            {
-                tableName = keySetIterator.next();
-                url = youthDivision.get(tableName);
-                startLeagueThread(url, tableName, false);
-                ++currentThreadsNumber;
-                if (currentThreadsNumber == THREADS_NUMBER)
-                {
-                    synchronized(someObject)
-                    {
-                        System.out.println("Blokada");
-                        someObject.wait();
-                        System.out.println("Po blokadzie");
-                    }
-                    --currentThreadsNumber;
-                }
-            }*/
             synchFunction(leaguesMap, currentThreadsNumber, true, false);
             synchFunction(fourthDivision, currentThreadsNumber, false, false);
             synchFunction(youthDivision, currentThreadsNumber, false, true);
@@ -211,9 +153,8 @@ public class LeaguesLinks
 
     private void startLeagueThread(String url, String tableName, boolean isNormalLeague, boolean isJSON)
     {
-        Runnable league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON, controller);
+        LeagueService league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON, controller);
         Thread leagueThread = new Thread(league);
-        //runnableList.add(league);
         threadsList.add(leagueThread);
         leagueThread.start();
     }
@@ -243,10 +184,13 @@ public class LeaguesLinks
 
     public void killLeagueThreads()
     {
+        Thread.currentThread().interrupt();
+        if(Thread.currentThread().isInterrupted())
+            throw new RuntimeException();
         for(Thread t: threadsList)
         {
-            t.stop();
-            //t.interrupt();
+            //t.stop();
+            t.interrupt();
             try
             {
                 t.join();
@@ -256,6 +200,27 @@ public class LeaguesLinks
                 Thread.currentThread().interrupt();
             }
         }
+    }
+
+    public static boolean checkHostConnection() {
+        try
+        {
+            //make a URL to a known source
+            URL address = new URL(url);
+
+            //open a connection to that source
+            HttpURLConnection urlConnect = (HttpURLConnection) address.openConnection();
+
+            //trying to retrieve data from the source. If there
+            //is no connection, this line will fail
+            Object objData = urlConnect.getContent();
+
+        }
+        catch (IOException e) {
+            System.out.println("Sprawdź połączenie z internetem");
+            return false;
+        }
+        return true;
     }
 
     private static String newLeagueName(String league) // String without ""

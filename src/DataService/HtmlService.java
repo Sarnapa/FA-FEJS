@@ -128,7 +128,6 @@ public class HtmlService
             catch (IOException e)
             {
                 System.out.println("kupka");
-                //System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
                 e.printStackTrace();
                 return null;
             }

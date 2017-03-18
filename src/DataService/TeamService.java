@@ -25,56 +25,74 @@ public class TeamService
         this.url = url;
     }
 
-    public void getPlayersUrls() throws InterruptedException
+    public boolean getPlayersUrls()
     {
-        //try {
+            boolean interrupted = false;
             Document doc = HtmlService.getHtmlSource(url, false);
-            if (doc != null) {
-                if(Thread.currentThread().interrupted())
-                {
-                    System.out.println("Interruption, BITCH");
-                    throw new InterruptedException();
-                }
+            if (doc != null)
+            {
                 Element playersContainer = doc.getElementsByClass("players-list").first();
                 name = doc.getElementsByClass("left").get(1).text();
                 name = name.substring(0, name.lastIndexOf('|') - 1).toUpperCase();
                 Elements links = playersContainer.getElementsByTag("a");
                 for (Element link : links) {
-                    if(Thread.currentThread().interrupted())
+                    /*if(Thread.currentThread().interrupted())
                     {
                         System.out.println("Interruption, BITCH");
                         throw new InterruptedException();
+                    }*/
+                    try
+                    {
+                        System.out.println(Thread.currentThread().isInterrupted());
+                        Thread.currentThread().sleep(10);
+                    }
+                    catch (InterruptedException e)
+                    {
+                        System.out.println("no kurcze 2");
+                        Thread.currentThread().interrupt();
+                        return true; // was interrupted
                     }
                     System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
                     if (link.parent() == playersContainer)
                         playersUrls.add(link.attr("href"));
                 }
-                getPlayers();
+                interrupted = getPlayers();
             }
-        //}
-        //catch(InterruptedException ex)
-        //{
-          //  System.out.println(";___;");
-        //}
+            return interrupted;
     }
 
-    private void getPlayers() throws InterruptedException
-    {
-        for(String url: playersUrls)
+    private boolean getPlayers() {
+        boolean interrupted = false;
+        try
         {
-            if(Thread.currentThread().interrupted())
+            for (String url : playersUrls)
             {
-                System.out.println("Interruption, BITCH");
-                throw new InterruptedException();
+                /*if(Thread.currentThread().interrupted())
+                {
+                    System.out.println("Interruption, BITCH");
+                    throw new InterruptedException();
+                }*/
+                System.out.println(Thread.currentThread().isInterrupted());
+                Thread.currentThread().sleep(10);
+                System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
+                PlayerService player = new PlayerService(leagueName, tableName, name, url);
+                player.getPlayerData();
+                //player.printPlayerData();
+                if (player.getLastName() != null)
+                    players.add(player);
             }
-            System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
-            PlayerService player = new PlayerService(leagueName, tableName, name, url);
-            player.getPlayerData();
-            //player.printPlayerData();
-            if(player.getLastName() != null)
-                players.add(player);
         }
-        updateDB();
+        catch (InterruptedException e)
+        {
+            System.out.println("no kurcze 3");
+            Thread.currentThread().interrupt();
+            interrupted = true;
+        }
+        finally
+        {
+            updateDB();
+            return interrupted;
+        }
     }
 
     public void updateDB()
