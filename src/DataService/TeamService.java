@@ -1,6 +1,7 @@
 package DataService;
 
 import DatabaseService.DatabaseConnection;
+import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -17,12 +18,14 @@ public class TeamService
     private String name; // Team's name
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
     private List<PlayerService> players = new ArrayList<>(); // List of players' records
+    private LayoutInit controller;
 
-    public TeamService(String leagueName, String tableName, String url)
+    public TeamService(String leagueName, String tableName, String url, LayoutInit _controller)
     {
         this.leagueName = leagueName;
         this.tableName = tableName;
         this.url = url;
+        this.controller = _controller;
     }
 
     public boolean getPlayersUrls()
@@ -53,6 +56,7 @@ public class TeamService
                         return true; // was interrupted
                     }
                     System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
+                    controller.log(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
                     if (link.parent() == playersContainer)
                         playersUrls.add(link.attr("href"));
                 }
@@ -75,6 +79,7 @@ public class TeamService
                 System.out.println(Thread.currentThread().isInterrupted());
                 Thread.currentThread().sleep(10);
                 System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
+                controller.log(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
                 PlayerService player = new PlayerService(leagueName, tableName, name, url);
                 player.getPlayerData();
                 //player.printPlayerData();

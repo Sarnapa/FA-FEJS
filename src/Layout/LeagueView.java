@@ -32,7 +32,6 @@ public class LeagueView extends JFrame {
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
 
-    //private ArrayList<Pair<Integer, Integer>> selectedToPDF = new ArrayList<>();
     private HashMap<Integer, Integer> selectedToPDF = new HashMap<>();
 
     private  class MyTableCellRenderer extends DefaultTableCellRenderer {
@@ -61,9 +60,9 @@ public class LeagueView extends JFrame {
         tableModel.setColumnIdentifiers(columnNames);
         playersTable = new JTable(tableModel);
         playersTable.setDefaultRenderer(Object.class, new MyTableCellRenderer());
-        //playersTable.setDefaultRenderer(Object.class, new CustomRenderer());
         glassPane = new MyGlassPane();
         //changes selection method. there's no need to hold ctrl.
+        /*
         playersTable.setSelectionModel(new DefaultListSelectionModel() {
             @Override
             public void setSelectionInterval(int x, int y) {
@@ -75,6 +74,7 @@ public class LeagueView extends JFrame {
                 }
             }
         });
+        */
     }
 
 
@@ -177,6 +177,7 @@ public class LeagueView extends JFrame {
         setSize(new Dimension(800, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setGlassPane(glassPane);
+        leagueChoice.setEditable(false);
         setVisible(true);
     }
 }

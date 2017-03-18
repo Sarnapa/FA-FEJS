@@ -120,11 +120,19 @@ public class LayoutInit{
             Iterator it = selected.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry tmp = (Map.Entry)it.next();
-                System.out.println(tmp.getKey() + " " + tmp.getValue());
-                if(!players_ids.contains(tmp.getKey())) {
-                    players_ids.add((int)tmp.getKey());
+                //System.out.println(tmp.getKey() + " " + tmp.getValue());
+                if(players_ids.contains(tmp.getKey())) {    //remove
+                    players_ids.remove(tmp.getKey());
+                    leagueView.getSelectedToPDF().remove(tmp.getKey());
                 }
-                leagueView.getSelectedToPDF().put((int)tmp.getKey(), (int)tmp.getValue());
+                else{                                       //add
+                    players_ids.add((int)tmp.getKey());
+                    leagueView.getSelectedToPDF().put((int)tmp.getKey(), (int)tmp.getValue());
+                }
+            }
+            System.out.println("----------------------\n");
+            for(Integer i: players_ids){
+                System.out.println(i);
             }
             //java.awt.EventQueue.invokeLater(new Runnable() {
                 //@Override
@@ -232,6 +240,10 @@ public class LayoutInit{
         progress.updateLeaguesCount();
     }
 
+    public void log(String s){
+        progress.log(s);
+    }
+
     /** Controller **/
     public LayoutInit()
     {
@@ -239,7 +251,7 @@ public class LayoutInit{
        // java.awt.EventQueue.invokeLater(new Runnable() {
        //     @Override
         //    public void run() {
-        //        leagueView.disableView();
+                leagueView.disableView();
                 fillLeagueChoice(leagueView, getLeaguesNames());
                 leagueView.enableView();
         //    }
