@@ -46,7 +46,6 @@ public class TeamService
                     }*/
                     try
                     {
-                        System.out.println(Thread.currentThread().isInterrupted());
                         Thread.currentThread().sleep(10);
                     }
                     catch (InterruptedException e)
@@ -55,8 +54,6 @@ public class TeamService
                         Thread.currentThread().interrupt();
                         return true; // was interrupted
                     }
-                    System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
-                    controller.log(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
                     if (link.parent() == playersContainer)
                         playersUrls.add(link.attr("href"));
                 }
@@ -76,10 +73,7 @@ public class TeamService
                     System.out.println("Interruption, BITCH");
                     throw new InterruptedException();
                 }*/
-                System.out.println(Thread.currentThread().isInterrupted());
                 Thread.currentThread().sleep(10);
-                System.out.println(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
-                controller.log(Thread.currentThread().getId() + " " + Thread.currentThread().getState());
                 PlayerService player = new PlayerService(leagueName, tableName, name, url);
                 player.getPlayerData();
                 //player.printPlayerData();

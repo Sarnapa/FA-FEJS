@@ -18,7 +18,7 @@ public class LeaguesLinks
     private HashMap<String, String> fourthDivision = new HashMap<>(); // <table_name, url>
     private HashMap<String, String> youthDivision = new HashMap<>(); // <table_name, url
     private static final int THREADS_NUMBER = 10;
-    private ArrayList<Thread> threadsList = new ArrayList<>();
+    private List<Thread> threadsList = new ArrayList<>();
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
     private static Layout.LayoutInit controller;
@@ -184,9 +184,9 @@ public class LeaguesLinks
 
     public void killLeagueThreads()
     {
-        Thread.currentThread().interrupt();
+        /*Thread.currentThread().interrupt();
         if(Thread.currentThread().isInterrupted())
-            throw new RuntimeException();
+            throw new RuntimeException();*/
         for(Thread t: threadsList)
         {
             //t.stop();
