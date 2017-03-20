@@ -31,8 +31,9 @@ public class LeagueView extends JFrame {
     private JButton addPlayersButton;
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
+    private LayoutInit controller;
 
-    private HashMap<Integer, Integer> selectedToPDF = new HashMap<>();
+
 
     private  class MyTableCellRenderer extends DefaultTableCellRenderer {
 
@@ -40,7 +41,7 @@ public class LeagueView extends JFrame {
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
             super.getTableCellRendererComponent(table, value, isSelected,  hasFocus, row, column);
 
-            if (selectedToPDF.containsValue(row)) {
+            if (controller.getPlayersIDs().containsValue(row)) {
                 setForeground(Color.red);
             } else {
                 setForeground(Color.black);
@@ -87,12 +88,6 @@ public class LeagueView extends JFrame {
         }
         return -1;
     }
-
-    public HashMap<Integer, Integer> getSelectedToPDF() {
-        return selectedToPDF;
-    }
-
-
 
     public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton){
         leagueChoice.addActionListener(listenerForLeagueChoiceButton);
@@ -164,8 +159,9 @@ public class LeagueView extends JFrame {
         playersTable.repaint();
     }
 
-    public LeagueView()
+    public LeagueView(LayoutInit _controller)
     {
+        controller = _controller;
         pack();
         setContentPane(rootPanel);
         initGUI();

@@ -13,7 +13,7 @@ import javax.naming.InitialContext;
 
 public class DatabaseConnection
 {
-    private static String dbURL = "jdbc:derby:./DB;create=true;user=fafejs;password=fafejs";
+    private static String dbURL = "jdbc:derby:./DB;create=true;";
     private Connection conn;
     private DatabaseUpdateContent duc;
     private DatabaseUpdateView duv;

@@ -124,7 +124,7 @@ public class LeagueService implements Runnable
                 System.out.println("Interruption, BITCH");
                 throw new InterruptedException();
             }*/
-            System.out.println(Thread.currentThread().isInterrupted() +" " +  Thread.currentThread().getId());
+            System.out.println("getTeams()" + Thread.currentThread().isInterrupted() +" " +  Thread.currentThread().getId());
             controller.log(Thread.currentThread().isInterrupted() +" " +  Thread.currentThread().getId());
             Thread.currentThread().sleep(10);
             TeamService team = new TeamService(name, tableName, url, controller);

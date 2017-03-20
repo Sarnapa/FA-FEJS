@@ -16,7 +16,8 @@ public class LayoutInit{
     private UpdateView updateView;
     private UpdateProgress progress;
     private List<Player> selectedPlayersToPdf = new ArrayList<Player>();
-    private ArrayList<Integer> players_ids = new ArrayList<>();
+    //private ArrayList<Integer> players_ids = new ArrayList<>();
+    private HashMap<Integer, Integer> playersIDs = new HashMap<>();
     private LeaguesLinks leaguesLinks;
 
     /** Main window listeners **/
@@ -32,12 +33,11 @@ public class LayoutInit{
                     getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
 
                     leagueView.disableView();
-                    Map<Integer, Integer> selected = leagueView.getSelectedToPDF();
-                    Iterator it = selected.entrySet().iterator();
+                    Iterator it = playersIDs.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry pair = (Map.Entry)it.next();
                         int tmp_ind = leagueView.getRowWithValue((int)pair.getKey());
-                        selected.put((int)pair.getKey(), tmp_ind);
+                        playersIDs.put((int)pair.getKey(), tmp_ind);
                     }
                     leagueView.refresh();
                     leagueView.enableView();
@@ -87,14 +87,16 @@ public class LayoutInit{
     class CreatePDFListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(players_ids.size() > 0)
+            if(playersIDs.size() > 0)
             {
                 DatabaseConnection db = new DatabaseConnection();
                 db.createConnection();
                 List<String> names = db.getTablesNames();
                 names.remove("PLAYERS");
-                for (int i : players_ids) {
-                    selectedPlayersToPdf.add(db.getDuv().getPlayerRows(i, names));
+                Iterator it = playersIDs.entrySet().iterator();
+                while (it.hasNext()) {
+                    Map.Entry tmp = (Map.Entry)it.next();
+                    selectedPlayersToPdf.add(db.getDuv().getPlayerRows((int)tmp.getKey(), names));
                 }
                 db.shutdown();
             }
@@ -103,6 +105,7 @@ public class LayoutInit{
                 PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
                 pdfCreator.generatePDF("pdf1");
                 selectedPlayersToPdf.clear();
+                playersIDs.clear();
             }
             //java.awt.EventQueue.invokeLater(new Runnable() {
                // @Override
@@ -121,18 +124,19 @@ public class LayoutInit{
             while (it.hasNext()) {
                 Map.Entry tmp = (Map.Entry)it.next();
                 //System.out.println(tmp.getKey() + " " + tmp.getValue());
-                if(players_ids.contains(tmp.getKey())) {    //remove
-                    players_ids.remove(tmp.getKey());
-                    leagueView.getSelectedToPDF().remove(tmp.getKey());
+                if(playersIDs.containsKey(tmp.getKey())) {    //remove
+                    playersIDs.remove(tmp.getKey());
                 }
                 else{                                       //add
-                    players_ids.add((int)tmp.getKey());
-                    leagueView.getSelectedToPDF().put((int)tmp.getKey(), (int)tmp.getValue());
+                    playersIDs.put((int)tmp.getKey(), (int)tmp.getValue());
                 }
             }
             System.out.println("----------------------\n");
-            for(Integer i: players_ids){
-                System.out.println(i);
+
+            Iterator it2 = playersIDs.entrySet().iterator();
+            while (it2.hasNext()) {
+                Map.Entry tmp2 = (Map.Entry)it2.next();
+                System.out.println(tmp2.getKey() + " " + tmp2.getValue());
             }
             //java.awt.EventQueue.invokeLater(new Runnable() {
                 //@Override
@@ -247,7 +251,7 @@ public class LayoutInit{
     /** Controller **/
     public LayoutInit()
     {
-        leagueView = new LeagueView();
+        leagueView = new LeagueView(this);
        // java.awt.EventQueue.invokeLater(new Runnable() {
        //     @Override
         //    public void run() {
@@ -261,5 +265,9 @@ public class LayoutInit{
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
         leagueView.addPDFButtonListener(new CreatePDFListener());
         leagueView.addPlayersButtonListener(new AddPlayersListener());
+    }
+
+    public HashMap<Integer, Integer> getPlayersIDs() {
+        return playersIDs;
     }
 }
