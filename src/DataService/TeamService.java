@@ -17,7 +17,7 @@ public class TeamService
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
     private List<PlayerService> players = new ArrayList<>(); // List of players' records
     private LayoutInit controller;
-    private static InterruptionFlag interruptionFlag;
+    private InterruptionFlag interruptionFlag;
 
     TeamService(String leagueName, String tableName, String url, LayoutInit controller, InterruptionFlag _interruptionFlag)
     {
@@ -25,7 +25,7 @@ public class TeamService
         this.tableName = tableName;
         this.url = url;
         this.controller = controller;
-        interruptionFlag = _interruptionFlag;
+        this.interruptionFlag = _interruptionFlag;
     }
 
     public boolean getPlayersUrls()

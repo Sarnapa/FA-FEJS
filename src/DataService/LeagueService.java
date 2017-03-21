@@ -24,7 +24,7 @@ public class LeagueService extends Thread//implements Runnable
     {
         this.url = url;
         this.tableName = tableName;
-        someObject = someObject;
+        someObject = _someObject;
         this.isNormalLeague = isNormalLeague;
         this.isJSON = isJSON;
         this.controller = _controller;

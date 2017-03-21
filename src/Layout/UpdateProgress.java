@@ -1,7 +1,6 @@
 package Layout;
 
 import javax.swing.*;
-import javax.swing.border.BevelBorder;
 import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
@@ -10,11 +9,7 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Date;
 
-/**
- * Created by sarnapa on 06.03.17.
- */
 public class UpdateProgress extends JFrame{
     private JPanel rootPanel;
     private JLabel TeamsDoneLabel;

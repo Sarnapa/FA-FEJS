@@ -196,7 +196,9 @@ public class LayoutInit{
 
     private void startUpdate(List<String> list){
         leaguesLinks.setSelectedLeagues(list);
-        leaguesLinks.getLeaguesUrls();
+        Thread mainUpdateThread = new Thread(leaguesLinks);
+        mainUpdateThread.start();
+        //leaguesLinks.getLeaguesUrls();
     }
 
     /** Progress window functions **/

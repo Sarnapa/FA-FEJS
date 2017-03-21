@@ -12,7 +12,7 @@ import java.net.*;
 import java.util.*;
 import java.util.List;
 
-public class LeaguesLinks
+public class LeaguesLinks implements Runnable
 {
     private static final String url = "https://www.laczynaspilka.pl/";
     private HashMap<String, String> leaguesMap = new HashMap<>(); // <table_name, url> - Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
@@ -23,6 +23,7 @@ public class LeaguesLinks
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
     private LayoutInit controller;
+    private boolean isInterrupted = false;
 
     public LeaguesLinks(LayoutInit _controller)
     {
@@ -34,7 +35,7 @@ public class LeaguesLinks
         selectedLeagues = list;
     }
 
-    public void getLeaguesUrls()
+    public void run()
     {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
         if(doc != null)
@@ -165,17 +166,15 @@ public class LeaguesLinks
     private void synchFunction(HashMap<String, String> map, int currentThreadsNumber, boolean isNormalLeague, boolean isJSON) throws InterruptedException
     {
         String tableName, url;
-        Iterator<String> keySetIterator = map.keySet().iterator();
-        while (keySetIterator.hasNext())
-        {
-            tableName = keySetIterator.next();
-            url = map.get(tableName);
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if(isInterrupted)
+                break;
+            tableName = entry.getKey();
+            url = entry.getValue();
             startLeagueThread(url, tableName, isNormalLeague, isJSON);
             ++currentThreadsNumber;
-            if (currentThreadsNumber == THREADS_NUMBER)
-            {
-                synchronized(someObject)
-                {
+            if (currentThreadsNumber == THREADS_NUMBER) {
+                synchronized (someObject) {
                     System.out.println("Blokada");
                     someObject.wait();
                     System.out.println("Po blokadzie");
@@ -187,6 +186,7 @@ public class LeaguesLinks
 
     public void killLeagueThreads()
     {
+        isInterrupted = true;
         for(LeagueService t: threadsList)
         {
             t.interrupt();
@@ -238,44 +238,38 @@ public class LeaguesLinks
 
     private void printLeaguesMap()
     {
-        Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
-        int i = 0;
-        while(keySetIterator.hasNext())
+        String tableName, url;
+        for (Map.Entry<String, String> entry : leaguesMap.entrySet())
         {
-            String tableName = keySetIterator.next();
-            String url = leaguesMap.get(tableName);
+            tableName = entry.getKey();
+            url = entry.getValue();
             System.out.println(tableName + ": " + url);
-            ++i;
         }
-        System.out.println("Normal Division Number: " + i);
+        System.out.println("Normal Division Number: " + leaguesMap.size());
     }
 
     private void printFourthDivisionUrls()
     {
-        Iterator<String> keySetIterator = fourthDivision.keySet().iterator();
-        int i = 0;
-        while(keySetIterator.hasNext())
+        String tableName, url;
+        for (Map.Entry<String, String> entry : leaguesMap.entrySet())
         {
-            String tableName = keySetIterator.next();
-            String url = fourthDivision.get(tableName);
+            tableName = entry.getKey();
+            url = entry.getValue();
             System.out.println(tableName + ": " + url);
-            ++i;
         }
-        System.out.println("Fourth Division Number: " + i);
+        System.out.println("Fourth Division Number: " + leaguesMap.size());
     }
 
     private void printYouthDivisionUrls()
     {
-        Iterator<String> keySetIterator = youthDivision.keySet().iterator();
-        int i = 0;
-        while(keySetIterator.hasNext())
+        String tableName, url;
+        for (Map.Entry<String, String> entry : leaguesMap.entrySet())
         {
-            String tableName = keySetIterator.next();
-            String url = youthDivision.get(tableName);
+            tableName = entry.getKey();
+            url = entry.getValue();
             System.out.println(tableName + ": " + url);
-            ++i;
         }
-        System.out.println("Youth Division Number: " + i);
+        System.out.println("Youth Division Number: " + youthDivision);
     }
 
     public void printAllLeagues()
