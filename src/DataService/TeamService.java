@@ -5,10 +5,8 @@ import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class TeamService
 {
@@ -19,71 +17,64 @@ public class TeamService
     private List<String> playersUrls = new ArrayList<>(); // List of players' Urls
     private List<PlayerService> players = new ArrayList<>(); // List of players' records
     private LayoutInit controller;
+    private static InterruptionFlag interruptionFlag;
 
-    public TeamService(String leagueName, String tableName, String url, LayoutInit _controller)
+    TeamService(String leagueName, String tableName, String url, LayoutInit controller, InterruptionFlag _interruptionFlag)
     {
         this.leagueName = leagueName;
         this.tableName = tableName;
         this.url = url;
-        this.controller = _controller;
+        this.controller = controller;
+        interruptionFlag = _interruptionFlag;
     }
 
     public boolean getPlayersUrls()
     {
-            boolean interrupted = false;
-            Document doc = HtmlService.getHtmlSource(url, false);
-            if (doc != null)
+        boolean interrupted = false;
+        Document doc = HtmlService.getHtmlSource(url, false, controller);
+        if (doc != null) {
+            Element playersContainer = doc.getElementsByClass("players-list").first();
+            name = doc.getElementsByClass("left").get(1).text();
+            name = name.substring(0, name.lastIndexOf('|') - 1).toUpperCase();
+            Elements links = playersContainer.getElementsByTag("a");
+            for (Element link : links)
             {
-                Element playersContainer = doc.getElementsByClass("players-list").first();
-                name = doc.getElementsByClass("left").get(1).text();
-                name = name.substring(0, name.lastIndexOf('|') - 1).toUpperCase();
-                Elements links = playersContainer.getElementsByTag("a");
-                for (Element link : links) {
-                    /*if(Thread.currentThread().interrupted())
-                    {
-                        System.out.println("Interruption, BITCH");
+                try
+                {
+                    if(interruptionFlag.getFlag())
                         throw new InterruptedException();
-                    }*/
-                    try
-                    {
-                        Thread.currentThread().sleep(10);
-                    }
-                    catch (InterruptedException e)
-                    {
-                        System.out.println("no kurcze 2");
-                        Thread.currentThread().interrupt();
-                        return true; // was interrupted
-                    }
-                    if (link.parent() == playersContainer)
-                        playersUrls.add(link.attr("href"));
                 }
-                interrupted = getPlayers();
+                catch (InterruptedException e)
+                {
+                    Thread.currentThread().interrupt();
+                    return true; // was interrupted
+                }
+                if (link.parent() == playersContainer)
+                    playersUrls.add(link.attr("href"));
             }
-            return interrupted;
+            interrupted = getPlayers();
+        }
+        return interrupted;
     }
 
-    private boolean getPlayers() {
+    private boolean getPlayers()
+    {
         boolean interrupted = false;
         try
         {
             for (String url : playersUrls)
             {
-                /*if(Thread.currentThread().interrupted())
-                {
-                    System.out.println("Interruption, BITCH");
+                System.out.println(Thread.currentThread().getId() + " " + url + " " + interruptionFlag.getFlag());
+                if(interruptionFlag.getFlag())
                     throw new InterruptedException();
-                }*/
-                Thread.currentThread().sleep(10);
-                PlayerService player = new PlayerService(leagueName, tableName, name, url);
+                PlayerService player = new PlayerService(leagueName, tableName, name, url, controller);
                 player.getPlayerData();
-                //player.printPlayerData();
                 if (player.getLastName() != null)
                     players.add(player);
             }
         }
         catch (InterruptedException e)
         {
-            System.out.println("no kurcze 3");
             Thread.currentThread().interrupt();
             interrupted = true;
         }
@@ -94,18 +85,33 @@ public class TeamService
         }
     }
 
-    public void updateDB()
+    private void updateDB()
     {
-        DatabaseConnection database = new DatabaseConnection();
+        DatabaseConnection database = new DatabaseConnection(controller);
         database.createConnection();
+        int failsCount = 0;
         for(PlayerService player: players)
         {
-            //player.printPlayerData();
-            //database.updatePlayer(player);
-            while(!database.updatePlayer(player))
+            int i = 0;
+            while(!database.updatePlayer(player) && i < 5)
             {
-                //database = new DatabaseConnection();
                 database.recreateConnection();
+                ++i;
+            }
+            if(i == 5)
+            {
+                controller.log("Failed inserting row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName());
+                ++failsCount;
+            }
+            else
+            {
+                controller.log("Inserted row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName());
+                failsCount = 0;
+            }
+            if(failsCount == 5)
+            {
+                controller.log("Ended updating database due to too many errors");
+                break;
             }
         }
         database.shutdown();

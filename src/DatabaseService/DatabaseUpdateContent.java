@@ -13,7 +13,6 @@ public class DatabaseUpdateContent
 
     public void updatePlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException
     {
-        //System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
         PreparedStatement pstmt = conn.prepareStatement("UPDATE APP.PLAYERS SET FIRST_NAME = ?, LAST_NAME = ?, BIRTHDATE = ? WHERE ID = ?");
         pstmt.setString(1,firstName);
         pstmt.setString(2,lastName);

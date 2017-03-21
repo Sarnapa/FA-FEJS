@@ -6,7 +6,8 @@ import org.jsoup.select.Elements;
 import java.util.LinkedList;
 import java.util.List;
 
-public class LeagueService implements Runnable
+
+public class LeagueService extends Thread//implements Runnable
 {
     private String name; // League's name
     private String tableName; // sometimes League's name from website differs from table's name
@@ -15,16 +16,23 @@ public class LeagueService implements Runnable
     private boolean isNormalLeague; // Normal league = Ekstraklasa, I liga, II liga, III Liga, CLJ
     private boolean isJSON;
     private List<String> teamsUrls = new LinkedList<>(); // List of teams' Urls
-    private static Layout.LayoutInit controller;
+    private Layout.LayoutInit controller;
+    private InterruptionFlag interruptionFlag = new InterruptionFlag(false);
 
-    public LeagueService(String url, String tableName, Object someObject, boolean isNormalLeague, boolean isJSON, Layout.LayoutInit _controller)
+
+    LeagueService(String url, String tableName, Object _someObject, boolean isNormalLeague, boolean isJSON, Layout.LayoutInit _controller)
     {
         this.url = url;
         this.tableName = tableName;
-        this.someObject = someObject;
+        someObject = someObject;
         this.isNormalLeague = isNormalLeague;
         this.isJSON = isJSON;
         this.controller = _controller;
+    }
+
+    public void interrupt()
+    {
+        interruptionFlag.setFlag();
     }
 
     public void run()
@@ -32,25 +40,18 @@ public class LeagueService implements Runnable
         Document doc = null;
         try
         {
-            doc = HtmlService.getHtmlSource(url, isJSON);
-            if(doc != null)
-            {
-                if(isNormalLeague)
-                {
+            doc = HtmlService.getHtmlSource(url, isJSON, controller);
+            if (doc != null) {
+                if (isNormalLeague) {
                     name = doc.getElementsByClass("show-drop").first().text();
                     getUrls(doc);
-                }
-                else
-                {
+                } else {
                     String firstWord = tableName.substring(0, tableName.indexOf(' '));
-                    if(firstWord.equals("CZWARTA"))
-                    {
+                    if (firstWord.equals("CZWARTA")) {
                         String nameText = doc.getElementsByClass("header-menu").first().text();
                         name = nameText.substring(9, nameText.indexOf('(') - 1);
                         getUrls(doc);
-                    }
-                    else
-                    {
+                    } else {
                         String nameText = doc.getElementsByClass("name-year").first().text();
                         name = nameText.substring(0, nameText.lastIndexOf(':'));
                         getYouthTeamsUrls(doc);
@@ -59,9 +60,8 @@ public class LeagueService implements Runnable
                 getTeams();
             }
         }
-        catch (InterruptedException e)  // TODO - obsluga
+        catch (InterruptedException e)
         {
-            System.out.println("no kurcze");
             Thread.currentThread().interrupt();
         }
         finally
@@ -77,21 +77,11 @@ public class LeagueService implements Runnable
     {
         Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
         Elements rows = teamsContainer.getElementsByClass("row");
-        //for(int i = 0; i < rows.size(); ++i)
         for (Element row : rows)
         {
-            /*if(Thread.currentThread().interrupted())
-            {
-                System.out.println("Interruption, BITCH");
-                throw new InterruptedException();
-            }*/
-            //Thread.currentThread().sleep(10);
-            //Element row = rows.get(i);
             Elements links = row.getElementsByTag("a");
-            //for(int j = 0; j < links.size(); ++j)
             for (Element link : links)
             {
-                //Element link = links.get(j);
                 teamsUrls.add(link.attr("href"));
             }
         }
@@ -101,16 +91,8 @@ public class LeagueService implements Runnable
     {
         Element teamsTable = doc.getElementsByClass("table-template").first();
         Elements rows = teamsTable.getElementsByClass("row-link");
-        //for(int i = 0; i < rows.size(); ++i)
         for (Element row : rows)
         {
-            /*if(Thread.currentThread().interrupted())
-            {
-                System.out.println("Interruption, BITCH");
-                throw new InterruptedException();
-            }*/
-            //Thread.currentThread().sleep(10);
-            //Element row = rows.get(i);
             teamsUrls.add(row.attr("data-url"));
         }
     }
@@ -119,15 +101,9 @@ public class LeagueService implements Runnable
     {
         for(String url: teamsUrls)
         {
-            /*if(Thread.currentThread().interrupted())
-            {
-                System.out.println("Interruption, BITCH");
+            if(interruptionFlag.getFlag())
                 throw new InterruptedException();
-            }*/
-            System.out.println("getTeams()" + Thread.currentThread().isInterrupted() +" " +  Thread.currentThread().getId());
-            controller.log(Thread.currentThread().isInterrupted() +" " +  Thread.currentThread().getId());
-            Thread.currentThread().sleep(10);
-            TeamService team = new TeamService(name, tableName, url, controller);
+            TeamService team = new TeamService(name, tableName, url, controller, interruptionFlag);
             if(team.getPlayersUrls())
                 return;
             else

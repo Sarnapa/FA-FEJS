@@ -109,7 +109,6 @@ public class Player
 
     public void printPlayer()
     {
-        System.out.println(Thread.currentThread().getId() + " " + firstName + " " + lastName + " " + date);
         for(PlayerRow row: playerRows)
             row.printPlayerRow();
     }

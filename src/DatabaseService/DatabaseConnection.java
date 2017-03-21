@@ -3,13 +3,10 @@ package DatabaseService;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-
 import DataService.PlayerService;
+import Layout.LayoutInit;
 import Layout.LeagueView;
 
-import javax.activation.DataSource;
-import javax.naming.Context;
-import javax.naming.InitialContext;
 
 public class DatabaseConnection
 {
@@ -17,6 +14,12 @@ public class DatabaseConnection
     private Connection conn;
     private DatabaseUpdateContent duc;
     private DatabaseUpdateView duv;
+    private LayoutInit controller;
+
+    public DatabaseConnection(LayoutInit controller)
+    {
+        this.controller = controller;
+    }
 
     public synchronized void createConnection()
     {
@@ -25,12 +28,11 @@ public class DatabaseConnection
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver"); // load the driver
             conn = DriverManager.getConnection(dbURL); // make Derby JDBC connection
             duc = new DatabaseUpdateContent(conn);
-            duv = new DatabaseUpdateView(conn);
-            System.out.println(conn);
+            duv = new DatabaseUpdateView(conn, controller);
         }
-        catch (Exception except) // TODO - obsluga
+        catch (Exception e)
         {
-            except.printStackTrace();
+            controller.log("Cannot connect to database. Reason: " + e.getMessage());
         }
     }
 
@@ -41,13 +43,12 @@ public class DatabaseConnection
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
             conn = DriverManager.getConnection(dbURL); // make Derby JDBC connection
             duc = new DatabaseUpdateContent(conn);
-            duv = new DatabaseUpdateView(conn);
-            System.out.println("Reconnect:" + conn);
+            duv = new DatabaseUpdateView(conn, controller);
         }
 
-        catch(Exception e) // TODO - obsluga
+        catch(Exception e)
         {
-            e.printStackTrace();
+            controller.log("Cannot connect to database. Reason: " + e.getMessage());
         }
 
     }
@@ -55,17 +56,16 @@ public class DatabaseConnection
     public synchronized boolean updatePlayer(PlayerService player)
     {
         boolean isUpdate = false;
+        String firstName = player.getFirstName();
+        String lastName = player.getLastName();
         try
         {
             int ID = player.getID();
-            String firstName = player.getFirstName();
-            String lastName = player.getLastName();
             Date birthdate;
             if(!(player.getDate() == null))
                 birthdate =  new java.sql.Date(player.getDate().getTime());
             else
                 birthdate = null;
-            //String league = newLeagueName(player.getTableName()).toUpperCase();
             String league = player.getTableName().toUpperCase();
             String team = player.getTeamName();
             int apps = player.getApps();
@@ -81,12 +81,12 @@ public class DatabaseConnection
         }
         catch (SQLIntegrityConstraintViolationException sqlE)
         {
-            System.out.println(sqlE.getMessage());
+            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException");
             isUpdate = true; // to avoid inserting bad data
         }
         catch (SQLException e)
         {
-            while (e != null)
+            /*while (e != null)
             {
                 System.out.println("Thread: " + Thread.currentThread().getId() + "\n----- SQLException -----");
                 System.out.println("  SQLState:   " + e.getSQLState());
@@ -96,7 +96,10 @@ public class DatabaseConnection
                 e = e.getNextException();
             }
             // for stack dumps, refer to derby.log or add
-            //e.printStackTrace(System.out); above
+            //e.printStackTrace(System.out); above*/
+
+            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database. Reason: " + e.getMessage());
+
             isUpdate = false;
         }
         finally
@@ -110,22 +113,26 @@ public class DatabaseConnection
         duv.updateView(view, leagueName, orderBy, desc);
     }
 
-    public List<String> getTablesNames(){
+    public List<String> getTablesNames()
+    {
         try
         {
             DatabaseMetaData metadata = conn.getMetaData();
             List<String> names = new ArrayList<>();
             String[] types = {"TABLE"};
             ResultSet rs = metadata.getTables(null, null, "%", types);
-            while(rs.next()) {
+            while(rs.next())
+            {
                 names.add(rs.getString(3)); // column 3 is table name
             }
             rs.close();
             return names;
-        } catch(SQLException e) {
-            e.printStackTrace();
         }
-        return null;
+        catch(SQLException e)
+        {
+            controller.showDialog("Database Error", "Cannot get tables names", 0, 0);
+            return null;
+        }
     }
 
     public DatabaseUpdateView getDuv() {
@@ -140,7 +147,7 @@ public class DatabaseConnection
             conn.close();
             //System.gc();
         }
-        catch (SQLException sqlExcept)
+        catch (SQLException sqlExcept) // TODO - obsluga
         {
             //sqlExcept.printStackTrace();
         }

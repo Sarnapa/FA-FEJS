@@ -1,9 +1,9 @@
 package DataService;
 
+import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -16,6 +16,7 @@ public class PlayerService
     private String firstName, lastName, teamName, leagueName, tableName;
     private Date date;
     private int apps, firstSquad, minutes, goals, yellowCards, redCards;
+    private LayoutInit controller;
 
     public int getID()
     {
@@ -82,18 +83,19 @@ public class PlayerService
         return redCards;
     }
 
-    public PlayerService(String leagueName, String tableName, String teamName, String url)
+    public PlayerService(String leagueName, String tableName, String teamName, String url, LayoutInit controller)
     {
         this.leagueName = leagueName;
         this.tableName = tableName;
         this.teamName = teamName;
         this.url = url;
         ID = Integer.parseInt(url.substring(url.lastIndexOf(',') + 1,url.lastIndexOf('.')));
+        this.controller = controller;
     }
 
     public void getPlayerData() throws InterruptedException
     {
-        Document doc = HtmlService.getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false, controller);
         try
         {
             if(doc != null)
@@ -108,11 +110,13 @@ public class PlayerService
                 DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
                 date = format.parse(dateText);
                 getStats(name, reportsUrl);
+                System.out.println("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
+                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
             }
         }
-        catch (ParseException e) // TODO - obsluga
+        catch (ParseException e)
         {
-            e.printStackTrace();
+            controller.log("Cannot parse text contained birthdate of player from address: " + url);
         }
         catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website or AKADEMIA MLODYCH ORLOW SYNDROME
         {
@@ -134,13 +138,14 @@ public class PlayerService
                         firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
                         lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
                     }
+                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
             }
         }
     }
 
-    private void getStats(String name, String url) throws  InterruptedException
+    private void getStats(String name, String url)
     {
-        Document doc = HtmlService.getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false, controller);
         if(doc != null)
         {
             Elements articles = doc.getElementsByClass("season__game");

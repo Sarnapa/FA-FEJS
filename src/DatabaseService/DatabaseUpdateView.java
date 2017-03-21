@@ -1,20 +1,19 @@
 package DatabaseService;
 
-import DataService.PlayerService;
+import Layout.LayoutInit;
 import Layout.LeagueView;
-
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class DatabaseUpdateView
 {
     private Connection conn;
+    private LayoutInit controller;
 
-    public DatabaseUpdateView(Connection conn)
+    public DatabaseUpdateView(Connection conn, LayoutInit controller)
     {
         this.conn = conn;
+        this.controller = controller;
     }
 
     /*public void selectPlayers()
@@ -69,13 +68,12 @@ public class DatabaseUpdateView
                                 results.getInt(9), results.getInt(10), results.getInt(11), leagueName);
                     }
                 }
-                catch (SQLException e) // TODO - obsluga
+                catch (SQLException e)
                 {
-                    e.printStackTrace();
+                    controller.showDialog("Database Error", "Cannot get player rows from database. Player ID: " + ID, 0, 0);
                 }
             }
         }
-        player.printPlayer();
         return player;
     }
 
@@ -100,7 +98,7 @@ public class DatabaseUpdateView
         }
         catch (SQLException sqlExcept)
         {
-            sqlExcept.printStackTrace();
+            controller.showDialog("Database Error", "Cannot get players rows from league " + leagueName, 0, 0);
         }
     }
 

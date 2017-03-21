@@ -5,25 +5,24 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
-import java.util.Random;
+import Layout.LayoutInit;
 
 public class HtmlService
 {
     // To get HTML code of page
-    public static Document getHtmlSource(String address, boolean isJSON)
+    public static Document getHtmlSource(String address, boolean isJSON, LayoutInit controller)
     {
-        //address = address + "?_=ts";
         int timeout = 30 * 1000;
         int delay1 = 5 * 1000;
         int delay2 = 10 * 1000;
             if(isJSON)
-                return loadJSON(address, timeout, delay2);
+                return loadJSON(address, timeout, delay2, controller);
             else
-                return loadHTML(address, timeout, delay1);
+                return loadHTML(address, timeout, delay1, controller);
     }
 
 
-    private static Document loadJSON(String address, int timeout, int delay)
+    private static Document loadJSON(String address, int timeout, int delay, LayoutInit controller)
     {
         int i = 0;
         Connection conn;
@@ -32,7 +31,6 @@ public class HtmlService
         {
             try
             {
-                long startTime = System.currentTimeMillis();
                 conn = Jsoup.connect(address)
                         .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/53.0.2785.143 Chrome/53.0.2785.143 Safari/537.36")
                         .maxBodySize(0).referrer("http://www.google.com")
@@ -40,8 +38,6 @@ public class HtmlService
                 resp = conn.execute();
                 if (resp.statusCode() == 200)
                 {
-                    System.out.print(Thread.currentThread().getId() + " " + address + " ");
-                    System.out.println(System.currentTimeMillis() - startTime);
                     String json = resp.body();
                     Document doc = Jsoup.parse(json);
                     return doc;
@@ -50,7 +46,7 @@ public class HtmlService
                 {
                     try
                     {
-                        System.out.println("420_z_JSON: " + Thread.currentThread().getId() + " " + address + " ");
+                        controller.log("JSON File - HTTP Status 420 for address: " + address);
                         Thread.currentThread().sleep(delay);
                     }
                     catch (InterruptedException e)
@@ -65,23 +61,20 @@ public class HtmlService
             catch (SocketTimeoutException ste)
             {
                 ++i;
-                System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + ste.getMessage() + " Próba: " + i);
-                ste.printStackTrace();
+                controller.log("Socket timeout reached for address: " + address + " . Attempt: " + i);
             }
             catch (IOException e)
             {
-                System.out.println("kupka");
-                //System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + e.getMessage());
-                e.printStackTrace();
+                controller.log("Cannot download HTML file from address: " + address);
                 return null;
             }
         }
         if (resp != null)
-            System.out.println("Nie można pobrać danych z adresu: " + address + " Kod HTML:  " + resp.statusCode() + " Wiadomość: " + resp.statusMessage());
+            controller.log("Cannot download HTML file from address: " + address);
         return null;
     }
 
-    private static Document loadHTML(String address, int timeout, int delay)
+    private static Document loadHTML(String address, int timeout, int delay, LayoutInit controller)
     {
         int i = 0;
         Connection conn;
@@ -90,24 +83,20 @@ public class HtmlService
         {
             try
             {
-                long startTime = System.currentTimeMillis();
                 conn = Jsoup.connect(address)
-                        //.userAgent("Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.10136")
                         .userAgent("Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/53.0.2785.143 Chrome/53.0.2785.143 Safari/537.36")
                         .maxBodySize(0).referrer("http://www.google.com")
                         .timeout(timeout).ignoreHttpErrors(true);
                 resp = conn.execute();
                 if (resp.statusCode() == 200)
                 {
-                    System.out.print(Thread.currentThread().getId() + " " + address + " ");
-                    System.out.println(System.currentTimeMillis() - startTime);
                     return conn.get();
                 }
                 else if (resp.statusCode() == 420) // ( ͡° ͜ʖ ͡°)
                 {
                     try
                     {
-                        System.out.println("420_bez_JSON: " + Thread.currentThread().getId() + " " + address + " ");
+                        controller.log("HTML File - HTTP Status 420 for address: " + address);
                         Thread.currentThread().sleep(delay);
                     }
                     catch (InterruptedException e)
@@ -122,42 +111,16 @@ public class HtmlService
             catch (SocketTimeoutException ste)
             {
                 ++i;
-                System.out.println("Nie można pobrać danych z adresu: " + address + " Powód: " + ste.getMessage() + " Próba: " + i);
-                ste.printStackTrace();
+                controller.log("Socket timeout reached for address: " + address + " . Attempt: " + i);
             }
             catch (IOException e)
             {
-                System.out.println("kupka");
-                e.printStackTrace();
+                controller.log("Cannot download HTML file from address: " + address);
                 return null;
             }
         }
         if (resp != null)
-            System.out.println("Nie można pobrać danych z adresu: " + address + " Kod HTML:  " + resp.statusCode() + " Wiadomość: " + resp.statusMessage());
+            controller.log("Cannot download HTML file from address: " + address);
         return null;
     }
-
-    /*private static String getUrlSource(String address) throws IOException
-    {
-        URL url = new URL(address);
-        URLConnection conn = url.openConnection();
-        BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
-        String inputLine;
-        StringBuilder source = new StringBuilder(); // StringBuffer - synchronized, StringBuilder - not, so is faster
-        while ((inputLine = in.readLine()) != null)
-            source.append(inputLine);
-        in.close();
-
-        return source.toString();
-    }*/
-
-    /*private static void writeFromSource(String toFind, String source){
-        String tmp;
-        int tmpIndex;
-        for (int i = -1; (i = source.indexOf(toFind, i + 1)) != -1; ) {
-            tmpIndex = i+toFind.length()+2;
-            tmp = source.substring(tmpIndex,source.indexOf(34,tmpIndex));
-            System.out.println(tmp);
-        }
-    }*/
 }

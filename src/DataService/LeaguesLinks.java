@@ -1,5 +1,6 @@
 package DataService;
 
+import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -18,19 +19,24 @@ public class LeaguesLinks
     private HashMap<String, String> fourthDivision = new HashMap<>(); // <table_name, url>
     private HashMap<String, String> youthDivision = new HashMap<>(); // <table_name, url
     private static final int THREADS_NUMBER = 10;
-    private List<Thread> threadsList = new ArrayList<>();
+    private List<LeagueService> threadsList = new ArrayList<>();
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
-    private static Layout.LayoutInit controller;
+    private LayoutInit controller;
 
-    public LeaguesLinks(List<String> list, Layout.LayoutInit _controller){
-        selectedLeagues = list;
+    public LeaguesLinks(LayoutInit _controller)
+    {
         controller = _controller;
+    }
+
+    public void setSelectedLeagues(List<String> list)
+    {
+        selectedLeagues = list;
     }
 
     public void getLeaguesUrls()
     {
-        Document doc = HtmlService.getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false, controller);
         if(doc != null)
         {
             Element menu = doc.getElementsByClass("main-category").first(); // one element
@@ -76,7 +82,7 @@ public class LeaguesLinks
 
     private void getSomeUrls(String url)
     {
-        Document doc = HtmlService.getHtmlSource(url, false);
+        Document doc = HtmlService.getHtmlSource(url, false, controller);
         if(doc != null)
         {
             Element list = doc.getElementById("games");
@@ -117,9 +123,6 @@ public class LeaguesLinks
                 int firstColonIndex = line.indexOf(':');
                 tableName = line.substring(0, firstColonIndex).toUpperCase();
                 url = line.substring(firstColonIndex + 1, line.length());
-                //StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-                //System.out.println(stackTraceElements[2].getMethodName());
-                //if(stackTraceElements[1].getMethodName().equals("get4LeagueUrls"))
                 if(selectedLeagues.contains(tableName))
                 {
                     if (fileName.equals("4liga.txt"))
@@ -129,15 +132,14 @@ public class LeaguesLinks
                 }
             }
         }
-        catch (FileNotFoundException e) // TODO - obsluga
+        catch (FileNotFoundException e)
         {
-            e.printStackTrace();
+            controller.log("File " + fileName + " not found.");
         }
     }
 
     private void getLeagues()
     {
-        System.out.println(leaguesMap.size() + " " + fourthDivision.size() + " " + youthDivision.size());
         try
         {
             int currentThreadsNumber = 0;
@@ -148,13 +150,14 @@ public class LeaguesLinks
         catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
+            controller.showDialog("Error", "The application will be closed", 0, 2);
+            System.exit(1);
         }
     }
 
     private void startLeagueThread(String url, String tableName, boolean isNormalLeague, boolean isJSON)
     {
-        LeagueService league = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON, controller);
-        Thread leagueThread = new Thread(league);
+        LeagueService leagueThread = new LeagueService(url, tableName, someObject, isNormalLeague, isJSON, controller);
         threadsList.add(leagueThread);
         leagueThread.start();
     }
@@ -184,25 +187,23 @@ public class LeaguesLinks
 
     public void killLeagueThreads()
     {
-        /*Thread.currentThread().interrupt();
-        if(Thread.currentThread().isInterrupted())
-            throw new RuntimeException();*/
-        for(Thread t: threadsList)
+        for(LeagueService t: threadsList)
         {
-            //t.stop();
             t.interrupt();
             try
             {
                 t.join();
             }
-            catch (InterruptedException e) //TODO - obsluga
+            catch (InterruptedException e)
             {
                 Thread.currentThread().interrupt();
+                controller.showDialog("Error", "The application will be closed", 0, 2);
+                System.exit(1);
             }
         }
     }
 
-    public static boolean checkHostConnection() {
+    public boolean checkHostConnection() {
         try
         {
             //make a URL to a known source
@@ -216,8 +217,9 @@ public class LeaguesLinks
             Object objData = urlConnect.getContent();
 
         }
-        catch (IOException e) {
-            System.out.println("Sprawdź połączenie z internetem");
+        catch (IOException e)
+        {
+            controller.showDialog("No internet connection", "Check your internet connection.", 0, 0);
             return false;
         }
         return true;
@@ -234,7 +236,7 @@ public class LeaguesLinks
         return sb.toString();
     }
 
-    public void printLeaguesMap()
+    private void printLeaguesMap()
     {
         Iterator<String> keySetIterator = leaguesMap.keySet().iterator();
         int i = 0;
@@ -248,7 +250,7 @@ public class LeaguesLinks
         System.out.println("Normal Division Number: " + i);
     }
 
-    public void printFourthDivisionUrls()
+    private void printFourthDivisionUrls()
     {
         Iterator<String> keySetIterator = fourthDivision.keySet().iterator();
         int i = 0;
@@ -262,7 +264,7 @@ public class LeaguesLinks
         System.out.println("Fourth Division Number: " + i);
     }
 
-    public void printYouthDivisionUrls()
+    private void printYouthDivisionUrls()
     {
         Iterator<String> keySetIterator = youthDivision.keySet().iterator();
         int i = 0;
@@ -271,7 +273,6 @@ public class LeaguesLinks
             String tableName = keySetIterator.next();
             String url = youthDivision.get(tableName);
             System.out.println(tableName + ": " + url);
-            //System.out.println(i + " " + tableName + ": " + url);
             ++i;
         }
         System.out.println("Youth Division Number: " + i);
