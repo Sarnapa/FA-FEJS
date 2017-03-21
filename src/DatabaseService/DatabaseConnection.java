@@ -55,7 +55,6 @@ public class DatabaseConnection
 
     public synchronized boolean updatePlayer(PlayerService player)
     {
-        boolean isUpdate = false;
         String firstName = player.getFirstName();
         String lastName = player.getLastName();
         try
@@ -77,12 +76,11 @@ public class DatabaseConnection
             System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
             duc.updatePlayersTable(ID, firstName, lastName, birthdate);
             duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
-            isUpdate = true;
         }
         catch (SQLIntegrityConstraintViolationException sqlE)
         {
             controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException");
-            isUpdate = true; // to avoid inserting bad data
+            return true; // to avoid inserting bad data
         }
         catch (SQLException e)
         {
@@ -99,13 +97,9 @@ public class DatabaseConnection
             //e.printStackTrace(System.out); above*/
 
             controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database. Reason: " + e.getMessage());
-
-            isUpdate = false;
+            return false;
         }
-        finally
-        {
-            return isUpdate;
-        }
+        return true;
     }
 
     public synchronized void updateView(LeagueView view, String leagueName, String orderBy, boolean desc)
