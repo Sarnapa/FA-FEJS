@@ -140,13 +140,17 @@ public class LayoutInit{
     class UpdateListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            updateView.disableView();
-            progress = new UpdateProgress();
-            progress.addProgressListener(new ProgressListener());
-            /*for(String s: updateView.getSelectedLeagues()){
-                System.out.println(s);
-            }*/
-            startUpdate(updateView.getSelectedLeagues());
+            List<String> selectedLeagues = updateView.getSelectedLeagues();
+            if(selectedLeagues.size() > 0)
+            {
+                updateView.disableView();
+                progress = new UpdateProgress();
+                progress.addProgressListener(new ProgressListener());
+                /*for(String s: updateView.getSelectedLeagues()){
+                    System.out.println(s);
+                 }*/
+                startUpdate(updateView.getSelectedLeagues());
+            }
         }
     }
 
@@ -156,6 +160,7 @@ public class LayoutInit{
         @Override
         public void actionPerformed(ActionEvent e) {
             leaguesLinks.killLeagueThreads();
+            leaguesLinks.clear();
             updateView.enableView();
             progress.dispose();
         }
@@ -198,7 +203,6 @@ public class LayoutInit{
         leaguesLinks.setSelectedLeagues(list);
         Thread mainUpdateThread = new Thread(leaguesLinks);
         mainUpdateThread.start();
-        //leaguesLinks.getLeaguesUrls();
     }
 
     /** Progress window functions **/

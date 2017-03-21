@@ -59,7 +59,6 @@ public class TeamService
 
     private boolean getPlayers()
     {
-        boolean interrupted = false;
         try
         {
             for (String url : playersUrls)
@@ -72,17 +71,15 @@ public class TeamService
                 if (player.getLastName() != null)
                     players.add(player);
             }
+            updateDB();
         }
         catch (InterruptedException e)
         {
             Thread.currentThread().interrupt();
-            interrupted = true;
-        }
-        finally
-        {
             updateDB();
-            return interrupted;
+            return true;
         }
+        return false;
     }
 
     private void updateDB()

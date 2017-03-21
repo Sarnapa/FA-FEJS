@@ -23,7 +23,7 @@ public class LeaguesLinks implements Runnable
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
     private LayoutInit controller;
-    private boolean isInterrupted = false;
+    private boolean isInterrupted;
 
     public LeaguesLinks(LayoutInit _controller)
     {
@@ -35,8 +35,17 @@ public class LeaguesLinks implements Runnable
         selectedLeagues = list;
     }
 
+    public void clear()
+    {
+        leaguesMap.clear();
+        fourthDivision.clear();
+        youthDivision.clear();
+        threadsList.clear();
+    }
+
     public void run()
     {
+        isInterrupted = false;
         Document doc = HtmlService.getHtmlSource(url, false, controller);
         if(doc != null)
         {
