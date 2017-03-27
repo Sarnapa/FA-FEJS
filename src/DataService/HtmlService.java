@@ -46,7 +46,7 @@ public class HtmlService
                 {
                     try
                     {
-                        controller.log("JSON File - HTTP Status 420 for address: " + address);
+                        controller.log("JSON File - HTTP Status 420 for address: " + address,1);
                         Thread.currentThread().sleep(delay);
                     }
                     catch (InterruptedException e)
@@ -61,16 +61,16 @@ public class HtmlService
             catch (SocketTimeoutException ste)
             {
                 ++i;
-                controller.log("Socket timeout reached for address: " + address + " . Attempt: " + i);
+                controller.log("Socket timeout reached for address: " + address + " . Attempt: " + i,2);
             }
             catch (IOException e)
             {
-                controller.log("Cannot download HTML file from address: " + address);
+                controller.log("Cannot download HTML file from address: " + address,2);
                 return null;
             }
         }
         if (resp != null)
-            controller.log("Cannot download HTML file from address: " + address);
+            controller.log("Cannot download HTML file from address: " + address,2);
         return null;
     }
 
@@ -96,7 +96,7 @@ public class HtmlService
                 {
                     try
                     {
-                        controller.log("HTML File - HTTP Status 420 for address: " + address);
+                        controller.log("HTML File - HTTP Status 420 for address: " + address, 1);
                         Thread.currentThread().sleep(delay);
                     }
                     catch (InterruptedException e)
@@ -111,16 +111,16 @@ public class HtmlService
             catch (SocketTimeoutException ste)
             {
                 ++i;
-                controller.log("Socket timeout reached for address: " + address + " . Attempt: " + i);
+                controller.log("Socket timeout reached for address: " + address + " . Attempt: " + i,2);
             }
             catch (IOException e)
             {
-                controller.log("Cannot download HTML file from address: " + address);
+                controller.log("Cannot download HTML file from address: " + address,2);
                 return null;
             }
         }
         if (resp != null)
-            controller.log("Cannot download HTML file from address: " + address);
+            controller.log("Cannot download HTML file from address: " + address,2);
         return null;
     }
 }

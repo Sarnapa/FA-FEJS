@@ -170,7 +170,7 @@ public class LeagueView extends JFrame {
     private void initGUI()
     {
         setTitle("FA-FEJS");
-        setSize(new Dimension(800, 600));
+        setSize(new Dimension(1000, 600));
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setGlassPane(glassPane);
         leagueChoice.setEditable(false);

@@ -111,12 +111,12 @@ public class PlayerService
                 date = format.parse(dateText);
                 getStats(name, reportsUrl);
                 System.out.println("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
-                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
+                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName,0);
             }
         }
         catch (ParseException e)
         {
-            controller.log("Cannot parse text contained birthdate of player from address: " + url);
+            controller.log("Cannot parse text contained birthdate of player from address: " + url,2);
         }
         catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website or AKADEMIA MLODYCH ORLOW SYNDROME
         {
@@ -138,7 +138,7 @@ public class PlayerService
                         firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
                         lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
                     }
-                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
+                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName,0);
             }
         }
     }

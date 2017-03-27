@@ -15,9 +15,11 @@
         <properties/>
         <border type="none"/>
         <children>
-          <component id="38b34" class="javax.swing.JTextArea" binding="logArea" custom-create="true">
+          <component id="61029" class="javax.swing.JTextPane" binding="logArea" custom-create="true">
             <constraints/>
-            <properties/>
+            <properties>
+              <editable value="false"/>
+            </properties>
           </component>
         </children>
       </scrollpane>

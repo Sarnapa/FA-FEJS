@@ -97,17 +97,17 @@ public class TeamService
             }
             if(i == 5)
             {
-                controller.log("Failed inserting row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName());
+                controller.log("Failed inserting row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName(),2);
                 ++failsCount;
             }
             else
             {
-                controller.log("Inserted row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName());
+                controller.log("Inserted row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName(),0);
                 failsCount = 0;
             }
             if(failsCount == 5)
             {
-                controller.log("Ended updating database due to too many errors");
+                controller.log("Ended updating database due to too many errors",1);
                 break;
             }
         }

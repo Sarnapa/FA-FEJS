@@ -144,7 +144,7 @@ public class LeaguesLinks implements Runnable
         }
         catch (FileNotFoundException e)
         {
-            controller.log("File " + fileName + " not found.");
+            controller.log("File " + fileName + " not found.",1);
         }
     }
 

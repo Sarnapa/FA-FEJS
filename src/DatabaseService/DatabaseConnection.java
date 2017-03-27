@@ -32,7 +32,7 @@ public class DatabaseConnection
         }
         catch (Exception e)
         {
-            controller.log("Cannot connect to database. Reason: " + e.getMessage());
+            controller.log("Cannot connect to database. Reason: " + e.getMessage(), 2);
         }
     }
 
@@ -48,7 +48,7 @@ public class DatabaseConnection
 
         catch(Exception e)
         {
-            controller.log("Cannot connect to database. Reason: " + e.getMessage());
+            controller.log("Cannot connect to database. Reason: " + e.getMessage(),2);
         }
 
     }
@@ -79,7 +79,7 @@ public class DatabaseConnection
         }
         catch (SQLIntegrityConstraintViolationException sqlE)
         {
-            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException");
+            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException",2);
             return true; // to avoid inserting bad data
         }
         catch (SQLException e)
@@ -96,7 +96,7 @@ public class DatabaseConnection
             // for stack dumps, refer to derby.log or add
             //e.printStackTrace(System.out); above*/
 
-            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database. Reason: " + e.getMessage());
+            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(),2);
             return false;
         }
         return true;

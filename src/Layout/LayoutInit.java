@@ -4,8 +4,10 @@ import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 
 public class LayoutInit{
     private LeagueView leagueView;
@@ -133,7 +135,7 @@ public class LayoutInit{
         @Override
         public void windowClosing(WindowEvent e) {
             leagueView.enableView();
-            updateView.dispose();
+            //updateView.dispose();
         }
     }
 
@@ -156,13 +158,15 @@ public class LayoutInit{
 
     /** Progress window listeners **/
 
+
     class ProgressListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             leaguesLinks.killLeagueThreads();
             leaguesLinks.clear();
             updateView.enableView();
-            progress.dispose();
+            log("Zakończono pobieranie danych, można teraz zamknąć okno.",1);
+            progress.changeCloseOperation();
         }
     }
 
@@ -215,8 +219,8 @@ public class LayoutInit{
         progress.updateLeaguesCount();
     }
 
-    public void log(String s){
-        progress.log(s);
+    public void log(String s, int c){
+        progress.log(s, c);
     }
 
     /** Message Dialog function **/
