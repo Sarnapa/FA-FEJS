@@ -142,6 +142,12 @@ public class LeagueView extends JFrame {
         return tmp;
     }
 
+    public void disableUpdateButton(){
+        updateButton.setEnabled(false);
+    }
+    public void enableUpdateButton(){
+        updateButton.setEnabled(true);
+    }
     public void clearTable(){
         tableModel.setRowCount(0);
     }

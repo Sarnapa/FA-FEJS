@@ -59,7 +59,8 @@ public class LayoutInit{
         {
             if (leaguesLinks.checkHostConnection())
             {
-                leagueView.disableView();
+                //leagueView.disableView();
+                leagueView.disableUpdateButton();
                 updateView = new UpdateView();
                 updateView.addUpdateWindowListener(new UpdateWindowListener());
                 updateView.addUpdateListener(new UpdateListener());
@@ -134,7 +135,8 @@ public class LayoutInit{
     class UpdateWindowListener extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {
-            leagueView.enableView();
+            leagueView.enableUpdateButton();
+            //leagueView.enableView();
             //updateView.dispose();
         }
     }
@@ -162,11 +164,21 @@ public class LayoutInit{
     class ProgressListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            leaguesLinks.killLeagueThreads();
-            leaguesLinks.clear();
-            updateView.enableView();
-            log("Zakończono pobieranie danych, można teraz zamknąć okno.",1);
-            progress.changeCloseOperation();
+            progress.disableUpdateButton();
+            SwingWorker myWorker= new SwingWorker<String, Void>() {
+                @Override
+                protected String doInBackground() throws Exception {
+                    log("Kończenie pracy programu. Trwa zapisywanie danych. Proszę czekać", 1);
+                    leaguesLinks.killLeagueThreads();
+                    leaguesLinks.clear();
+                    updateView.enableView();
+                    log("Zakończono pobieranie danych, można teraz zamknąć okno.",1);
+                    progress.changeCloseOperation();
+                    return null;
+                }
+            };
+            myWorker.execute();
+
         }
     }
 
