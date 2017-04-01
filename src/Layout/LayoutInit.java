@@ -3,9 +3,16 @@ package Layout;
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
+import org.apache.derby.database.Database;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
+import javax.swing.table.TableModel;
 import java.awt.event.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class LayoutInit {
@@ -16,6 +23,7 @@ public class LayoutInit {
     private List<Player> selectedPlayersToPdf = new ArrayList<>();
     private HashMap<Integer, Integer> playersIDs = new HashMap<>();
     private LeaguesLinks leaguesLinks;
+    private String currentLeague;
 
     /**
      * Main window listeners
@@ -25,7 +33,8 @@ public class LayoutInit {
         @Override
         public void actionPerformed(ActionEvent e) {
             leagueView.clearTable();
-            System.out.println(leagueView.getLeagueChoiceSelected());
+            currentLeague = leagueView.getLeagueChoiceSelected();
+            System.out.println(currentLeague);
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
 
             leagueView.disableView();
@@ -50,9 +59,63 @@ public class LayoutInit {
         }
     }
 
+    class TableListener implements TableModelListener {
+        @Override
+        public void tableChanged(TableModelEvent e) {
+            int row = e.getFirstRow();
+            int column = e.getColumn();
+            TableModel model = (TableModel)e.getSource();
+            String columnName = model.getColumnName(column);
+            int id = (int)model.getValueAt(row, 0);
+            Object newValue = model.getValueAt(row, column);
+            String team = (String) model.getValueAt(row, 4);
+            switch(column){
+                case 1:
+                case 2:
+                case 4:
+                    newValue = newValue.toString();
+                    break;
+                case 3:
+                    DateFormat format = new SimpleDateFormat("yyyy-mm-dd");
+                    try {
+                        java.util.Date tmp = format.parse(newValue.toString());
+                        java.sql.Date tmp2 = new java.sql.Date(tmp.getTime());
+                        newValue = tmp2;
+                        System.out.println(newValue);
+                    }catch(ParseException e1) {
+                        e1.printStackTrace();
+                    }
+                    break;
+                default:
+                    newValue = Integer.parseInt(newValue.toString());
+                    break;
+
+            }
+            System.out.println(row + " " + column + " " + columnName + " :" + id + " - " + newValue + " " + newValue.getClass());
+            if(column > 3) {
+                updateDatabase(id, team, currentLeague, columnName, newValue);
+            } else {
+                updateDatabase(id, "","", columnName, newValue);
+            }
+
+
+        }
+    }
+
     /**
      * Buttons listeners
      **/
+
+
+    class EditModeButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            if(leagueView.editMode())
+                leagueView.addTableModelListener(new TableListener());
+            else
+                leagueView.removeTableModelListener();
+        }
+    }
 
     class UpdateButtonListener implements ActionListener {
         @Override
@@ -170,6 +233,13 @@ public class LayoutInit {
     /**
      * Main window functions
      **/
+    private void updateDatabase(int id, String team, String leagueName, String columnName, Object newValue) {
+        System.out.println("elo");
+        DatabaseConnection db = new DatabaseConnection(this);
+        db.createConnection();
+        db.updatePlayersSpecificColumn(id, team, leagueName, columnName, newValue);
+        db.shutdown();
+    }
 
     private void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc) {
         DatabaseConnection db = new DatabaseConnection(this);
@@ -257,6 +327,7 @@ public class LayoutInit {
         fillLeagueChoice(leagueView, getLeaguesNames());
         leagueView.enableView();
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
+        leagueView.addEditModeButtonListener(new EditModeButtonListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
         leagueView.addPDFButtonListener(new CreatePDFListener());

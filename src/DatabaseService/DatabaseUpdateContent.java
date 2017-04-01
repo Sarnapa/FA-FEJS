@@ -1,6 +1,11 @@
 package DatabaseService;
 
 import java.sql.*;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class DatabaseUpdateContent {
     private final Connection conn;
@@ -95,6 +100,31 @@ public class DatabaseUpdateContent {
         pstmt.setInt(6, goals);
         pstmt.setInt(7, yellowCards);
         pstmt.setInt(8, redCards);
+        pstmt.execute();
+    }
+
+    public void updatePlayersSpecificColumn(int id, String team, String leagueName, String columnName, Object newValue) throws SQLException {
+        String statement = "UPDATE TABLENAME SET " + columnName + " = ? WHERE ID = ?";
+        if (leagueName.equals("")){   //change data in PLAYERS
+            statement = statement.replace("TABLENAME", "APP.PLAYERS");
+        } else {                        //change data in league table
+            statement = statement.replace("TABLENAME", "APP.\"" + leagueName + "\"");
+            statement = statement + "AND TEAM = ?";
+        }
+        PreparedStatement pstmt = conn.prepareStatement(statement);
+        if(newValue.getClass() == Integer.class) {
+            pstmt.setInt(1, Integer.parseInt(newValue.toString()));
+        }
+        else if(newValue.getClass() == String.class) {
+            pstmt.setString(1, newValue.toString());
+        }
+        else if(newValue.getClass() == java.sql.Date.class){
+            pstmt.setDate(1, (java.sql.Date)newValue);
+        }
+        pstmt.setInt(2, id);
+        if(!team.equals("")){
+            pstmt.setString(3, team);
+        }
         pstmt.execute();
     }
 }

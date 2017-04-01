@@ -1,8 +1,14 @@
 package Layout;
 
+import javafx.scene.control.Tab;
+
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
@@ -19,9 +25,11 @@ public class LeagueView extends JFrame {
     private JPanel buttonPanel;
     private JTable playersTable;
     private JButton addPlayersButton;
+    private JButton editModeButton;
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
     private LayoutInit controller;
+    private boolean isTableEditable = false;
 
 
     private class MyTableCellRenderer extends DefaultTableCellRenderer {
@@ -44,7 +52,9 @@ public class LeagueView extends JFrame {
         tableModel = new DefaultTableModel(0, columnNames.length) {
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                return false;
+                if(columnIndex == 0)
+                    return false; // don't change id!
+                return isTableEditable;
             }
         };
         tableModel.setColumnIdentifiers(columnNames);
@@ -78,24 +88,8 @@ public class LeagueView extends JFrame {
         return -1;
     }
 
-    public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton) {
-        leagueChoice.addActionListener(listenerForLeagueChoiceButton);
-    }
-
-    public void addTableHeaderListener(MouseAdapter listenerForTableHeader) {
-        playersTable.getTableHeader().addMouseListener(listenerForTableHeader);
-    }
-
-    public void addUpdateButtonListener(ActionListener listenerForUpdateButton) {
-        updateButton.addActionListener(listenerForUpdateButton);
-    }
-
-    public void addPDFButtonListener(ActionListener listenerForPDFButton) {
-        pdfButton.addActionListener(listenerForPDFButton);
-    }
-
-    public void addPlayersButtonListener(ActionListener listenerForPlayersButton) {
-        addPlayersButton.addActionListener(listenerForPlayersButton);
+    public boolean isTableEditable() {
+        return isTableEditable;
     }
 
     public void disableView() {
@@ -157,6 +151,23 @@ public class LeagueView extends JFrame {
         leagueChoice.setSelectedIndex(-1);
     }
 
+    public boolean editMode(){
+        if(isTableEditable){
+            playersTable.setBorder(new EmptyBorder(0,0,0,0));
+            pdfButton.setEnabled(true);
+            updateButton.setEnabled(true);
+            addPlayersButton.setEnabled(true);
+            leagueChoice.setEnabled(true);
+        } else {
+            playersTable.setBorder(new LineBorder(Color.blue, 1));
+            pdfButton.setEnabled(false);
+            updateButton.setEnabled(false);
+            addPlayersButton.setEnabled(false);
+            leagueChoice.setEnabled(false);
+        }
+        isTableEditable = !isTableEditable;
+        return isTableEditable;
+    }
     public void refresh() {
         playersTable.repaint();
     }
@@ -175,5 +186,36 @@ public class LeagueView extends JFrame {
         setGlassPane(glassPane);
         leagueChoice.setEditable(false);
         setVisible(true);
+    }
+
+
+    public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton) {
+        leagueChoice.addActionListener(listenerForLeagueChoiceButton);
+    }
+
+    public void addTableHeaderListener(MouseAdapter listenerForTableHeader) {
+        playersTable.getTableHeader().addMouseListener(listenerForTableHeader);
+    }
+
+    public void addUpdateButtonListener(ActionListener listenerForUpdateButton) {
+        updateButton.addActionListener(listenerForUpdateButton);
+    }
+
+    public void addPDFButtonListener(ActionListener listenerForPDFButton) {
+        pdfButton.addActionListener(listenerForPDFButton);
+    }
+
+    public void addPlayersButtonListener(ActionListener listenerForPlayersButton) {
+        addPlayersButton.addActionListener(listenerForPlayersButton);
+    }
+    public void addEditModeButtonListener(ActionListener listenerForEditModeButton) {
+        editModeButton.addActionListener(listenerForEditModeButton);
+    }
+    public void addTableModelListener(TableModelListener listenerForTableModel) {
+        tableModel.addTableModelListener(listenerForTableModel);
+    }
+    public void removeTableModelListener() {
+        TableModelListener[] list = tableModel.getTableModelListeners();
+        tableModel.removeTableModelListener(list[0]);
     }
 }

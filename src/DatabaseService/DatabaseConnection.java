@@ -42,6 +42,17 @@ public class DatabaseConnection {
 
     }
 
+    public synchronized boolean updatePlayersSpecificColumn(int id, String team, String leagueName, String columnName, Object newValue){
+        try{
+            String _columnName = columnName.replace(" ","_");
+            duc.updatePlayersSpecificColumn(id, team, leagueName, _columnName, newValue);
+        } catch(SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public synchronized boolean updatePlayer(PlayerService player) {
         String firstName = player.getFirstName();
         String lastName = player.getLastName();
