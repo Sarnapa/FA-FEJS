@@ -23,39 +23,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class PDFCreator
-{
-    List<Player> playersList = new ArrayList<Player>();
-    Document document;
+public class PDFCreator {
+    private List<Player> playersList = new ArrayList<>();
+    private Document document;
 
-    public PDFCreator(List<Player> playersList)
-    {
+    public PDFCreator(List<Player> playersList) {
         this.playersList = playersList;
     }
 
-    public void generatePDF(String fileName)
-    {
+    public void generatePDF(String fileName) {
         String dest = "./pdfs/" + fileName + ".pdf";
         PdfWriter writer = null;
-        try
-        {
+        try {
             writer = new PdfWriter(dest);
-        }
-        catch (FileNotFoundException e) // TODO - obsluga
+        } catch (FileNotFoundException e) // TODO - obsluga
         {
             e.printStackTrace();
         }
-        if(writer != null)
-        {
+        if (writer != null) {
             PdfDocument pdf = new PdfDocument(writer);
             document = new Document(pdf, PageSize.A4.rotate());
-            try
-            {
+            try {
                 document.setMargins(20, 20, 20, 20);
-                for(Player player: playersList)
+                for (Player player : playersList)
                     createPlayerParagraph(player);
-            }
-            catch (IOException e) // TODO - obsluga
+            } catch (IOException e) // TODO - obsluga
             {
                 e.printStackTrace();
             }
@@ -63,16 +55,14 @@ public class PDFCreator
         }
     }
 
-    private void createPlayerParagraph(Player player) throws IOException
-    {
+    private void createPlayerParagraph(Player player) throws IOException {
         String dateText = "";
         PdfFont font = PdfFontFactory.createFont(FontConstants.TIMES_ROMAN, "CP1250", true);
         PdfFont bold = PdfFontFactory.createFont(FontConstants.TIMES_BOLD, "CP1250", true);
         String firstName = player.getFirstName();
         String lastName = player.getLastName();
         Date date = player.getDate();
-        if(date != null)
-        {
+        if (date != null) {
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
             dateText = df.format(date);
         }
@@ -85,9 +75,8 @@ public class PDFCreator
         createPlayerTable(playerRows, font, bold);
     }
 
-    private void createPlayerTable(List<Player.PlayerRow> playerRows, PdfFont font, PdfFont bold)
-    {
-        Table table = new Table(new float[] {5, 5, 1, 3, 2, 1, 1, 1});
+    private void createPlayerTable(List<Player.PlayerRow> playerRows, PdfFont font, PdfFont bold) {
+        Table table = new Table(new float[]{5, 5, 1, 3, 2, 1, 1, 1});
         table.setWidthPercent(100);
         table.addHeaderCell(new Cell().add(new Paragraph("Team").setFont(bold).setFontSize(12).setTextAlignment(TextAlignment.CENTER)).setVerticalAlignment(VerticalAlignment.MIDDLE));
         table.addHeaderCell(new Cell().add(new Paragraph("League").setFont(bold).setFontSize(12).setTextAlignment(TextAlignment.CENTER)).setVerticalAlignment(VerticalAlignment.MIDDLE));
@@ -97,13 +86,12 @@ public class PDFCreator
         table.addHeaderCell(new Cell().add(new Paragraph("Goals").setFont(bold).setFontSize(12).setTextAlignment(TextAlignment.CENTER)).setVerticalAlignment(VerticalAlignment.MIDDLE));
         table.addHeaderCell(new Cell().add(new Paragraph("Yellow Cards").setFont(bold).setFontSize(12).setTextAlignment(TextAlignment.CENTER)).setVerticalAlignment(VerticalAlignment.MIDDLE));
         table.addHeaderCell(new Cell().add(new Paragraph("Red Cards").setFont(bold).setFontSize(12).setTextAlignment(TextAlignment.CENTER)).setVerticalAlignment(VerticalAlignment.MIDDLE));
-        for(Player.PlayerRow row: playerRows)
+        for (Player.PlayerRow row : playerRows)
             createRow(row, table, font);
         document.add(table);
     }
 
-    private void createRow(Player.PlayerRow row, Table table, PdfFont font)
-    {
+    private void createRow(Player.PlayerRow row, Table table, PdfFont font) {
         String teamName = row.getTeamName();
         String leagueName = row.getLeagueName();
         String apps = Integer.toString(row.getApps());

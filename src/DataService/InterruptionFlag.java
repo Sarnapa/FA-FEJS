@@ -1,22 +1,18 @@
 package DataService;
 
 // Due to problem associated with interrupt method
-public class InterruptionFlag
-{
+public class InterruptionFlag {
     private boolean isInterrupted;
 
-    InterruptionFlag(boolean isInterrupted)
-    {
+    InterruptionFlag(boolean isInterrupted) {
         this.isInterrupted = isInterrupted;
     }
 
-    public void setFlag()
-    {
+    public void setFlag() {
         isInterrupted = true;
     }
 
-    public boolean getFlag()
-    {
+    public boolean getFlag() {
         return isInterrupted;
     }
 }

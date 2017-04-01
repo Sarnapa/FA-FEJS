@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class UpdateProgress extends JFrame{
+public class UpdateProgress extends JFrame {
     private JPanel rootPanel;
     private JLabel TeamsDoneLabel;
     private JLabel TeamsDoneCount;
@@ -31,12 +31,12 @@ public class UpdateProgress extends JFrame{
         style = logArea.addStyle("MyStyle", null);
         logArea.setBorder(new LineBorder(Color.gray, 1));
         logScrollPane = new JScrollPane(logArea);
-        logScrollPane.setBorder(new EmptyBorder(3,3,3,3));
+        logScrollPane.setBorder(new EmptyBorder(3, 3, 3, 3));
         DefaultCaret caret = (DefaultCaret) logArea.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
 
-    public void addProgressListener(ActionListener listenerForProgressStopButton){
+    public void addProgressListener(ActionListener listenerForProgressStopButton) {
         stopButton.addActionListener(listenerForProgressStopButton);
     }
 
@@ -46,22 +46,23 @@ public class UpdateProgress extends JFrame{
         initGUI();
     }
 
-    public void updateTeamsCount(){
+    public void updateTeamsCount() {
         ++TeamsDone;
         TeamsDoneCount.setText(Integer.toString(TeamsDone));
     }
 
-    public void updateLeaguesCount(){
+    public void updateLeaguesCount() {
         ++LeaguesDone;
         LeaguesDoneCount.setText(Integer.toString(LeaguesDone));
     }
 
-    public void disableUpdateButton(){
+    public void disableUpdateButton() {
         stopButton.setEnabled(false);
     }
-    public void log(String s, int level){
 
-        switch(level){
+    public void log(String s, int level) {
+
+        switch (level) {
             case 0:         // log
                 StyleConstants.setForeground(style, Color.black);
                 break;
@@ -80,28 +81,28 @@ public class UpdateProgress extends JFrame{
         try {
             Document doc = logArea.getDocument();
             doc.insertString(doc.getLength(), timestamp + ": " + s + "\n", style);
-        } catch(BadLocationException exc) {
+        } catch (BadLocationException exc) {
             exc.printStackTrace();
         }
     }
 
-    private void setBorders(){
+    private void setBorders() {
         TitledBorder border;
         border = BorderFactory.createTitledBorder("FA-FEJS data is being update...");
         labelsPanel.setBorder(new CompoundBorder(
                 border,
-                new EmptyBorder(5,5,5,5)));
+                new EmptyBorder(5, 5, 5, 5)));
     }
 
-    public void changeCloseOperation(){
+    public void changeCloseOperation() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
-    private void initGUI(){
+    private void initGUI() {
         setTitle("FA-FEJS");
         setSize(new Dimension(700, 500));
         setResizable(true);
-        rootPanel.setBorder(new EmptyBorder(5,5,5,5));
+        rootPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         setBorders();
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         setVisible(true);

@@ -4,13 +4,13 @@ import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PlayerService
-{
+public class PlayerService {
     private String url;
     private int ID;
     private String firstName, lastName, teamName, leagueName, tableName;
@@ -18,88 +18,71 @@ public class PlayerService
     private int apps, firstSquad, minutes, goals, yellowCards, redCards;
     private LayoutInit controller;
 
-    public int getID()
-    {
+    public int getID() {
         return ID;
     }
 
-    public String getFirstName()
-    {
+    public String getFirstName() {
         return firstName;
     }
 
-    public String getLastName()
-    {
+    public String getLastName() {
         return lastName;
     }
 
-    public String getTeamName()
-    {
+    public String getTeamName() {
         return teamName;
     }
 
-    public String getLeagueName()
-    {
+    public String getLeagueName() {
         return leagueName;
     }
 
-    public String getTableName()
-    {
+    public String getTableName() {
         return tableName;
     }
 
-    public Date getDate()
-    {
+    public Date getDate() {
         return date;
     }
 
-    public int getApps()
-    {
+    public int getApps() {
         return apps;
     }
 
-    public int getFirstSquad()
-    {
+    public int getFirstSquad() {
         return firstSquad;
     }
 
-    public int getMinutes()
-    {
+    public int getMinutes() {
         return minutes;
     }
 
-    public int getGoals()
-    {
+    public int getGoals() {
         return goals;
     }
 
-    public int getYellowCards()
-    {
+    public int getYellowCards() {
         return yellowCards;
     }
 
-    public int getRedCards()
-    {
+    public int getRedCards() {
         return redCards;
     }
 
-    public PlayerService(String leagueName, String tableName, String teamName, String url, LayoutInit controller)
-    {
+    public PlayerService(String leagueName, String tableName, String teamName, String url, LayoutInit controller) {
         this.leagueName = leagueName;
         this.tableName = tableName;
         this.teamName = teamName;
         this.url = url;
-        ID = Integer.parseInt(url.substring(url.lastIndexOf(',') + 1,url.lastIndexOf('.')));
+        ID = Integer.parseInt(url.substring(url.lastIndexOf(',') + 1, url.lastIndexOf('.')));
         this.controller = controller;
     }
 
-    public void getPlayerData() throws InterruptedException
-    {
+    public void getPlayerData() throws InterruptedException {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
-        try
-        {
-            if(doc != null)
-            {
+        try {
+            if (doc != null) {
                 String name = doc.getElementsByClass("header--white").first().child(0).text();
                 String reportsUrl = doc.getElementsByClass("box-standard").get(3).getElementsByTag("a").attr("href");
                 firstName = name.substring(0, name.indexOf(' ')).toLowerCase(); // begin index - inclusive, end index - exclusive
@@ -111,60 +94,47 @@ public class PlayerService
                 date = format.parse(dateText);
                 getStats(name, reportsUrl);
                 System.out.println("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
-                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName,0);
+                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName, 0);
             }
-        }
-        catch (ParseException e)
+        } catch (ParseException e) {
+            controller.log("Cannot parse text contained birthdate of player from address: " + url, 2);
+        } catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website or AKADEMIA MLODYCH ORLOW SYNDROME
         {
-            controller.log("Cannot parse text contained birthdate of player from address: " + url,2);
-        }
-        catch (NullPointerException e) // GORNIK KONIN SYNDROME - only player's name on website or AKADEMIA MLODYCH ORLOW SYNDROME
-        {
-            if (doc != null)
-            {
+            if (doc != null) {
                 String name = doc.getElementsByClass("cf").get(6).child(0).text();
-                if(!name.substring(0, name.indexOf(' ')).equals("Profil")) // 1 case - GORNIK KONIN SYNDROME, 2 case - AKADEMIA MLODYCH ORLOW SYNDROME
+                if (!name.substring(0, name.indexOf(' ')).equals("Profil")) // 1 case - GORNIK KONIN SYNDROME, 2 case - AKADEMIA MLODYCH ORLOW SYNDROME
                 {
-                    if (name.lastIndexOf('|') >= 0)
-                    {
+                    if (name.lastIndexOf('|') >= 0) {
                         name = name.substring(0, name.lastIndexOf('|') - 1); // - 1 because of 1 space
                         firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
                         lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
                     }
+                } else {
+                    name = doc.getElementsByClass("head-black").first().text();
+                    firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
+                    lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
                 }
-                else
-                    {
-                        name = doc.getElementsByClass("head-black").first().text();
-                        firstName = name.substring(0, name.lastIndexOf(' ')); // begin index - inclusive, end index - exclusive
-                        lastName = name.substring(name.lastIndexOf(' ') + 1, name.length());
-                    }
-                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName,0);
+                controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName, 0);
             }
         }
     }
 
-    private void getStats(String name, String url)
-    {
+    private void getStats(String name, String url) {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
-        if(doc != null)
-        {
+        if (doc != null) {
             Elements articles = doc.getElementsByClass("season__game");
-            for (Element article : articles)
-            {
+            for (Element article : articles) {
                 String leagueText = article.getElementsByClass("event").first().text();
                 Element teamNamesContainer = article.getElementsByClass("teams").first();
                 Elements teamNameTexts = teamNamesContainer.getElementsByTag("a");
                 boolean isCorrectTeam = false;
-                for(int i = 0; i < teamNameTexts.size(); ++i)
-                {
-                    if(teamNameTexts.get(i).text().toLowerCase().equals(teamName.toLowerCase()))
-                    {
+                for (int i = 0; i < teamNameTexts.size(); ++i) {
+                    if (teamNameTexts.get(i).text().toLowerCase().equals(teamName.toLowerCase())) {
                         isCorrectTeam = true;
                         break;
                     }
                 }
-                if (leagueText.toLowerCase().contains(leagueName.toLowerCase()) && isCorrectTeam)
-                {
+                if (leagueText.toLowerCase().contains(leagueName.toLowerCase()) && isCorrectTeam) {
                     String minutesText = article.getElementsByClass("season__game-time").first().text();
                     if (!minutesText.equals("")) {
                         minutesText = minutesText.substring(7);
@@ -197,11 +167,10 @@ public class PlayerService
         }
     }
 
-    public void printPlayerData()
-    {
-        if(firstName != null)
-        System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName + " " + date + " " + teamName + " " + apps + " " +
-                firstSquad + " " + minutes + " " + goals + " " + yellowCards + " " + redCards);
+    public void printPlayerData() {
+        if (firstName != null)
+            System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName + " " + date + " " + teamName + " " + apps + " " +
+                    firstSquad + " " + minutes + " " + goals + " " + yellowCards + " " + redCards);
         else
             System.out.println("ALERT: " + Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName + " " + date + " " + teamName);
     }

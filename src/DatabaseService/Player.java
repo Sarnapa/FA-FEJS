@@ -4,16 +4,13 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Player
-{
-    public class PlayerRow
-    {
+public class Player {
+    public class PlayerRow {
         private String teamName, leagueName;
         private int apps, firstSquad, minutes, goals, yellowCards, redCards;
 
         public PlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
-                  int yellowCards, int redCards, String leagueName)
-        {
+                         int yellowCards, int redCards, String leagueName) {
             this.teamName = teamName;
             this.apps = apps;
             this.firstSquad = firstSquad;
@@ -24,48 +21,39 @@ public class Player
             this.leagueName = leagueName;
         }
 
-        public String getTeamName()
-        {
+        public String getTeamName() {
             return teamName;
         }
 
-        public int getApps()
-        {
+        public int getApps() {
             return apps;
         }
 
-        public int getFirstSquad()
-        {
+        public int getFirstSquad() {
             return firstSquad;
         }
 
-        public int getMinutes()
-        {
+        public int getMinutes() {
             return minutes;
         }
 
-        public int getGoals()
-        {
+        public int getGoals() {
             return goals;
         }
 
-        public int getYellowCards()
-        {
+        public int getYellowCards() {
             return yellowCards;
         }
 
-        public int getRedCards()
-        {
+        public int getRedCards() {
             return redCards;
         }
 
-        public String getLeagueName()
-        {
+        public String getLeagueName() {
             return leagueName;
         }
 
-        public void printPlayerRow()
-        {
+        public void printPlayerRow() {
             System.out.println(Thread.currentThread().getId() + " " + teamName + " " + leagueName + " " + apps + " " + firstSquad + " " + minutes + " " + goals + " " + yellowCards + " " + redCards);
         }
     }
@@ -73,43 +61,39 @@ public class Player
     private int ID;
     private String firstName, lastName;
     private Date date;
-    private List<PlayerRow> playerRows = new ArrayList<PlayerRow>();
+    private List<PlayerRow> playerRows = new ArrayList<>();
 
-    public Player(int ID, String firstName, String lastName, Date date)
-    {
+    public Player(int ID, String firstName, String lastName, Date date) {
         this.ID = ID;
         this.firstName = firstName;
         this.lastName = lastName;
         this.date = date;
     }
 
-    public String getFirstName()
-    {
+    public String getFirstName() {
         return firstName;
     }
 
-    public String getLastName()
-    {
+    public String getLastName() {
         return lastName;
     }
 
-    public Date getDate()
-    {
+    public Date getDate() {
         return date;
     }
 
-    public List<PlayerRow> getPlayerRows() { return playerRows; }
+    public List<PlayerRow> getPlayerRows() {
+        return playerRows;
+    }
 
     public void addPlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
-                             int yellowCards, int redCards, String leagueName)
-    {
+                             int yellowCards, int redCards, String leagueName) {
         PlayerRow row = new PlayerRow(teamName, apps, firstSquad, minutes, goals, yellowCards, redCards, leagueName);
         playerRows.add(row);
     }
 
-    public void printPlayer()
-    {
-        for(PlayerRow row: playerRows)
+    public void printPlayer() {
+        for (PlayerRow row : playerRows)
             row.printPlayerRow();
     }
 }

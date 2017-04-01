@@ -6,29 +6,25 @@ import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 
-/**
- * Created by Pawel on 21-Oct-16.
- */
-public class UpdateView extends JFrame{
+public class UpdateView extends JFrame {
     private JPanel rootPanel;
     private JButton updateButton;
-    private JList leaguesList;
+    private JList<String> leaguesList;
     private JScrollPane leaguesListPane;
-    private DefaultListModel listModel;
+    private DefaultListModel<String> listModel;
     private MyGlassPane glassPane;
 
     private void createUIComponents() {
         glassPane = new MyGlassPane();
-        listModel = new DefaultListModel();
-        leaguesList = new JList(listModel);
+        listModel = new DefaultListModel<>();
+        leaguesList = new JList<>(listModel);
         leaguesListPane = new JScrollPane(leaguesList);
         leaguesList.setSelectionModel(new DefaultListSelectionModel() {
             @Override
             public void setSelectionInterval(int x, int y) {
-                if(super.isSelectedIndex(x)) {
+                if (super.isSelectedIndex(x)) {
                     super.removeSelectionInterval(x, y);
-                }
-                else {
+                } else {
                     super.addSelectionInterval(x, y);
                 }
             }
@@ -37,17 +33,17 @@ public class UpdateView extends JFrame{
 
     }
 
-    public void disableView(){
+    public void disableView() {
         setEnabled(false);
         glassPane.setVisible(true);
     }
 
-    public void enableView(){
+    public void enableView() {
         setEnabled(true);
         glassPane.setVisible(false);
     }
 
-    public void addToLeaguesList(String s){
+    public void addToLeaguesList(String s) {
         listModel.addElement(s);
     }
 
@@ -55,20 +51,20 @@ public class UpdateView extends JFrame{
         pack();
         setContentPane(rootPanel);
         updateButton.setText("Update");
-        leaguesList.setBorder(new EmptyBorder(5,5,5,5));
-        rootPanel.setBorder(new EmptyBorder(5,5,5,5));
+        leaguesList.setBorder(new EmptyBorder(5, 5, 5, 5));
+        rootPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
         initGUI();
     }
 
-    public void addUpdateWindowListener(WindowAdapter listenerForUpdateWindow){
+    public void addUpdateWindowListener(WindowAdapter listenerForUpdateWindow) {
         addWindowListener(listenerForUpdateWindow);
     }
 
-    public void addUpdateListener(ActionListener listenerForUpdate){
+    public void addUpdateListener(ActionListener listenerForUpdate) {
         updateButton.addActionListener(listenerForUpdate);
     }
 
-    public java.util.List<String> getSelectedLeagues(){
+    public java.util.List<String> getSelectedLeagues() {
         return leaguesList.getSelectedValuesList();
     }
 

@@ -3,23 +3,23 @@ package Layout;
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
+
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
-import java.util.List;
 
-public class LayoutInit{
+public class LayoutInit {
     private LeagueView leagueView;
     private boolean desc = false;
     private UpdateView updateView;
     private UpdateProgress progress;
-    private List<Player> selectedPlayersToPdf = new ArrayList<Player>();
-    //private ArrayList<Integer> players_ids = new ArrayList<>();
+    private List<Player> selectedPlayersToPdf = new ArrayList<>();
     private HashMap<Integer, Integer> playersIDs = new HashMap<>();
     private LeaguesLinks leaguesLinks;
 
-    /** Main window listeners **/
+    /**
+     * Main window listeners
+     **/
 
     class LeagueChoiceListener implements ActionListener {
         @Override
@@ -31,9 +31,9 @@ public class LayoutInit{
             leagueView.disableView();
             Iterator it = playersIDs.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry pair = (Map.Entry)it.next();
-                int tmp_ind = leagueView.getRowWithValue((int)pair.getKey());
-                playersIDs.put((int)pair.getKey(), tmp_ind);
+                Map.Entry pair = (Map.Entry) it.next();
+                int tmp_ind = leagueView.getRowWithValue((int) pair.getKey());
+                playersIDs.put((int) pair.getKey(), tmp_ind);
             }
             leagueView.refresh();
             leagueView.enableView();
@@ -44,22 +44,20 @@ public class LayoutInit{
         @Override
         public void mouseClicked(MouseEvent e) {
             int col = leagueView.getPlayersTable().columnAtPoint(e.getPoint());
-            /*String name = leagueView.getPlayersTable().getColumnName(col);
-            System.out.println("Column index selected " + col + " " + name);*/
             leagueView.clearTable();
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), leagueView.getPlayersTable().getColumnName(col), desc);
             desc = !desc;
         }
     }
-        /** Buttons listeners **/
+
+    /**
+     * Buttons listeners
+     **/
 
     class UpdateButtonListener implements ActionListener {
         @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            if (leaguesLinks.checkHostConnection())
-            {
-                //leagueView.disableView();
+        public void actionPerformed(ActionEvent e) {
+            if (leaguesLinks.checkHostConnection()) {
                 leagueView.disableUpdateButton();
                 updateView = new UpdateView();
                 updateView.addUpdateWindowListener(new UpdateWindowListener());
@@ -72,23 +70,21 @@ public class LayoutInit{
     class CreatePDFListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            if(playersIDs.size() > 0)
-            {
+            if (playersIDs.size() > 0) {
                 DatabaseConnection db = new DatabaseConnection(LayoutInit.this);
                 db.createConnection();
                 List<String> names = db.getTablesNames();
                 names.remove("PLAYERS");
                 Iterator it = playersIDs.entrySet().iterator();
                 while (it.hasNext()) {
-                    Map.Entry tmp = (Map.Entry)it.next();
-                    selectedPlayersToPdf.add(db.getDuv().getPlayerRows((int)tmp.getKey(), names));
+                    Map.Entry tmp = (Map.Entry) it.next();
+                    selectedPlayersToPdf.add(db.getDuv().getPlayerRows((int) tmp.getKey(), names));
                 }
                 db.shutdown();
             }
-            if(selectedPlayersToPdf.size() > 0)
-            {
+            if (selectedPlayersToPdf.size() > 0) {
                 PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
-                String pdfName = (String)JOptionPane.showInputDialog(
+                String pdfName = (String) JOptionPane.showInputDialog(
                         leagueView,
                         "Write PDF filename.",
                         "FA-FEJS",
@@ -110,34 +106,25 @@ public class LayoutInit{
             Map<Integer, Integer> selected = leagueView.getSelectedPlayers();
             Iterator it = selected.entrySet().iterator();
             while (it.hasNext()) {
-                Map.Entry tmp = (Map.Entry)it.next();
-                //System.out.println(tmp.getKey() + " " + tmp.getValue());
-                if(playersIDs.containsKey(tmp.getKey())) {    //remove
+                Map.Entry tmp = (Map.Entry) it.next();
+                if (playersIDs.containsKey(tmp.getKey())) {    //remove
                     playersIDs.remove(tmp.getKey());
-                }
-                else{                                       //add
-                    playersIDs.put((int)tmp.getKey(), (int)tmp.getValue());
+                } else {                                       //add
+                    playersIDs.put((int) tmp.getKey(), (int) tmp.getValue());
                 }
             }
-            //System.out.println("----------------------\n");
-
-            //Iterator it2 = playersIDs.entrySet().iterator();
-            //while (it2.hasNext()) {
-                //Map.Entry tmp2 = (Map.Entry)it2.next();
-                //System.out.println(tmp2.getKey() + " " + tmp2.getValue());
-            //}
             leagueView.refresh();
         }
     }
 
-    /** Update window listeners **/
+    /**
+     * Update window listeners
+     **/
 
     class UpdateWindowListener extends WindowAdapter {
         @Override
         public void windowClosing(WindowEvent e) {
             leagueView.enableUpdateButton();
-            //leagueView.enableView();
-            //updateView.dispose();
         }
     }
 
@@ -145,34 +132,32 @@ public class LayoutInit{
         @Override
         public void actionPerformed(ActionEvent e) {
             List<String> selectedLeagues = updateView.getSelectedLeagues();
-            if(selectedLeagues.size() > 0)
-            {
+            if (selectedLeagues.size() > 0) {
                 updateView.disableView();
                 progress = new UpdateProgress();
                 progress.addProgressListener(new ProgressListener());
-                /*for(String s: updateView.getSelectedLeagues()){
-                    System.out.println(s);
-                 }*/
                 startUpdate(updateView.getSelectedLeagues());
             }
         }
     }
 
-    /** Progress window listeners **/
+    /**
+     * Progress window listeners
+     **/
 
 
     class ProgressListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
             progress.disableUpdateButton();
-            SwingWorker myWorker= new SwingWorker<String, Void>() {
+            SwingWorker myWorker = new SwingWorker<String, Void>() {
                 @Override
                 protected String doInBackground() throws Exception {
-                    log("Kończenie pracy programu. Trwa zapisywanie danych. Proszę czekać", 1);
+                    log("Finishing work. Please wait...", 1);
                     leaguesLinks.killLeagueThreads();
                     leaguesLinks.clear();
                     updateView.enableView();
-                    log("Zakończono pobieranie danych, można teraz zamknąć okno.",1);
+                    log("Data update completed! You can now close this window.", 1);
                     progress.changeCloseOperation();
                     return null;
                 }
@@ -182,16 +167,18 @@ public class LayoutInit{
         }
     }
 
-    /** Main window functions **/
+    /**
+     * Main window functions
+     **/
 
-    private void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc){
+    private void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc) {
         DatabaseConnection db = new DatabaseConnection(this);
         db.createConnection();
         db.updateView(view, leagueName, orderBy, desc);
         db.shutdown();
     }
 
-    private List<String> getLeaguesNames(){
+    private List<String> getLeaguesNames() {
         DatabaseConnection db = new DatabaseConnection(this);
         db.createConnection();
         List<String> names = db.getTablesNames();
@@ -206,7 +193,9 @@ public class LayoutInit{
         }
     }
 
-    /** Update window functions **/
+    /**
+     * Update window functions
+     **/
 
     private void fillUpdateTable(UpdateView uv, List<String> names) {
         for (String s : names) {
@@ -215,33 +204,35 @@ public class LayoutInit{
         }
     }
 
-    private void startUpdate(List<String> list){
+    private void startUpdate(List<String> list) {
         leaguesLinks.setSelectedLeagues(list);
         Thread mainUpdateThread = new Thread(leaguesLinks);
         mainUpdateThread.start();
     }
 
-    /** Progress window functions **/
+    /**
+     * Progress window functions
+     **/
 
-    public void updateTeamsCount(){
+    public void updateTeamsCount() {
         progress.updateTeamsCount();
     }
 
-    public void updateLeaguesCount(){
+    public void updateLeaguesCount() {
         progress.updateLeaguesCount();
     }
 
-    public void log(String s, int c){
+    public void log(String s, int c) {
         progress.log(s, c);
     }
 
-    /** Message Dialog function **/
+    /**
+     * Message Dialog function
+     **/
 
-    public void showDialog(String dialogTitle, String text, int dialogOption, int parentID)
-    {
+    public void showDialog(String dialogTitle, String text, int dialogOption, int parentID) {
         //JOptionPane.ERROR_MESSAGE = 0, JOptionPane.INFORMATION_MESSAGE = 1, JOptionPane.WARNING_MESSAGE = 2
-        switch(parentID)
-        {
+        switch (parentID) {
             case 0:
                 JOptionPane.showMessageDialog(leagueView, text, dialogTitle, dialogOption);
                 break;
@@ -257,9 +248,10 @@ public class LayoutInit{
         }
     }
 
-    /** Controller **/
-    public LayoutInit()
-    {
+    /**
+     * Controller
+     **/
+    public LayoutInit() {
         leagueView = new LeagueView(this);
         leagueView.disableView();
         fillLeagueChoice(leagueView, getLeaguesNames());
@@ -272,8 +264,7 @@ public class LayoutInit{
         leaguesLinks = new LeaguesLinks(this);
     }
 
-    public HashMap<Integer, Integer> getPlayersIDs()
-    {
+    public HashMap<Integer, Integer> getPlayersIDs() {
         return playersIDs;
     }
 }

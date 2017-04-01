@@ -1,26 +1,16 @@
 package Layout;
 
-import javafx.util.Pair;
-
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
-import java.io.IOException;
-import java.util.*;
+import java.util.HashMap;
 
-import static java.lang.Thread.sleep;
-
-/**
- * Created by Pawel on 06-Sep-16.
- */
 public class LeagueView extends JFrame {
 
-    private JComboBox leagueChoice;
+    private JComboBox<String> leagueChoice;
     private JButton updateButton;
     private JButton pdfButton;
     private JPanel rootPanel;
@@ -34,12 +24,11 @@ public class LeagueView extends JFrame {
     private LayoutInit controller;
 
 
-
-    private  class MyTableCellRenderer extends DefaultTableCellRenderer {
+    private class MyTableCellRenderer extends DefaultTableCellRenderer {
 
         @Override
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            super.getTableCellRendererComponent(table, value, isSelected,  hasFocus, row, column);
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
 
             if (controller.getPlayersIDs().containsValue(row)) {
                 setForeground(Color.red);
@@ -51,8 +40,8 @@ public class LeagueView extends JFrame {
     }
 
     private void createUIComponents() {
-        String[] columnNames ={"ID", "FIRST NAME", "LAST NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST SQUAD", "MINUTES", "GOALS", "YELLOW CARDS", "RED CARDS"};
-        tableModel = new DefaultTableModel(0, columnNames.length){
+        String[] columnNames = {"ID", "FIRST NAME", "LAST NAME", "BIRTHDATE", "TEAM", "APPS", "FIRST SQUAD", "MINUTES", "GOALS", "YELLOW CARDS", "RED CARDS"};
+        tableModel = new DefaultTableModel(0, columnNames.length) {
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return false;
@@ -79,41 +68,42 @@ public class LeagueView extends JFrame {
     }
 
 
-    public int getRowWithValue(int x){
+    public int getRowWithValue(int x) {
         int rowCount = playersTable.getRowCount();
-        for(int i = 0; i < rowCount; i++){
-            if(playersTable.getValueAt(i, 0).equals(x)){
+        for (int i = 0; i < rowCount; i++) {
+            if (playersTable.getValueAt(i, 0).equals(x)) {
                 return i;
             }
         }
         return -1;
     }
 
-    public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton){
+    public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton) {
         leagueChoice.addActionListener(listenerForLeagueChoiceButton);
     }
 
-    public void addTableHeaderListener(MouseAdapter listenerForTableHeader){
+    public void addTableHeaderListener(MouseAdapter listenerForTableHeader) {
         playersTable.getTableHeader().addMouseListener(listenerForTableHeader);
     }
 
-    public void addUpdateButtonListener(ActionListener listenerForUpdateButton){
+    public void addUpdateButtonListener(ActionListener listenerForUpdateButton) {
         updateButton.addActionListener(listenerForUpdateButton);
     }
 
-    public void addPDFButtonListener(ActionListener listenerForPDFButton){
-       pdfButton.addActionListener(listenerForPDFButton);
+    public void addPDFButtonListener(ActionListener listenerForPDFButton) {
+        pdfButton.addActionListener(listenerForPDFButton);
     }
-    public void addPlayersButtonListener(ActionListener listenerForPlayersButton){
+
+    public void addPlayersButtonListener(ActionListener listenerForPlayersButton) {
         addPlayersButton.addActionListener(listenerForPlayersButton);
     }
 
-    public void disableView(){
+    public void disableView() {
         setEnabled(false);
         glassPane.setVisible(true);
     }
 
-    public void enableView(){
+    public void enableView() {
         setEnabled(true);
         glassPane.setVisible(false);
     }
@@ -133,51 +123,55 @@ public class LeagueView extends JFrame {
         return result;
     }
 
-    public HashMap<Integer, Integer> getSelectedPlayers(){
+    public HashMap<Integer, Integer> getSelectedPlayers() {
         HashMap<Integer, Integer> tmp = new HashMap<>();
         int[] players = playersTable.getSelectedRows();
-        for(int i = 0; i < players.length; i++){
-            tmp.put((int)playersTable.getValueAt(players[i],0), (players[i]));
+        for (int player : players) {
+            tmp.put((int) playersTable.getValueAt(player, 0), (player));
         }
         return tmp;
     }
 
-    public void disableUpdateButton(){
+    public void disableUpdateButton() {
         updateButton.setEnabled(false);
     }
-    public void enableUpdateButton(){
+
+    public void enableUpdateButton() {
         updateButton.setEnabled(true);
     }
-    public void clearTable(){
+
+    public void clearTable() {
         tableModel.setRowCount(0);
     }
-    public void addToPlayersTable(Object[] s){
+
+    public void addToPlayersTable(Object[] s) {
         tableModel.addRow(s);
     }
-    public JTable getPlayersTable(){ return playersTable; }
 
-    public void addLeagueChoiceElement(String s){
+    public JTable getPlayersTable() {
+        return playersTable;
+    }
+
+    public void addLeagueChoiceElement(String s) {
         leagueChoice.addItem(s);
         leagueChoice.setSelectedIndex(-1);
     }
 
-    public void refresh(){
+    public void refresh() {
         playersTable.repaint();
     }
 
-    public LeagueView(LayoutInit _controller)
-    {
+    public LeagueView(LayoutInit _controller) {
         controller = _controller;
         pack();
         setContentPane(rootPanel);
         initGUI();
     }
 
-    private void initGUI()
-    {
+    private void initGUI() {
         setTitle("FA-FEJS");
         setSize(new Dimension(1000, 600));
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setGlassPane(glassPane);
         leagueChoice.setEditable(false);
         setVisible(true);
