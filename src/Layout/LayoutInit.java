@@ -1,15 +1,17 @@
 package Layout;
 
+import DataService.FolderContentReader;
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
 import org.apache.derby.database.Database;
-
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.TableModel;
 import java.awt.event.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -23,6 +25,7 @@ public class LayoutInit {
     private List<Player> selectedPlayersToPdf = new ArrayList<>();
     private HashMap<Integer, Integer> playersIDs = new HashMap<>();
     private LeaguesLinks leaguesLinks;
+    private final static String pdfsFolderDst = "./pdfs";
     private String currentLeague;
 
     /**
@@ -33,6 +36,7 @@ public class LayoutInit {
         @Override
         public void actionPerformed(ActionEvent e) {
             leagueView.clearTable();
+            //System.out.println(leagueView.getLeagueChoiceSelected());
             currentLeague = leagueView.getLeagueChoiceSelected();
             System.out.println(currentLeague);
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
@@ -145,19 +149,50 @@ public class LayoutInit {
                 }
                 db.shutdown();
             }
-            if (selectedPlayersToPdf.size() > 0) {
+            if(selectedPlayersToPdf.size() > 0) {
                 PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
-                String pdfName = (String) JOptionPane.showInputDialog(
-                        leagueView,
-                        "Write PDF filename.",
-                        "FA-FEJS",
-                        JOptionPane.PLAIN_MESSAGE,
-                        null,
-                        null,
-                        "");
-                pdfCreator.generatePDF(pdfName);
+                boolean isReady = false;
+                FolderContentReader contentReader = new FolderContentReader(pdfsFolderDst);
+                String pdfName = "";
+                while(!isReady)
+                {
+                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd-MM-yyyy_HH.mm.ss");
+                    LocalDateTime now = LocalDateTime.now();
+                    String initString = dtf.format(now);
+                    Object resultInput = JOptionPane.showInputDialog(
+                            leagueView,
+                            "Write PDF filename.",
+                            "FA-FEJS",
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            null,
+                            initString);
+                    if(resultInput != null)
+                    {
+                        pdfName = (String) resultInput;
+                        if (!pdfName.equals("")) {
+                            if (contentReader.isFile(pdfName + ".pdf")) {
+                                Object[] options = {"Yes", "No"};
+                                int optionCode = JOptionPane.showOptionDialog(leagueView, "Do you want to overwrite it?", "File with this name already existed", JOptionPane.YES_NO_OPTION,
+                                        JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+                                if (optionCode == 0)
+                                    isReady = true;
+                            } else
+                                isReady = true;
+                        }
+                        else
+                            break;
+                    }
+                    else
+                        break;
+                }
+                if(isReady)
+                {
+                    String dest = "./pdfs/" + pdfName + ".pdf";
+                    pdfCreator.generatePDF(dest);
+                    playersIDs.clear();
+                }
                 selectedPlayersToPdf.clear();
-                playersIDs.clear();
             }
             leagueView.refresh();
         }

@@ -10,7 +10,7 @@ public class DatabaseUpdateView {
     private final Connection conn;
     private final LayoutInit controller;
 
-    public DatabaseUpdateView(Connection conn, LayoutInit controller) {
+    DatabaseUpdateView(Connection conn, LayoutInit controller) {
         this.conn = conn;
         this.controller = controller;
     }
@@ -69,7 +69,7 @@ public class DatabaseUpdateView {
         return player;
     }
 
-    public void updateView(LeagueView view, String leagueName, String orderBy, boolean desc) {
+    void updateView(LeagueView view, String leagueName, String orderBy, boolean desc) {
         try {
             Statement stmt = conn.createStatement();
             String query = prepareStatement(leagueName, orderBy, desc);

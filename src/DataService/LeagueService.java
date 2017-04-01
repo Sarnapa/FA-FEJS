@@ -85,6 +85,7 @@ public class LeagueService extends Thread//implements Runnable
     }
 
     private void getTeams() throws InterruptedException {
+
         for (String url : teamsUrls) {
             if (interruptionFlag.getFlag())
                 throw new InterruptedException();

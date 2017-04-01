@@ -8,9 +8,9 @@ import org.jsoup.nodes.Document;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
-public class HtmlService {
+class HtmlService {
     // To get HTML code of page
-    public static Document getHtmlSource(String address, boolean isJSON, LayoutInit controller) {
+    static Document getHtmlSource(String address, boolean isJSON, LayoutInit controller) {
         int timeout = 30 * 1000;
         int delay1 = 5 * 1000;
         int delay2 = 10 * 1000;

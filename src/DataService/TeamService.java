@@ -27,7 +27,7 @@ public class TeamService {
         this.interruptionFlag = _interruptionFlag;
     }
 
-    public boolean getPlayersUrls() {
+    boolean getPlayersUrls() {
         boolean interrupted = false;
         Document doc = HtmlService.getHtmlSource(url, false, controller);
         if (doc != null) {
@@ -54,7 +54,7 @@ public class TeamService {
     private boolean getPlayers() {
         try {
             for (String url : playersUrls) {
-                System.out.println(Thread.currentThread().getId() + " " + url + " " + interruptionFlag.getFlag());
+                //System.out.println(Thread.currentThread().getId() + " " + url + " " + interruptionFlag.getFlag());
                 if (interruptionFlag.getFlag())
                     throw new InterruptedException();
                 PlayerService player = new PlayerService(leagueName, tableName, name, url, controller);

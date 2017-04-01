@@ -158,9 +158,7 @@ public class LeaguesLinks implements Runnable {
             ++currentThreadsNumber;
             if (currentThreadsNumber == THREADS_NUMBER) {
                 synchronized (someObject) {
-                    System.out.println("Blokada");
                     someObject.wait();
-                    System.out.println("Po blokadzie");
                 }
                 --currentThreadsNumber;
             }

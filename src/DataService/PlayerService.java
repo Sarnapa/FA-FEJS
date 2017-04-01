@@ -70,7 +70,7 @@ public class PlayerService {
         return redCards;
     }
 
-    public PlayerService(String leagueName, String tableName, String teamName, String url, LayoutInit controller) {
+    PlayerService(String leagueName, String tableName, String teamName, String url, LayoutInit controller) {
         this.leagueName = leagueName;
         this.tableName = tableName;
         this.teamName = teamName;
@@ -79,7 +79,7 @@ public class PlayerService {
         this.controller = controller;
     }
 
-    public void getPlayerData() throws InterruptedException {
+    void getPlayerData() throws InterruptedException {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
         try {
             if (doc != null) {
@@ -93,7 +93,7 @@ public class PlayerService {
                 DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
                 date = format.parse(dateText);
                 getStats(name, reportsUrl);
-                System.out.println("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
+                //System.out.println("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
                 controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName, 0);
             }
         } catch (ParseException e) {

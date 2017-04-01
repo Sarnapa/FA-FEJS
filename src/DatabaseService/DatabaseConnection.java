@@ -71,24 +71,15 @@ public class DatabaseConnection {
             int goals = player.getGoals();
             int yellowCards = player.getYellowCards();
             int redCards = player.getRedCards();
-            System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
+            //System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
             duc.updatePlayersTable(ID, firstName, lastName, birthdate);
             duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
         } catch (SQLIntegrityConstraintViolationException sqlE) {
             controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException", 2);
             return true; // to avoid inserting bad data
-        } catch (SQLException e) {
-            /*while (e != null)
-            {
-                System.out.println("Thread: " + Thread.currentThread().getId() + "\n----- SQLException -----");
-                System.out.println("  SQLState:   " + e.getSQLState());
-                System.out.println("  Error Code: " + e.getErrorCode());
-                System.out.println("  Message:    " + e.getMessage());
-                e.printStackTrace(System.out);
-                e = e.getNextException();
-            }
-            // for stack dumps, refer to derby.log or add
-            //e.printStackTrace(System.out); above*/
+        }
+        catch (SQLException e)
+        {
 
             controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(), 2);
             return false;

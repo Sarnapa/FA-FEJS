@@ -7,14 +7,14 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class DatabaseUpdateContent {
+class DatabaseUpdateContent {
     private final Connection conn;
 
-    public DatabaseUpdateContent(Connection conn) {
+    DatabaseUpdateContent(Connection conn) {
         this.conn = conn;
     }
 
-    public void updatePlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException {
+    void updatePlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException {
         PreparedStatement pstmt = conn.prepareStatement("UPDATE APP.PLAYERS SET FIRST_NAME = ?, LAST_NAME = ?, BIRTHDATE = ? WHERE ID = ?");
         pstmt.setString(1, firstName);
         pstmt.setString(2, lastName);
@@ -31,10 +31,9 @@ public class DatabaseUpdateContent {
         pstmt.close();
     }
 
-    public void updateLeagueTable(String league, int ID, String team, int apps, int firstSquad, int minutes, int goals, int yellowCards, int redCards) throws SQLException {
+    void updateLeagueTable(String league, int ID, String team, int apps, int firstSquad, int minutes, int goals, int yellowCards, int redCards) throws SQLException {
         String statement = "SELECT COUNT(*) AS cnt FROM TABLENAME WHERE ID = ?";
         statement = statement.replace("TABLENAME", "APP.\"" + league + "\"");
-        //System.out.println(statement);
         PreparedStatement pstmt = conn.prepareStatement(statement);
         pstmt.setInt(1, ID);
         ResultSet result = pstmt.executeQuery();

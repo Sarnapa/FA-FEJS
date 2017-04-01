@@ -9,7 +9,7 @@ public class Player {
         private String teamName, leagueName;
         private int apps, firstSquad, minutes, goals, yellowCards, redCards;
 
-        public PlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
+        PlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
                          int yellowCards, int redCards, String leagueName) {
             this.teamName = teamName;
             this.apps = apps;
@@ -53,7 +53,7 @@ public class Player {
             return leagueName;
         }
 
-        public void printPlayerRow() {
+        void printPlayerRow() {
             System.out.println(Thread.currentThread().getId() + " " + teamName + " " + leagueName + " " + apps + " " + firstSquad + " " + minutes + " " + goals + " " + yellowCards + " " + redCards);
         }
     }
@@ -86,7 +86,7 @@ public class Player {
         return playerRows;
     }
 
-    public void addPlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
+    void addPlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
                              int yellowCards, int redCards, String leagueName) {
         PlayerRow row = new PlayerRow(teamName, apps, firstSquad, minutes, goals, yellowCards, redCards, leagueName);
         playerRows.add(row);
