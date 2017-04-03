@@ -1,17 +1,16 @@
 package Layout;
 
-import javafx.scene.control.Tab;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
+import javax.swing.event.CellEditorListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableModel;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
+import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 
 public class LeagueView extends JFrame {
@@ -29,6 +28,7 @@ public class LeagueView extends JFrame {
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
     private LayoutInit controller;
+    private TableCellListener tableCellListener;
     private boolean isTableEditable = false;
 
 
@@ -52,8 +52,8 @@ public class LeagueView extends JFrame {
         tableModel = new DefaultTableModel(0, columnNames.length) {
             @Override
             public boolean isCellEditable(int rowIndex, int columnIndex) {
-                if(columnIndex == 0)
-                    return false; // don't change id!
+                if(columnIndex == 0 || columnIndex == 4)
+                    return false; // don't change id and team!
                 return isTableEditable;
             }
         };
@@ -78,7 +78,7 @@ public class LeagueView extends JFrame {
     }
 
 
-    public int getRowWithValue(int x) {
+    int getRowWithValue(int x) {
         int rowCount = playersTable.getRowCount();
         for (int i = 0; i < rowCount; i++) {
             if (playersTable.getValueAt(i, 0).equals(x)) {
@@ -92,17 +92,17 @@ public class LeagueView extends JFrame {
         return isTableEditable;
     }
 
-    public void disableView() {
+    void disableView() {
         setEnabled(false);
         glassPane.setVisible(true);
     }
 
-    public void enableView() {
+    void enableView() {
         setEnabled(true);
         glassPane.setVisible(false);
     }
 
-    public String getLeagueChoiceSelected() {
+    String getLeagueChoiceSelected() {
         return leagueChoice.getSelectedItem().toString();
     }
 
@@ -117,7 +117,7 @@ public class LeagueView extends JFrame {
         return result;
     }
 
-    public HashMap<Integer, Integer> getSelectedPlayers() {
+    HashMap<Integer, Integer> getSelectedPlayers() {
         HashMap<Integer, Integer> tmp = new HashMap<>();
         int[] players = playersTable.getSelectedRows();
         for (int player : players) {
@@ -126,15 +126,15 @@ public class LeagueView extends JFrame {
         return tmp;
     }
 
-    public void disableUpdateButton() {
+    void disableUpdateButton() {
         updateButton.setEnabled(false);
     }
 
-    public void enableUpdateButton() {
+    void enableUpdateButton() {
         updateButton.setEnabled(true);
     }
 
-    public void clearTable() {
+    void clearTable() {
         tableModel.setRowCount(0);
     }
 
@@ -142,23 +142,26 @@ public class LeagueView extends JFrame {
         tableModel.addRow(s);
     }
 
-    public JTable getPlayersTable() {
+    JTable getPlayersTable() {
         return playersTable;
     }
 
-    public void addLeagueChoiceElement(String s) {
+    void addLeagueChoiceElement(String s) {
         leagueChoice.addItem(s);
         leagueChoice.setSelectedIndex(-1);
     }
 
-    public boolean editMode(){
-        if(isTableEditable){
+    boolean editMode(){
+        if(isTableEditable)
+        {
             playersTable.setBorder(new EmptyBorder(0,0,0,0));
             pdfButton.setEnabled(true);
             updateButton.setEnabled(true);
             addPlayersButton.setEnabled(true);
             leagueChoice.setEnabled(true);
-        } else {
+        }
+        else
+        {
             playersTable.setBorder(new LineBorder(Color.blue, 1));
             pdfButton.setEnabled(false);
             updateButton.setEnabled(false);
@@ -168,11 +171,11 @@ public class LeagueView extends JFrame {
         isTableEditable = !isTableEditable;
         return isTableEditable;
     }
-    public void refresh() {
+    void refresh() {
         playersTable.repaint();
     }
 
-    public LeagueView(LayoutInit _controller) {
+    LeagueView(LayoutInit _controller) {
         controller = _controller;
         pack();
         setContentPane(rootPanel);
@@ -189,33 +192,50 @@ public class LeagueView extends JFrame {
     }
 
 
-    public void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton) {
+    void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton) {
         leagueChoice.addActionListener(listenerForLeagueChoiceButton);
     }
 
-    public void addTableHeaderListener(MouseAdapter listenerForTableHeader) {
+    void addTableHeaderListener(MouseAdapter listenerForTableHeader) {
         playersTable.getTableHeader().addMouseListener(listenerForTableHeader);
     }
 
-    public void addUpdateButtonListener(ActionListener listenerForUpdateButton) {
+    void addUpdateButtonListener(ActionListener listenerForUpdateButton) {
         updateButton.addActionListener(listenerForUpdateButton);
     }
 
-    public void addPDFButtonListener(ActionListener listenerForPDFButton) {
+    void addPDFButtonListener(ActionListener listenerForPDFButton) {
         pdfButton.addActionListener(listenerForPDFButton);
     }
 
-    public void addPlayersButtonListener(ActionListener listenerForPlayersButton) {
+    void addPlayersButtonListener(ActionListener listenerForPlayersButton) {
         addPlayersButton.addActionListener(listenerForPlayersButton);
     }
-    public void addEditModeButtonListener(ActionListener listenerForEditModeButton) {
+    void addEditModeButtonListener(ActionListener listenerForEditModeButton) {
         editModeButton.addActionListener(listenerForEditModeButton);
     }
-    public void addTableModelListener(TableModelListener listenerForTableModel) {
+
+    /*void addTableModelListener(TableModelListener listenerForTableModel) {
         tableModel.addTableModelListener(listenerForTableModel);
     }
-    public void removeTableModelListener() {
+
+    void removeTableModelListener() {
         TableModelListener[] list = tableModel.getTableModelListeners();
         tableModel.removeTableModelListener(list[0]);
+    }*/
+
+    void createTableCellListener(Action action)
+    {
+        this.tableCellListener = new TableCellListener(playersTable, action);
     }
+
+    void removeTableCellListener()
+    {
+        PropertyChangeListener[] list = playersTable.getPropertyChangeListeners();
+        for(PropertyChangeListener listener: list) {
+            playersTable.removePropertyChangeListener(listener);
+        }
+        this.tableCellListener = null;
+    }
+
 }
