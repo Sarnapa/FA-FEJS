@@ -4,6 +4,7 @@ public class Main {
 
     public static void main(String[] args) {
         //error error = new error();
-        LayoutInit layout = new LayoutInit();
+        InsertModeWindow imw = new InsertModeWindow();
+        // LayoutInit layout = new LayoutInit();
     }
 }
