@@ -145,7 +145,7 @@ public class LayoutInit {
 
     private static boolean findSpecialCharacter(String text)
     {
-        Pattern p = Pattern.compile("[^a-z 0-9]", Pattern.CASE_INSENSITIVE);
+        Pattern p = Pattern.compile("[^a-z ' -]", Pattern.CASE_INSENSITIVE);
         Matcher m = p.matcher(text);
         return m.find();
     }

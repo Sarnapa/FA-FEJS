@@ -162,7 +162,7 @@ public class LeagueView extends JFrame {
         }
         else
         {
-            playersTable.setBorder(new LineBorder(Color.blue, 1));
+            playersTable.setBorder(new LineBorder(Color.red, 1));
             pdfButton.setEnabled(false);
             updateButton.setEnabled(false);
             addPlayersButton.setEnabled(false);
