@@ -53,6 +53,16 @@ public class DatabaseConnection {
         return true;
     }
 
+    public synchronized  boolean deletePlayer(int ID, String leagueName){
+        try{
+            duc.deletePlayer(ID, leagueName);
+        } catch(SQLException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
+    }
+
     public synchronized boolean updatePlayer(PlayerService player) {
         String firstName = player.getFirstName();
         String lastName = player.getLastName();
@@ -108,7 +118,9 @@ public class DatabaseConnection {
             int yellowCards = row.getYellowCards();
             int redCards = row.getRedCards();
             System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
-            duc.insertToPlayersTable(ID, firstName, lastName, birthdate);
+            if(!duc.existsInPlayers(ID)){
+                duc.insertToPlayersTable(ID, firstName, lastName, birthdate);
+            }
             duc.insertPlayerToLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
         }
         catch (SQLIntegrityConstraintViolationException sqlE)
@@ -130,14 +142,7 @@ public class DatabaseConnection {
 
     public List<String> getTablesNames() {
         try {
-            DatabaseMetaData metadata = conn.getMetaData();
-            List<String> names = new ArrayList<>();
-            String[] types = {"TABLE"};
-            ResultSet rs = metadata.getTables(null, null, "%", types);
-            while (rs.next()) {
-                names.add(rs.getString(3)); // column 3 is table name
-            }
-            rs.close();
+            List<String> names = duc.getTableNames();
             return names;
         } catch (SQLException e) {
             controller.showDialog("Database Error", "Cannot get tables names", 0, 0);

@@ -26,6 +26,25 @@ class DatabaseUpdateContent {
         pstmt.close();
     }
 
+    public boolean existsInPlayers(int ID){
+        try{
+            String statement = "SELECT COUNT(*) AS cnt FROM APP.PLAYERS WHERE ID = ?";
+            PreparedStatement pstmt = conn.prepareStatement(statement);
+            pstmt.setInt(1, ID);
+            ResultSet result = pstmt.executeQuery();
+            int resultCount = 0;
+            while (result.next())
+                resultCount = result.getInt("cnt");
+            if (resultCount == 0)
+                return false;
+            else
+                return true;
+        } catch(SQLException e){
+            e.printStackTrace();
+            return true;
+        }
+    }
+
     void insertToPlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException
     {
         PreparedStatement pstmt = conn.prepareStatement("INSERT INTO APP.PLAYERS VALUES (?,?,?,?)");
@@ -34,6 +53,52 @@ class DatabaseUpdateContent {
         pstmt.setString(3, lastName);
         pstmt.setDate(4, birthdate);
         pstmt.execute();
+        pstmt.close();
+    }
+
+    List<String> getTableNames() throws SQLException{
+        try{
+            DatabaseMetaData metadata = conn.getMetaData();
+            List<String> names = new ArrayList<>();
+            String[] types = {"TABLE"};
+            ResultSet rs = metadata.getTables(null, null, "%", types);
+            while (rs.next()) {
+                names.add(rs.getString(3)); // column 3 is table name
+            }
+            rs.close();
+            return names;
+        } catch(SQLException e){
+            throw new SQLException(e);
+        }
+    }
+    void deletePlayer(int ID, String leagueName) throws SQLException{
+        String statement = "DELETE FROM TABLENAME WHERE ID = ?";
+        statement = statement.replace("TABLENAME", "APP.\"" + leagueName + "\"");
+        PreparedStatement pstmt = conn.prepareStatement(statement);
+        pstmt.setInt(1, ID);
+        pstmt.execute();
+
+        List<String> leaguesNames = getTableNames();
+        int resultCount = 0;
+        for(String league: leaguesNames){
+            if(!league.equals("PLAYERS")){
+                statement = "SELECT COUNT(*) AS cnt FROM TABLENAME WHERE ID = ?";
+                statement = statement.replace("TABLENAME", "APP.\"" + league + "\"");
+                pstmt = conn.prepareStatement(statement);
+                pstmt.setInt(1, ID);
+                ResultSet result = pstmt.executeQuery();
+                while (result.next())
+                    resultCount = result.getInt("cnt");
+                if (resultCount != 0) {
+                    break;
+                }
+            }
+        }
+        if(resultCount == 0){
+            pstmt = conn.prepareStatement("DELETE FROM APP.PLAYERS WHERE ID = ?");
+            pstmt.setInt(1, ID);
+            pstmt.execute();
+        }
         pstmt.close();
     }
 

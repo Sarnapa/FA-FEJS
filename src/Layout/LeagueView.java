@@ -25,6 +25,7 @@ public class LeagueView extends JFrame {
     private JButton addPlayersButton;
     private JButton editModeButton;
     private JButton insertModeButton;
+    private JButton delButton;
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
     private LayoutInit controller;
@@ -75,6 +76,8 @@ public class LeagueView extends JFrame {
             }
         });
         */
+        delButton = new JButton();
+        delButton.setVisible(false);
     }
 
 
@@ -151,10 +154,15 @@ public class LeagueView extends JFrame {
         leagueChoice.setSelectedIndex(-1);
     }
 
+    public void delFromTable(int rowIndex){
+        tableModel.removeRow(rowIndex);
+    }
+
     boolean editMode(){
         if(isTableEditable)
         {
             playersTable.setBorder(new EmptyBorder(0,0,0,0));
+            delButton.setVisible(false);
             pdfButton.setEnabled(true);
             updateButton.setEnabled(true);
             addPlayersButton.setEnabled(true);
@@ -163,6 +171,7 @@ public class LeagueView extends JFrame {
         else
         {
             playersTable.setBorder(new LineBorder(Color.red, 1));
+            delButton.setVisible(true);
             pdfButton.setEnabled(false);
             updateButton.setEnabled(false);
             addPlayersButton.setEnabled(false);
@@ -171,6 +180,7 @@ public class LeagueView extends JFrame {
         isTableEditable = !isTableEditable;
         return isTableEditable;
     }
+
     void refresh() {
         playersTable.repaint();
     }
@@ -220,7 +230,9 @@ public class LeagueView extends JFrame {
     void addEditModeButtonListener(ActionListener listenerForEditModeButton) {
         editModeButton.addActionListener(listenerForEditModeButton);
     }
-
+    void addDelButtonListener(ActionListener listenerForDelButton) {
+        delButton.addActionListener(listenerForDelButton);
+    }
     void addInsertModeButtonListener(ActionListener listenerForInsertModeButton) {
         insertModeButton.addActionListener(listenerForInsertModeButton);
     }

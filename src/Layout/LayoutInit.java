@@ -161,6 +161,30 @@ public class LayoutInit {
         }
     }
 
+    class DelButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            SwingWorker myWorker = new SwingWorker<String, Void>() {
+                @Override
+                protected String doInBackground() throws Exception {
+                    Map<Integer, Integer> selected = leagueView.getSelectedPlayers();
+                    Iterator it = selected.entrySet().iterator();
+                    while (it.hasNext()) {
+                        Map.Entry tmp = (Map.Entry) it.next();
+                        System.out.println(tmp.getKey() + " " + tmp.getValue());
+                        if(delFromDatabase((int)tmp.getKey())){
+                            leagueView.delFromTable((int)tmp.getValue());
+                            leagueView.refresh();
+                        }
+                        else log("Error while deleting from database", 2);
+                    }
+                    return null;
+                }
+            };
+            myWorker.execute();
+        }
+    }
+
     class InsertModeButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -336,6 +360,9 @@ public class LayoutInit {
                 Player player = new Player(id, firstName, lastName, birthdate);
                 player.addPlayerRow(team, apps, firstSquad, minutes, goals, yellowCards, redCards, currentLeague);
                 insertToDatabase(player);
+                Object[] temp = {id, firstName, lastName, birthdate, team, apps, firstName, minutes, goals, yellowCards, redCards};
+                leagueView.addToPlayersTable(temp);
+                leagueView.refresh();
                 insertModeWindow.dispatchEvent(new WindowEvent(insertModeWindow, WindowEvent.WINDOW_CLOSING));
             }
         }
@@ -351,6 +378,17 @@ public class LayoutInit {
     /**
      * Main window functions
      **/
+
+    private boolean delFromDatabase(int ID){
+        DatabaseConnection db = new DatabaseConnection(this);
+        db.createConnection();
+        if(db.deletePlayer(ID, currentLeague)) {
+            db.shutdown();
+            return true;
+        }
+        db.shutdown();
+        return false;
+    }
 
     private void insertToDatabase(Player player)
     {
@@ -454,12 +492,14 @@ public class LayoutInit {
         leagueView.enableView();
 
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
-        leagueView.addEditModeButtonListener(new EditModeButtonListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
+
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
-        leagueView.addPDFButtonListener(new CreatePDFListener());
         leagueView.addPlayersButtonListener(new AddPlayersListener());
+        leagueView.addPDFButtonListener(new CreatePDFListener());
+        leagueView.addEditModeButtonListener(new EditModeButtonListener());
         leagueView.addInsertModeButtonListener(new InsertModeButtonListener());
+        leagueView.addDelButtonListener(new DelButtonListener());
 
         leaguesLinks = new LeaguesLinks(this);
     }
