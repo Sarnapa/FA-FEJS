@@ -25,6 +25,7 @@ public class LeagueView extends JFrame {
     private JTable playersTable;
     private JButton addPlayersButton;
     private JButton editModeButton;
+    private JButton insertModeButton;
     private DefaultTableModel tableModel;
     private MyGlassPane glassPane;
     private LayoutInit controller;
@@ -215,14 +216,18 @@ public class LeagueView extends JFrame {
         editModeButton.addActionListener(listenerForEditModeButton);
     }
 
-    /*void addTableModelListener(TableModelListener listenerForTableModel) {
+    void addInsertModeButtonListener(ActionListener listenerForInsertModeButton) {
+        insertModeButton.addActionListener(listenerForInsertModeButton);
+    }
+
+    void addTableModelListener(TableModelListener listenerForTableModel) {
         tableModel.addTableModelListener(listenerForTableModel);
     }
 
     void removeTableModelListener() {
         TableModelListener[] list = tableModel.getTableModelListeners();
         tableModel.removeTableModelListener(list[0]);
-    }*/
+    }
 
     void createTableCellListener(Action action)
     {

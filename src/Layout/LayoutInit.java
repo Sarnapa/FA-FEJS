@@ -4,6 +4,9 @@ import DataService.FolderContentReader;
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
+import org.apache.derby.database.Database;
+import org.jdatepicker.impl.JDatePickerImpl;
+
 import javax.swing.*;
 import javax.swing.event.TableModelEvent;
 import javax.swing.event.TableModelListener;
@@ -15,14 +18,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class LayoutInit {
     private LeagueView leagueView;
     private boolean desc = false;
     private UpdateView updateView;
     private UpdateProgress progress;
+    private InsertModeWindow insertModeWindow;
     private List<Player> selectedPlayersToPdf = new ArrayList<>();
     private HashMap<Integer, Integer> playersIDs = new HashMap<>();
     private LeaguesLinks leaguesLinks;
@@ -37,7 +39,9 @@ public class LayoutInit {
         @Override
         public void actionPerformed(ActionEvent e) {
             leagueView.clearTable();
+            //System.out.println(leagueView.getLeagueChoiceSelected());
             currentLeague = leagueView.getLeagueChoiceSelected();
+            System.out.println(currentLeague);
             getPlayersFromLeague(leagueView, leagueView.getLeagueChoiceSelected(), "", desc);
 
             leagueView.disableView();
@@ -62,112 +66,17 @@ public class LayoutInit {
         }
     }
 
-    class TableCellAction extends AbstractAction
-    {
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            TableCellListener tableCellListener = (TableCellListener) e.getSource();
-            TableModel model = tableCellListener.getTable().getModel();
-            int row = tableCellListener.getRow();
-            int column = tableCellListener.getColumn();
-            String columnName = model.getColumnName(column);
-            int id = (int) model.getValueAt(row, 0);
-            Object newValue = tableCellListener.getNewValue();
-            String team = (String) model.getValueAt(row, 4);
-            boolean isCorrect = false;
-            if (newValue == null || newValue.toString().equals(""))
-            {
-                model.setValueAt(tableCellListener.getOldValue(), row, column);
-                showDialog("Wrong value!", "Cannot insert empty value", 0, 0);
-            }
-            else
-            {
-                switch (column) {
-                    case 1:
-                        if (findSpecialCharacter(newValue.toString())) {
-                            model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Detected special characters in inserted text", 0, 0);
-                        } else
-                            isCorrect = true;
-                        break;
-                    case 2:
-                        if (findSpecialCharacter(newValue.toString())) {
-                            model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Detected special characters in inserted text", 0, 0);
-                        } else
-                            isCorrect = true;
-                        break;
-                    case 3:
-                        DateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-                        try {
-                            String dateString = newValue.toString();
-                            System.out.println("DateString: " + dateString);
-                            if (isValidDate(dateString))
-                            {
-                                java.util.Date tmp = format.parse(dateString);
-                                newValue = new java.sql.Date(tmp.getTime());
-                                System.out.println(newValue);
-                                isCorrect = true;
-                            }
-                            else
-                            {
-                                model.setValueAt(tableCellListener.getOldValue(), row, column);
-                                showDialog("Wrong value!", "Wrong date format", 0, 0);
-                            }
-                        }
-                        catch (ParseException pe) {
-                            model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Wrong date format", 0, 0);
-                        }
-                        break;
-                    default:
-                        try {
-                            newValue = Integer.parseInt(newValue.toString());
-                            isCorrect = true;
-                        }
-                        catch (NumberFormatException nfe) {
-                            model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Detected letters or special characters in inserted text", 0, 0);
-                        }
-                        break;
-                }
-                if (isCorrect) {
-                    System.out.println(row + " " + column + " " + columnName + " :" + id + " - " + newValue + " " + newValue.getClass());
-                    if (column > 3) {
-                        updateDatabase(id, team, currentLeague, columnName, newValue);
-                    } else {
-                        updateDatabase(id, "", "", columnName, newValue);
-                    }
-                }
-            }
-        }
-    }
-
-    private static boolean findSpecialCharacter(String text)
-    {
-        Pattern p = Pattern.compile("[^a-z ' -]", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(text);
-        return m.find();
-    }
-
-    private static boolean isValidDate(String dateText)
-    {
-        Pattern p  = Pattern.compile("((19|20)\\d\\d)-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$");
-        Matcher m = p.matcher(dateText);
-        return m.find();
-    }
-
-    /*class TableListener implements TableModelListener {
+    class TableListener implements TableModelListener {
         @Override
         public void tableChanged(TableModelEvent e) {
             int row = e.getFirstRow();
             int column = e.getColumn();
-            TableModel model = (TableModel)e.getSource();
+            TableModel model = (TableModel) e.getSource();
             String columnName = model.getColumnName(column);
-            int id = (int)model.getValueAt(row, 0);
+            int id = (int) model.getValueAt(row, 0);
             Object newValue = model.getValueAt(row, column);
             String team = (String) model.getValueAt(row, 4);
-            switch(column){
+            switch (column) {
                 case 1:
                 case 2:
                 case 4:
@@ -175,14 +84,12 @@ public class LayoutInit {
                     break;
                 case 3:
                     DateFormat format = new SimpleDateFormat("yyyy-mm-dd");
-                    try
-                    {
+                    try {
                         java.util.Date tmp = format.parse(newValue.toString());
-                        newValue = new java.sql.Date(tmp.getTime());
+                        java.sql.Date tmp2 = new java.sql.Date(tmp.getTime());
+                        newValue = tmp2;
                         System.out.println(newValue);
-                    }
-                    catch(ParseException e1)
-                    {
+                    } catch (ParseException e1) {
                         e1.printStackTrace();
                     }
                     break;
@@ -192,30 +99,38 @@ public class LayoutInit {
 
             }
             System.out.println(row + " " + column + " " + columnName + " :" + id + " - " + newValue + " " + newValue.getClass());
-            if(column > 3) {
+            if (column > 3) {
                 updateDatabase(id, team, currentLeague, columnName, newValue);
             } else {
-                updateDatabase(id, "","", columnName, newValue);
+                updateDatabase(id, "", "", columnName, newValue);
             }
+
+
         }
-    }*/
+    }
 
     /**
      * Buttons listeners
      **/
 
+
     class EditModeButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            /*if(leagueView.editMode())
+            if (leagueView.editMode())
                 leagueView.addTableModelListener(new TableListener());
             else
                 leagueView.removeTableModelListener();
-            */
-            if(leagueView.editMode())
-                leagueView.createTableCellListener(new TableCellAction());
-            else
-                leagueView.removeTableCellListener();
+        }
+    }
+
+    class InsertModeButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            leagueView.disableView();
+            insertModeWindow = new InsertModeWindow();
+            insertModeWindow.addInsertButtonListener(new InsertButtonListener());
+            insertModeWindow.addInsertModeWindowListener(new InsertModeWindowListener());
         }
     }
 
@@ -341,6 +256,7 @@ public class LayoutInit {
      * Progress window listeners
      **/
 
+
     class ProgressListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -361,11 +277,28 @@ public class LayoutInit {
 
         }
     }
+    /**
+     * Insert mode window listeners
+     **/
+    class InsertButtonListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println("elo");
+        }
+    }
+
+    class InsertModeWindowListener extends WindowAdapter {
+        @Override
+        public void windowClosing(WindowEvent e) {
+            leagueView.enableView();
+        }
+    }
 
     /**
      * Main window functions
      **/
     private void updateDatabase(int id, String team, String leagueName, String columnName, Object newValue) {
+        System.out.println("elo");
         DatabaseConnection db = new DatabaseConnection(this);
         db.createConnection();
         db.updatePlayersSpecificColumn(id, team, leagueName, columnName, newValue);
@@ -457,16 +390,19 @@ public class LayoutInit {
         leagueView.disableView();
         fillLeagueChoice(leagueView, getLeaguesNames());
         leagueView.enableView();
+
         leagueView.addLeagueChoiceListener(new LeagueChoiceListener());
         leagueView.addEditModeButtonListener(new EditModeButtonListener());
         leagueView.addTableHeaderListener(new TableHeaderListener());
         leagueView.addUpdateButtonListener(new UpdateButtonListener());
         leagueView.addPDFButtonListener(new CreatePDFListener());
         leagueView.addPlayersButtonListener(new AddPlayersListener());
+        leagueView.addInsertModeButtonListener(new InsertModeButtonListener());
+
         leaguesLinks = new LeaguesLinks(this);
     }
 
-    HashMap<Integer, Integer> getPlayersIDs() {
+    public HashMap<Integer, Integer> getPlayersIDs() {
         return playersIDs;
     }
 }
