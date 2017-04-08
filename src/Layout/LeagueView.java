@@ -3,7 +3,6 @@ package Layout;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
-import javax.swing.event.CellEditorListener;
 import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
@@ -178,6 +177,8 @@ public class LeagueView extends JFrame {
 
     LeagueView(LayoutInit _controller) {
         controller = _controller;
+        editModeButton.setEnabled(false);
+        insertModeButton.setEnabled(false);
         pack();
         setContentPane(rootPanel);
         initGUI();
@@ -192,6 +193,10 @@ public class LeagueView extends JFrame {
         setVisible(true);
     }
 
+    void setEnabledModeButtons() {
+        editModeButton.setEnabled(true);
+        insertModeButton.setEnabled(true);
+    }
 
     void addLeagueChoiceListener(ActionListener listenerForLeagueChoiceButton) {
         leagueChoice.addActionListener(listenerForLeagueChoiceButton);

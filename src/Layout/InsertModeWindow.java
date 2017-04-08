@@ -14,23 +14,21 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Properties;
 
-/**
- * Created by blank on 4/7/2017.
- */
 public class InsertModeWindow extends JFrame {
     private JPanel rootPanel;
     private JTextField idField;
     private JTextField firstNameField;
     private JTextField lastNameField;
+    private JDatePickerImpl birthdateField;
     private JTextField teamField;
     private JTextField appsField;
     private JTextField firstSquadField;
     private JTextField minutesField;
     private JTextField goalsField;
     private JTextField yellowCardsField;
-    private JButton insertButton;
     private JTextField redCardsField;
-    private JDatePickerImpl birthdateField;
+    private JButton insertButton;
+    private InsertModeInputVerifier verifier;
 
 
     public class DateLabelFormatter extends JFormattedTextField.AbstractFormatter {
@@ -65,14 +63,41 @@ public class InsertModeWindow extends JFrame {
         birthdateField = new JDatePickerImpl(datePanel, new DateLabelFormatter());
     }
 
-    InsertModeWindow() {
+    InsertModeWindow(InsertModeInputVerifier verifier)
+    {
+        this.verifier = verifier;
+        setInputVerifier();
         initGUI();
+    }
+
+    private void setInputVerifier()
+    {
+        idField.setName("idField");
+        idField.setInputVerifier(verifier);
+        firstNameField.setName("firstNameField");
+        firstNameField.setInputVerifier(verifier);
+        lastNameField.setName("lastNameField");
+        lastNameField.setInputVerifier(verifier);
+        teamField.setName("teamField");
+        teamField.setInputVerifier(verifier);
+        appsField.setName("appsField");
+        appsField.setInputVerifier(verifier);
+        firstSquadField.setName("firstSquadField");
+        firstSquadField.setInputVerifier(verifier);
+        minutesField.setName("minutesField");
+        minutesField.setInputVerifier(verifier);
+        goalsField.setName("goalsField");
+        goalsField.setInputVerifier(verifier);
+        yellowCardsField.setName("yellowCardsField");
+        yellowCardsField.setInputVerifier(verifier);
+        redCardsField.setName("redCardsField");
+        redCardsField.setInputVerifier(verifier);
     }
 
     private void initGUI() {
         setContentPane(rootPanel);
         rootPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-        setTitle("FA-FEJS Data updater");
+        setTitle("FA-FEJS Insert Mode");
         setSize(new Dimension(360, 360));
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -87,15 +112,15 @@ public class InsertModeWindow extends JFrame {
         addWindowListener(listenerForInsertModeWindow);
     }
 
-    public String getID(){return idField.getText();}
-    public String getFirstName(){return firstNameField.getText();}
-    public String getLastName(){return lastNameField.getText();}
-    public java.sql.Date getBirthdate(){return (java.sql.Date)birthdateField.getModel().getValue();}
-    public String getTeam(){return teamField.getText();}
-    public String getApps(){return appsField.getText();}
-    public String getFirstSquad(){return firstSquadField.getText();}
-    public String getMinutes(){return minutesField.getText();}
-    public String getGoals(){return goalsField.getText();}
-    public String getYellowCards(){return yellowCardsField.getText();}
-    public String getRedCards(){return redCardsField.getText();}
+    int getID(){return Integer.parseInt(idField.getText());}
+    String getFirstName(){return firstNameField.getText();}
+    String getLastName(){return lastNameField.getText();}
+    java.sql.Date getBirthdate(){return (java.sql.Date)birthdateField.getModel().getValue();}
+    String getTeam(){return teamField.getText();}
+    int getApps(){return Integer.parseInt(appsField.getText());}
+    int getFirstSquad(){return Integer.parseInt(firstSquadField.getText());}
+    int getMinutes(){return Integer.parseInt(minutesField.getText());}
+    int getGoals(){return Integer.parseInt(goalsField.getText());}
+    int getYellowCards(){return Integer.parseInt(yellowCardsField.getText());}
+    int getRedCards(){return Integer.parseInt(redCardsField.getText());}
 }

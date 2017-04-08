@@ -75,13 +75,50 @@ public class DatabaseConnection {
             duc.updatePlayersTable(ID, firstName, lastName, birthdate);
             duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
         } catch (SQLIntegrityConstraintViolationException sqlE) {
-            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException", 2);
+            controller.log("Cannot insert player " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException", 2);
             return true; // to avoid inserting bad data
         }
         catch (SQLException e)
         {
 
-            controller.log("Cannot insert footballer " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(), 2);
+            controller.log("Cannot insert player " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(), 2);
+            return false;
+        }
+        return true;
+    }
+
+    public synchronized boolean insertPlayer(Player player)
+    {
+        String firstName = player.getFirstName();
+        String lastName = player.getLastName();
+        try {
+            Player.PlayerRow row = player.getPlayerRows().get(0);
+            int ID = player.getID();
+            Date birthdate;
+            if (!(player.getDate() == null))
+                birthdate = player.getDate();
+            else
+                birthdate = null;
+            String league = row.getLeagueName().toUpperCase();
+            String team = row.getTeamName();
+            int apps = row.getApps();
+            int firstSquad = row.getFirstSquad();
+            int minutes = row.getMinutes();
+            int goals = row.getGoals();
+            int yellowCards = row.getYellowCards();
+            int redCards = row.getRedCards();
+            System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
+            duc.insertToPlayersTable(ID, firstName, lastName, birthdate);
+            duc.insertPlayerToLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
+        }
+        catch (SQLIntegrityConstraintViolationException sqlE)
+        {
+            controller.showDialog("Database Error", "Cannot insert player " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException", 0,0);
+            return false;
+        }
+        catch (SQLException e)
+        {
+            controller.showDialog("Database Error", "Cannot insert player " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(), 0,0);
             return false;
         }
         return true;

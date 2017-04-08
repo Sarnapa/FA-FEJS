@@ -9,7 +9,7 @@ public class Player {
         private String teamName, leagueName;
         private int apps, firstSquad, minutes, goals, yellowCards, redCards;
 
-        PlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
+        public PlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
                          int yellowCards, int redCards, String leagueName) {
             this.teamName = teamName;
             this.apps = apps;
@@ -70,6 +70,8 @@ public class Player {
         this.date = date;
     }
 
+    public int getID() { return ID; }
+
     public String getFirstName() {
         return firstName;
     }
@@ -86,7 +88,7 @@ public class Player {
         return playerRows;
     }
 
-    void addPlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
+    public void addPlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
                              int yellowCards, int redCards, String leagueName) {
         PlayerRow row = new PlayerRow(teamName, apps, firstSquad, minutes, goals, yellowCards, redCards, leagueName);
         playerRows.add(row);

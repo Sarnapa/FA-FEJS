@@ -36,27 +36,27 @@ public class UpdateProgress extends JFrame {
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
     }
 
-    public void addProgressListener(ActionListener listenerForProgressStopButton) {
+    void addProgressListener(ActionListener listenerForProgressStopButton) {
         stopButton.addActionListener(listenerForProgressStopButton);
     }
 
-    public UpdateProgress() {
+    UpdateProgress() {
         pack();
         setContentPane(rootPanel);
         initGUI();
     }
 
-    public void updateTeamsCount() {
+    void updateTeamsCount() {
         ++TeamsDone;
         TeamsDoneCount.setText(Integer.toString(TeamsDone));
     }
 
-    public void updateLeaguesCount() {
+    void updateLeaguesCount() {
         ++LeaguesDone;
         LeaguesDoneCount.setText(Integer.toString(LeaguesDone));
     }
 
-    public void disableUpdateButton() {
+    void disableUpdateButton() {
         stopButton.setEnabled(false);
     }
 
@@ -94,7 +94,7 @@ public class UpdateProgress extends JFrame {
                 new EmptyBorder(5, 5, 5, 5)));
     }
 
-    public void changeCloseOperation() {
+    void changeCloseOperation() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 

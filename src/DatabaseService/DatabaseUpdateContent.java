@@ -21,13 +21,19 @@ class DatabaseUpdateContent {
         pstmt.setDate(3, birthdate);
         pstmt.setInt(4, ID);
         if (pstmt.executeUpdate() == 0) {
-            pstmt = conn.prepareStatement("INSERT INTO APP.PLAYERS VALUES (?,?,?,?)");
-            pstmt.setInt(1, ID);
-            pstmt.setString(2, firstName);
-            pstmt.setString(3, lastName);
-            pstmt.setDate(4, birthdate);
-            pstmt.execute();
+           insertToPlayersTable(ID, firstName, lastName, birthdate);
         }
+        pstmt.close();
+    }
+
+    void insertToPlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException
+    {
+        PreparedStatement pstmt = conn.prepareStatement("INSERT INTO APP.PLAYERS VALUES (?,?,?,?)");
+        pstmt.setInt(1, ID);
+        pstmt.setString(2, firstName);
+        pstmt.setString(3, lastName);
+        pstmt.setDate(4, birthdate);
+        pstmt.execute();
         pstmt.close();
     }
 
@@ -84,10 +90,11 @@ class DatabaseUpdateContent {
         String resultTeam = "";
         while (result.next())
             resultTeam = result.getString(1);
+        pstmt.close();
         return resultTeam.equals(team);
     }
 
-    private void insertPlayerToLeagueTable(String league, int ID, String team, int apps, int firstSquad, int minutes, int goals, int yellowCards, int redCards) throws SQLException {
+    void insertPlayerToLeagueTable(String league, int ID, String team, int apps, int firstSquad, int minutes, int goals, int yellowCards, int redCards) throws SQLException {
         String statement = "INSERT INTO TABLENAME (ID, TEAM, APPS, FIRST_SQUAD, MINUTES, GOALS, YELLOW_CARDS, RED_CARDS) VALUES (?,?,?,?,?,?,?,?)";
         statement = statement.replace("TABLENAME", "APP.\"" + league + "\"");
         PreparedStatement pstmt = conn.prepareStatement(statement);
@@ -100,6 +107,7 @@ class DatabaseUpdateContent {
         pstmt.setInt(7, yellowCards);
         pstmt.setInt(8, redCards);
         pstmt.execute();
+        pstmt.close();
     }
 
     public void updatePlayersSpecificColumn(int id, String team, String leagueName, String columnName, Object newValue) throws SQLException {
@@ -125,5 +133,6 @@ class DatabaseUpdateContent {
             pstmt.setString(3, team);
         }
         pstmt.execute();
+        pstmt.close();
     }
 }
