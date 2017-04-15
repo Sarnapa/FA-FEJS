@@ -3,6 +3,11 @@ package DataService;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * To provide files list in directory that is given as parameter.
+ * This class let user not to overwrite existing pdf file accidentally.
+ */
+
 public class FolderContentReader
 {
     private String dirPathName;

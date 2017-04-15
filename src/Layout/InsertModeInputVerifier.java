@@ -4,6 +4,10 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 import java.awt.*;
 
+/**
+ * Our verifier to verify data inserting in 'Insert Mode' by user.
+ */
+
 class InsertModeInputVerifier extends InputVerifier
 {
     private ValueValidator validator;

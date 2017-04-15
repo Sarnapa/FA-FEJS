@@ -1,6 +1,9 @@
 package DataService;
 
-// Due to problem associated with interrupt method
+/**
+ * Own interruption flag due to problem associated with built-in mechanism
+ */
+
 class InterruptionFlag {
     private boolean isInterrupted;
 

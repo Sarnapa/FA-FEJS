@@ -4,16 +4,20 @@ import Layout.LayoutInit;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 
+/**
+ * Base class that download source code of page that will be parsed.
+ * Youth leagues pages are downloaded as JSON due to structure of these pages.
+ */
+
 class HtmlService {
-    // To get HTML code of page
+
     static Document getHtmlSource(String address, boolean isJSON, LayoutInit controller) {
         int timeout = 30 * 1000;
-        int delay1 = 5 * 1000;
-        int delay2 = 10 * 1000;
+        int delay1 = 5 * 1000; // for "normal" league
+        int delay2 = 10 * 1000; // for "youth" league
         if (isJSON)
             return loadJSON(address, timeout, delay2, controller);
         else
@@ -35,7 +39,7 @@ class HtmlService {
                 if (resp.statusCode() == 200) {
                     String json = resp.body();
                     return Jsoup.parse(json);
-                } else if (resp.statusCode() == 420) // ( ͡° ͜ʖ ͡°)
+                } else if (resp.statusCode() == 420) // when the client is being rate limited
                 {
                     try {
                         controller.log("JSON File - HTTP Status 420 for address: " + address, 1);
@@ -72,7 +76,8 @@ class HtmlService {
                 resp = conn.execute();
                 if (resp.statusCode() == 200) {
                     return conn.get();
-                } else if (resp.statusCode() == 420) // ( ͡° ͜ʖ ͡°)
+                }
+                else if (resp.statusCode() == 420) // when the client is being rate limited
                 {
                     try {
                         controller.log("HTML File - HTTP Status 420 for address: " + address, 1);

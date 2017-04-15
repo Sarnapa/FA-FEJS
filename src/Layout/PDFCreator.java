@@ -13,7 +13,6 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.Date;
@@ -22,33 +21,32 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * To create pdf file containing report of selected players.
+ */
 
-public class PDFCreator {
+class PDFCreator {
     private List<Player> playersList = new ArrayList<>();
     private Document document;
 
-    public PDFCreator(List<Player> playersList) {
+    PDFCreator(List<Player> playersList) {
         this.playersList = playersList;
     }
 
-    public void generatePDF(String dest)
+    void generatePDF(String dest) throws FileNotFoundException
     {
         PdfWriter writer = null;
-        try {
-            writer = new PdfWriter(dest);
-        } catch (FileNotFoundException e) // TODO - obsluga
-        {
-            e.printStackTrace();
-        }
+        writer = new PdfWriter(dest);
         if (writer != null) {
             PdfDocument pdf = new PdfDocument(writer);
             document = new Document(pdf, PageSize.A4.rotate());
-            try {
+            try
+            {
                 document.setMargins(20, 20, 20, 20);
                 for (Player player : playersList)
                     createPlayerParagraph(player);
             }
-            catch (IOException e) // TODO - obsluga
+            catch (IOException e)
             {
                 e.printStackTrace();
             }

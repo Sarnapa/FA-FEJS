@@ -7,6 +7,9 @@ import DatabaseService.Player;
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.event.*;
+import java.io.FileNotFoundException;
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.text.DateFormat;
@@ -77,7 +80,7 @@ public class LayoutInit {
             if (validator.isEmpty(newValue))
             {
                 model.setValueAt(tableCellListener.getOldValue(), row, column);
-                showDialog("Wrong value!", "Cannot insert empty value", 0, 0);
+                showDialog("Wrong value!", "Cannot insert empty value.", 0, 0);
             }
             else
             {
@@ -85,14 +88,14 @@ public class LayoutInit {
                     case 1:
                         if (validator.findSpecialCharacter(newValue.toString())) {
                             model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Detected special characters in inserted text", 0, 0);
+                            showDialog("Wrong value!", "Detected special characters in inserted text.", 0, 0);
                         } else
                             isCorrect = true;
                         break;
                     case 2:
                         if (validator.findSpecialCharacter(newValue.toString())) {
                             model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Detected special characters in inserted text", 0, 0);
+                            showDialog("Wrong value!", "Detected special characters in inserted text.", 0, 0);
                         } else
                             isCorrect = true;
                         break;
@@ -111,12 +114,12 @@ public class LayoutInit {
                             else
                             {
                                 model.setValueAt(tableCellListener.getOldValue(), row, column);
-                                showDialog("Wrong value!", "Wrong date format", 0, 0);
+                                showDialog("Wrong value!", "Wrong date format.", 0, 0);
                             }
                         }
                         catch (ParseException pe) {
                             model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Wrong date format", 0, 0);
+                            showDialog("Wrong value!", "Wrong date format.", 0, 0);
                         }
                         break;
                     default:
@@ -126,12 +129,12 @@ public class LayoutInit {
                         }
                         catch (NumberFormatException nfe) {
                             model.setValueAt(tableCellListener.getOldValue(), row, column);
-                            showDialog("Wrong value!", "Detected letters or special characters in inserted text", 0, 0);
+                            showDialog("Wrong value!", "Detected letters or special characters in inserted text.", 0, 0);
                         }
                         break;
                 }
-                if (isCorrect) {
-                    System.out.println(row + " " + column + " " + columnName + " :" + id + " - " + newValue + " " + newValue.getClass());
+                if (isCorrect)
+                {
                     if (column > 3) {
                         updateDatabase(id, team, currentLeague, columnName, newValue);
                     } else {
@@ -149,11 +152,6 @@ public class LayoutInit {
     class EditModeButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            /*if(leagueView.editMode())
-                leagueView.addTableModelListener(new TableListener());
-            else
-                leagueView.removeTableModelListener();
-            */
             if(leagueView.editMode())
                 leagueView.createTableCellListener(new TableCellAction());
             else
@@ -171,12 +169,11 @@ public class LayoutInit {
                     Iterator it = selected.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry tmp = (Map.Entry) it.next();
-                        System.out.println(tmp.getKey() + " " + tmp.getValue());
                         if(delFromDatabase((int)tmp.getKey())){
                             leagueView.delFromTable((int)tmp.getValue());
                             leagueView.refresh();
                         }
-                        else log("Error while deleting from database", 2);
+                        else log("Error while deleting from database.", 2);
                     }
                     return null;
                 }
@@ -213,16 +210,31 @@ public class LayoutInit {
         @Override
         public void actionPerformed(ActionEvent e) {
             if (playersIDs.size() > 0) {
-                DatabaseConnection db = new DatabaseConnection(LayoutInit.this);
-                db.createConnection();
+                DatabaseConnection db = new DatabaseConnection();
+                if(!db.createConnection())
+                    showDialog("Database Error", "Cannot connect to database.", 0, 0);
                 List<String> names = db.getTablesNames();
-                names.remove("PLAYERS");
-                Iterator it = playersIDs.entrySet().iterator();
-                while (it.hasNext()) {
-                    Map.Entry tmp = (Map.Entry) it.next();
-                    selectedPlayersToPdf.add(db.getDuv().getPlayerRows((int) tmp.getKey(), names));
+                if(names != null)
+                    names.remove("PLAYERS");
+                else
+                {
+                    showDialog("Database Error", "Cannot get tables names.", 0, 0);
                 }
-                db.shutdown();
+                Iterator it = playersIDs.entrySet().iterator();
+                while (it.hasNext())
+                {
+                    Map.Entry tmp = (Map.Entry) it.next();
+                    try
+                    {
+                        selectedPlayersToPdf.add(db.getDuv().getPlayerRows((int) tmp.getKey(), names));
+                    }
+                    catch(SQLException sqlE)
+                    {
+                        showDialog("Database Error", "Cannot get player rows from database. Player ID: " + (int) tmp.getKey(), 0, 0);
+                    }
+                }
+                if(!db.shutdown())
+                    showDialog("Database Error", "Cannot shutdown database.", 0, 0);
             }
             if(selectedPlayersToPdf.size() > 0) {
                 PDFCreator pdfCreator = new PDFCreator(selectedPlayersToPdf);
@@ -264,7 +276,14 @@ public class LayoutInit {
                 if(isReady)
                 {
                     String dest = "./pdfs/" + pdfName + ".pdf";
-                    pdfCreator.generatePDF(dest);
+                    try
+                    {
+                        pdfCreator.generatePDF(dest);
+                    }
+                    catch (FileNotFoundException e1)
+                    {
+                        showDialog("PDF Creator Error", "Not found main directory for PDF files.", 0, 0);
+                    }
                     playersIDs.clear();
                 }
                 selectedPlayersToPdf.clear();
@@ -379,45 +398,91 @@ public class LayoutInit {
      * Main window functions
      **/
 
-    private boolean delFromDatabase(int ID){
-        DatabaseConnection db = new DatabaseConnection(this);
-        db.createConnection();
-        if(db.deletePlayer(ID, currentLeague)) {
-            db.shutdown();
-            return true;
+    private boolean delFromDatabase(int ID)
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        if(!db.createConnection())
+            showDialog("Database Error", "Cannot connect to database.", 0, 0);
+        else
+        {
+            if (db.deletePlayer(ID, currentLeague))
+            {
+                if (!db.shutdown())
+                    showDialog("Database Error", "Cannot shutdown database.", 0, 0);
+                return true;
+            }
+            if (!db.shutdown())
+                showDialog("Database Error", "Cannot shutdown database.", 0, 0);
         }
-        db.shutdown();
         return false;
     }
 
     private void insertToDatabase(Player player)
     {
-        DatabaseConnection db = new DatabaseConnection(this);
-        db.createConnection();
-        db.insertPlayer(player);
-        db.shutdown();
+        DatabaseConnection db = new DatabaseConnection();
+        if(!db.createConnection())
+            showDialog("Database Error", "Cannot connect to database.", 0, 0);
+        else
+        {
+            try
+            {
+                db.insertPlayer(player);
+            }
+            catch (SQLIntegrityConstraintViolationException e1)
+            {
+                showDialog("Database Error", "Cannot insert player " + player.getFirstName() + " " + player.getLastName() + " to database due to SQLIntegrityConstraintViolationException.", 0, 0);
+            }
+            catch (SQLException e2)
+            {
+                showDialog("Database Error", "Cannot insert player " + player.getFirstName() + " " + player.getLastName() + " to database. Reason: " + e2.getMessage(), 0, 0);
+            }
+            if (!db.shutdown())
+                showDialog("Database Error", "Cannot shutdown database.", 0, 0);
+        }
     }
 
-    private void updateDatabase(int id, String team, String leagueName, String columnName, Object newValue) {
-        DatabaseConnection db = new DatabaseConnection(this);
-        db.createConnection();
-        db.updatePlayersSpecificColumn(id, team, leagueName, columnName, newValue);
-        db.shutdown();
+    private void updateDatabase(int id, String team, String leagueName, String columnName, Object newValue)
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        if(!db.createConnection())
+            showDialog("Database Error", "Cannot connect to database.", 0, 0);
+        else
+        {
+            if(!db.updatePlayersSpecificColumn(id, team, leagueName, columnName, newValue))
+                showDialog("Database Error", "Cannot update this column for player ID: " + id, 0, 0);
+            if (!db.shutdown())
+                showDialog("Database Error", "Cannot shutdown database.", 0, 0);
+        }
     }
 
-    private void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc) {
-        DatabaseConnection db = new DatabaseConnection(this);
-        db.createConnection();
-        db.updateView(view, leagueName, orderBy, desc);
-        db.shutdown();
+    private void getPlayersFromLeague(LeagueView view, String leagueName, String orderBy, boolean desc)
+    {
+        DatabaseConnection db = new DatabaseConnection();
+        if(!db.createConnection())
+            showDialog("Database Error", "Cannot connect to database.", 0, 0);
+        else
+        {
+            if(!db.updateView(view, leagueName, orderBy, desc))
+                showDialog("Database Error", "Cannot get players rows from league " + leagueName, 0, 0);
+            if (!db.shutdown())
+                showDialog("Database Error", "Cannot shutdown database.", 0, 0);
+        }
     }
 
     private List<String> getLeaguesNames() {
-        DatabaseConnection db = new DatabaseConnection(this);
-        db.createConnection();
-        List<String> names = db.getTablesNames();
-        db.shutdown();
-        return names;
+        DatabaseConnection db = new DatabaseConnection();
+        if(!db.createConnection())
+            showDialog("Database Error", "Cannot connect to database.", 0, 0);
+        else
+        {
+            List<String> names = db.getTablesNames();
+            if(names == null)
+                showDialog("Database Error", "Cannot get tables names from database", 0, 0);
+            if (!db.shutdown())
+                showDialog("Database Error", "Cannot shutdown database.", 0, 0);
+            return names;
+        }
+        return null;
     }
 
     private static void fillLeagueChoice(LeagueView lv, List<String> names) {

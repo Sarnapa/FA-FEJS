@@ -4,13 +4,16 @@ import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
+
+/**
+ * To initiate the task of parsing players data - getting appropriate leagues links and starting threads.
+ */
 
 public class LeaguesLinks implements Runnable {
     private static final String url = "https://www.laczynaspilka.pl/";
@@ -82,6 +85,10 @@ public class LeaguesLinks implements Runnable {
         }
     }
 
+    /**
+     * There are some third leagues and 'CLJ' leagues, so we have to get all necessary links.
+     */
+
     private void getSomeUrls(String url) {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
         if (doc != null) {
@@ -97,6 +104,11 @@ public class LeaguesLinks implements Runnable {
             }
         }
     }
+
+    /**
+     * All 4 and youth leagues links are put in txt files - time saving and we don't have
+     * opportunity to download these links in common way due to JavaScript.
+     */
 
     private void get4LeagueUrls() {
         getDataFromFile("4liga.txt");
@@ -128,6 +140,12 @@ public class LeaguesLinks implements Runnable {
         }
     }
 
+    /**
+     * Threads service code section.
+     * Due to problems associated with overloading website, we have to limit count of concurrently running threads
+     * to 10 threads.
+     */
+
     private void getLeagues() {
         try {
             int currentThreadsNumber = 0;
@@ -136,7 +154,7 @@ public class LeaguesLinks implements Runnable {
             synchFunction(youthDivision, currentThreadsNumber, false, true);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            controller.showDialog("Error", "The application will be closed", 0, 2);
+            controller.showDialog("Error", "The application will be closed.", 0, 2);
             System.exit(1);
         }
     }
@@ -173,11 +191,15 @@ public class LeaguesLinks implements Runnable {
                 t.join();
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
-                controller.showDialog("Error", "The application will be closed", 0, 2);
+                controller.showDialog("Error", "The application will be closed.", 0, 2);
                 System.exit(1);
             }
         }
     }
+
+    /**
+     * Function to check user connection before downloading players data from website
+     */
 
     public boolean checkHostConnection() {
         try {
@@ -198,7 +220,11 @@ public class LeaguesLinks implements Runnable {
         return true;
     }
 
-    private static String newLeagueName(String league) // String without ""
+    /**
+     * We have to sometimes dispose of quotation marks from downloaded league name
+     */
+
+    private static String newLeagueName(String league)
     {
         int first = league.indexOf('\"');
         if (first == -1)
@@ -208,6 +234,10 @@ public class LeaguesLinks implements Runnable {
         sb.append(league.substring(0, first)).append(league.substring(first + 1, second)).append(league.substring(second + 1));
         return sb.toString();
     }
+
+    /**
+     * Print section - for debugging
+     */
 
     private void printLeaguesMap() {
         String tableName, url;

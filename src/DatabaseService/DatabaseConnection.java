@@ -1,151 +1,169 @@
 package DatabaseService;
 
 import DataService.PlayerService;
-import Layout.LayoutInit;
 import Layout.LeagueView;
-
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Main class for database service. Generally, methods are divided into two specific groups:
+ * first associated with updating content of database, second containing select methods -
+ * necessary for updating view.
+ */
+
 public class DatabaseConnection {
-    private static final String dbURL = "jdbc:derby:./DB;create=true;";
+    private static final String dbURL = "jdbc:derby:./DB;create=true";
     private Connection conn;
     private DatabaseUpdateContent duc;
     private DatabaseUpdateView duv;
-    private final LayoutInit controller;
 
-    public DatabaseConnection(LayoutInit controller) {
-        this.controller = controller;
-    }
+    /**
+     * To create connection to database.
+     * Reconnection method is intended for another attempts in downloading players task.
+     */
 
-    public synchronized void createConnection() {
-        try {
+    public synchronized boolean createConnection()
+    {
+        try
+        {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver"); // load the driver
             conn = DriverManager.getConnection(dbURL); // make Derby JDBC connection
             duc = new DatabaseUpdateContent(conn);
-            duv = new DatabaseUpdateView(conn, controller);
-        } catch (Exception e) {
-            controller.log("Cannot connect to database. Reason: " + e.getMessage(), 2);
+            duv = new DatabaseUpdateView(conn);
         }
+        catch (Exception e)
+        {
+            return false;
+        }
+        return true;
     }
 
-    public synchronized void recreateConnection() {
-        try {
+    public synchronized boolean recreateConnection()
+    {
+        try
+        {
             Class.forName("org.apache.derby.jdbc.EmbeddedDriver").newInstance();
             conn = DriverManager.getConnection(dbURL); // make Derby JDBC connection
             duc = new DatabaseUpdateContent(conn);
-            duv = new DatabaseUpdateView(conn, controller);
-        } catch (Exception e) {
-            controller.log("Cannot connect to database. Reason: " + e.getMessage(), 2);
+            duv = new DatabaseUpdateView(conn);
         }
-
+        catch (Exception e)
+        {
+            return false;
+        }
+        return true;
     }
+
+    /**
+     * For updating one specific column that is editing by user.
+     */
 
     public synchronized boolean updatePlayersSpecificColumn(int id, String team, String leagueName, String columnName, Object newValue){
-        try{
+        try
+        {
             String _columnName = columnName.replace(" ","_");
             duc.updatePlayersSpecificColumn(id, team, leagueName, _columnName, newValue);
-        } catch(SQLException e){
-            e.printStackTrace();
-            return false;
         }
-        return true;
-    }
-
-    public synchronized  boolean deletePlayer(int ID, String leagueName){
-        try{
-            duc.deletePlayer(ID, leagueName);
-        } catch(SQLException e){
-            e.printStackTrace();
-            return false;
-        }
-        return true;
-    }
-
-    public synchronized boolean updatePlayer(PlayerService player) {
-        String firstName = player.getFirstName();
-        String lastName = player.getLastName();
-        try {
-            int ID = player.getID();
-            Date birthdate;
-            if (!(player.getDate() == null))
-                birthdate = new java.sql.Date(player.getDate().getTime());
-            else
-                birthdate = null;
-            String league = player.getTableName().toUpperCase();
-            String team = player.getTeamName();
-            int apps = player.getApps();
-            int firstSquad = player.getFirstSquad();
-            int minutes = player.getMinutes();
-            int goals = player.getGoals();
-            int yellowCards = player.getYellowCards();
-            int redCards = player.getRedCards();
-            //System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
-            duc.updatePlayersTable(ID, firstName, lastName, birthdate);
-            duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
-        } catch (SQLIntegrityConstraintViolationException sqlE) {
-            controller.log("Cannot insert player " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException", 2);
-            return true; // to avoid inserting bad data
-        }
-        catch (SQLException e)
+        catch(SQLException e)
         {
-
-            controller.log("Cannot insert player " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(), 2);
             return false;
         }
         return true;
     }
 
-    public synchronized boolean insertPlayer(Player player)
+    /**
+     * To delete player from database. User choose this player in 'Edit Mode'.
+     */
+
+    public synchronized  boolean deletePlayer(int ID, String leagueName)
+    {
+        try
+        {
+            duc.deletePlayer(ID, leagueName);
+        }
+        catch(SQLException e)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     *  Method for downloading players task. To update content of database.
+     */
+
+    public synchronized void updatePlayer(PlayerService player) throws SQLException
     {
         String firstName = player.getFirstName();
         String lastName = player.getLastName();
-        try {
-            Player.PlayerRow row = player.getPlayerRows().get(0);
-            int ID = player.getID();
-            Date birthdate;
-            if (!(player.getDate() == null))
-                birthdate = player.getDate();
-            else
-                birthdate = null;
-            String league = row.getLeagueName().toUpperCase();
-            String team = row.getTeamName();
-            int apps = row.getApps();
-            int firstSquad = row.getFirstSquad();
-            int minutes = row.getMinutes();
-            int goals = row.getGoals();
-            int yellowCards = row.getYellowCards();
-            int redCards = row.getRedCards();
-            System.out.println(Thread.currentThread().getId() + " " + ID + " " + firstName + " " + lastName);
-            if(!duc.existsInPlayers(ID)){
-                duc.insertToPlayersTable(ID, firstName, lastName, birthdate);
-            }
-            duc.insertPlayerToLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
-        }
-        catch (SQLIntegrityConstraintViolationException sqlE)
+        int ID = player.getID();
+        Date birthdate;
+        if (!(player.getDate() == null))
+            birthdate = new java.sql.Date(player.getDate().getTime());
+        else
+            birthdate = null;
+        String league = player.getTableName().toUpperCase();
+        String team = player.getTeamName();
+        int apps = player.getApps();
+        int firstSquad = player.getFirstSquad();
+        int minutes = player.getMinutes();
+        int goals = player.getGoals();
+        int yellowCards = player.getYellowCards();
+        int redCards = player.getRedCards();
+        duc.updatePlayersTable(ID, firstName, lastName, birthdate);
+        duc.updateLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
+    }
+
+    /**
+     * Inserting player data that have been inserted by user in 'Insert Mode'.
+     */
+
+    public synchronized void insertPlayer(Player player) throws SQLException
+    {
+        String firstName = player.getFirstName();
+        String lastName = player.getLastName();
+        Player.PlayerRow row = player.getPlayerRows().get(0);
+        int ID = player.getID();
+        Date birthdate;
+        if (!(player.getDate() == null))
+            birthdate = player.getDate();
+        else
+            birthdate = null;
+        String league = row.getLeagueName().toUpperCase();
+        String team = row.getTeamName();
+        int apps = row.getApps();
+        int firstSquad = row.getFirstSquad();
+        int minutes = row.getMinutes();
+        int goals = row.getGoals();
+        int yellowCards = row.getYellowCards();
+        int redCards = row.getRedCards();
+        if(!duc.existsInPlayers(ID))
         {
-            controller.showDialog("Database Error", "Cannot insert player " + firstName + " " + lastName + " to database due to SQLIntegrityConstraintViolationException", 0,0);
-            return false;
+            duc.insertToPlayersTable(ID, firstName, lastName, birthdate);
         }
-        catch (SQLException e)
+        duc.insertPlayerToLeagueTable(league, ID, team, apps, firstSquad, minutes, goals, yellowCards, redCards);
+    }
+
+    public synchronized boolean updateView(LeagueView view, String leagueName, String orderBy, boolean desc)
+    {
+        try
         {
-            controller.showDialog("Database Error", "Cannot insert player " + firstName + " " + lastName + " to database. Reason: " + e.getMessage(), 0,0);
+            duv.updateView(view, leagueName, orderBy, desc);
+        }
+        catch(SQLException sqlException)
+        {
             return false;
         }
         return true;
     }
 
-    public synchronized void updateView(LeagueView view, String leagueName, String orderBy, boolean desc) {
-        duv.updateView(view, leagueName, orderBy, desc);
-    }
-
     public List<String> getTablesNames() {
-        try {
-            List<String> names = duc.getTableNames();
-            return names;
-        } catch (SQLException e) {
-            controller.showDialog("Database Error", "Cannot get tables names", 0, 0);
+        try
+        {
+            return duc.getTableNames();
+        }
+        catch (SQLException e)
+        {
             return null;
         }
     }
@@ -154,15 +172,27 @@ public class DatabaseConnection {
         return duv;
     }
 
-    public synchronized void shutdown() {
-        try {
-            DriverManager.getConnection(dbURL + ";shutdown=true");
-            conn.close();
-            //System.gc();
-        } catch (SQLException sqlExcept) // TODO - obsluga
-        {
-            //sqlExcept.printStackTrace();
-        }
+    /**
+     * To shutdown database. REMEMBER - DriverManager.getConnection throws exception
+     * when successfully shutting down derby.
+     */
 
+    public synchronized boolean shutdown()
+    {
+        try
+        {
+            conn.close();
+            DriverManager.getConnection(dbURL + ";shutdown=true");
+            //System.gc();
+        }
+        catch (SQLNonTransientConnectionException sqlExcept1)
+        {
+            return true;
+        }
+        catch (SQLException sqlExcept2)
+        {
+            return false;
+        }
+        return false;
     }
 }

@@ -2,19 +2,22 @@ package DatabaseService;
 
 import java.sql.*;
 import java.sql.Date;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-class DatabaseUpdateContent {
+/**
+ * To update content of database.
+ */
+
+class DatabaseUpdateContent
+{
     private final Connection conn;
 
     DatabaseUpdateContent(Connection conn) {
         this.conn = conn;
     }
 
-    void updatePlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException {
+    void updatePlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException
+    {
         PreparedStatement pstmt = conn.prepareStatement("UPDATE APP.PLAYERS SET FIRST_NAME = ?, LAST_NAME = ?, BIRTHDATE = ? WHERE ID = ?");
         pstmt.setString(1, firstName);
         pstmt.setString(2, lastName);
@@ -26,23 +29,18 @@ class DatabaseUpdateContent {
         pstmt.close();
     }
 
-    public boolean existsInPlayers(int ID){
-        try{
-            String statement = "SELECT COUNT(*) AS cnt FROM APP.PLAYERS WHERE ID = ?";
-            PreparedStatement pstmt = conn.prepareStatement(statement);
-            pstmt.setInt(1, ID);
-            ResultSet result = pstmt.executeQuery();
-            int resultCount = 0;
-            while (result.next())
-                resultCount = result.getInt("cnt");
-            if (resultCount == 0)
-                return false;
-            else
-                return true;
-        } catch(SQLException e){
-            e.printStackTrace();
-            return true;
-        }
+    boolean existsInPlayers(int ID) throws SQLException
+    {
+        String statement = "SELECT COUNT(*) AS cnt FROM APP.PLAYERS WHERE ID = ?";
+        PreparedStatement pstmt = conn.prepareStatement(statement);
+        pstmt.setInt(1, ID);
+        ResultSet result = pstmt.executeQuery();
+        int resultCount = 0;
+        while (result.next())
+            resultCount = result.getInt("cnt");
+        if (resultCount == 0)
+            return false;
+        return true;
     }
 
     void insertToPlayersTable(int ID, String firstName, String lastName, Date birthdate) throws SQLException
@@ -56,8 +54,10 @@ class DatabaseUpdateContent {
         pstmt.close();
     }
 
-    List<String> getTableNames() throws SQLException{
-        try{
+    List<String> getTableNames() throws SQLException
+    {
+        try
+        {
             DatabaseMetaData metadata = conn.getMetaData();
             List<String> names = new ArrayList<>();
             String[] types = {"TABLE"};
@@ -67,11 +67,14 @@ class DatabaseUpdateContent {
             }
             rs.close();
             return names;
-        } catch(SQLException e){
+        }
+        catch(SQLException e)
+        {
             throw new SQLException(e);
         }
     }
-    void deletePlayer(int ID, String leagueName) throws SQLException{
+    void deletePlayer(int ID, String leagueName) throws SQLException
+    {
         String statement = "DELETE FROM TABLENAME WHERE ID = ?";
         statement = statement.replace("TABLENAME", "APP.\"" + leagueName + "\"");
         PreparedStatement pstmt = conn.prepareStatement(statement);
@@ -101,6 +104,11 @@ class DatabaseUpdateContent {
         }
         pstmt.close();
     }
+
+    /**
+     * This method considers a few cases - inserting new player, inserting player to table in that
+     * he is but in other team (transfer issue etc.), updating player in table.
+     */
 
     void updateLeagueTable(String league, int ID, String team, int apps, int firstSquad, int minutes, int goals, int yellowCards, int redCards) throws SQLException {
         String statement = "SELECT COUNT(*) AS cnt FROM TABLENAME WHERE ID = ?";
@@ -146,6 +154,10 @@ class DatabaseUpdateContent {
         pstmt.close();
     }
 
+    /**
+     * To check if our player change team and in this case we have to add new row.
+     */
+
     private boolean isTheSameTeam(String league, int ID, String team) throws SQLException {
         String statement = "SELECT TEAM AS cnt FROM TABLENAME WHERE ID = ?";
         statement = statement.replace("TABLENAME", "APP.\"" + league + "\"");
@@ -174,6 +186,10 @@ class DatabaseUpdateContent {
         pstmt.execute();
         pstmt.close();
     }
+
+    /**
+     * To update one column that has been modified by user in 'Edit mode'.
+     */
 
     public void updatePlayersSpecificColumn(int id, String team, String leagueName, String columnName, Object newValue) throws SQLException {
         String statement = "UPDATE TABLENAME SET " + columnName + " = ? WHERE ID = ?";

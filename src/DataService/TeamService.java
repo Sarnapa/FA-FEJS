@@ -6,8 +6,15 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
+import java.sql.SQLException;
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
+
+/**
+ * Another level of getting players data task.
+ * This time we collect data connected with players from particular team.
+ */
 
 public class TeamService {
     private String leagueName; // League's name
@@ -26,6 +33,11 @@ public class TeamService {
         this.controller = controller;
         this.interruptionFlag = _interruptionFlag;
     }
+
+    /**
+     * Gathering players urls.
+     * There is checking interruption flag in main function loop.
+     */
 
     boolean getPlayersUrls() {
         boolean interrupted = false;
@@ -51,10 +63,14 @@ public class TeamService {
         return interrupted;
     }
 
+    /**
+     * To initiate downloading data for every player in particular team.
+     * Also, this code section is responsible for updating database with players data.
+     */
+
     private boolean getPlayers() {
         try {
             for (String url : playersUrls) {
-                //System.out.println(Thread.currentThread().getId() + " " + url + " " + interruptionFlag.getFlag());
                 if (interruptionFlag.getFlag())
                     throw new InterruptedException();
                 PlayerService player = new PlayerService(leagueName, tableName, name, url, controller);
@@ -71,14 +87,39 @@ public class TeamService {
         return false;
     }
 
-    private void updateDB() {
-        DatabaseConnection database = new DatabaseConnection(controller);
-        database.createConnection();
+    /**
+     * To update database.
+     * In case of 5 failed attempts, we stop further attempts and give appropriate message with error description.
+     */
+
+    private void updateDB()
+    {
+        DatabaseConnection database = new DatabaseConnection();
+        if(!database.createConnection())
+            controller.log("Cannot connect to database.",2);
         int failsCount = 0;
-        for (PlayerService player : players) {
+        for (PlayerService player : players)
+        {
             int i = 0;
-            while (!database.updatePlayer(player) && i < 5) {
-                database.recreateConnection();
+            while (i < 5)
+            {
+                try
+                {
+                    database.updatePlayer(player);
+                    break;
+                }
+                catch(SQLIntegrityConstraintViolationException e1)
+                {
+                    controller.log("Cannot insert player " + player.getFirstName() + " " + player.getLastName() + " to database due to SQLIntegrityConstraintViolationException.", 2);
+                    i = 5;
+                    break;
+                }
+                catch(SQLException e2)
+                {
+                    controller.log("Cannot insert player " + player.getFirstName() + " " + player.getLastName() + " to database. Reason: " + e2.getMessage(), 2);
+                }
+                if(!database.recreateConnection())
+                    controller.log("Cannot connect to database.",2);
                 ++i;
             }
             if (i == 5) {
@@ -89,12 +130,17 @@ public class TeamService {
                 failsCount = 0;
             }
             if (failsCount == 5) {
-                controller.log("Ended updating database due to too many errors", 1);
+                controller.log("Ended updating database due to too many errors.", 1);
                 break;
             }
         }
-        database.shutdown();
+        if(!database.shutdown())
+            controller.log("Cannot shutdown database.", 2);
     }
+
+    /**
+     * Print section - for debugging
+     */
 
     public void printPlayersUrls() {
         for (String player : playersUrls) {

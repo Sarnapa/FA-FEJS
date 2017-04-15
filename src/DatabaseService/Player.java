@@ -4,13 +4,22 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Structure containing data of player from all leagues where he plays.
+ */
+
 public class Player {
     public class PlayerRow {
         private String teamName, leagueName;
         private int apps, firstSquad, minutes, goals, yellowCards, redCards;
 
+        /**
+         * Class representing player stats data from one team
+         */
+
         public PlayerRow(String teamName, int apps, int firstSquad, int minutes, int goals,
-                         int yellowCards, int redCards, String leagueName) {
+                         int yellowCards, int redCards, String leagueName)
+        {
             this.teamName = teamName;
             this.apps = apps;
             this.firstSquad = firstSquad;

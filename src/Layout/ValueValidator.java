@@ -3,6 +3,10 @@ package Layout;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Class containing methods for verifying values inserting by user.
+ */
+
 class ValueValidator {
 
     boolean isEmpty(Object newValue)

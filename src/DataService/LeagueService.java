@@ -3,12 +3,15 @@ package DataService;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Another level of getting players data task.
+ * This time we collect data connected with teams from particular league.
+ */
 
-public class LeagueService extends Thread//implements Runnable
+public class LeagueService extends Thread
 {
     private String name; // League's name
     private String tableName; // sometimes League's name from website differs from table's name
@@ -65,6 +68,10 @@ public class LeagueService extends Thread//implements Runnable
         }
     }
 
+    /**
+     * Downloading links to teams pages. For youth teams - other function.
+     */
+
     private void getUrls(Document doc) {
         Element teamsContainer = doc.getElementsByClass("league-teams-list").first(); // one element - cannot use getElementById. Not complete class name but it works
         Elements rows = teamsContainer.getElementsByClass("row");
@@ -84,6 +91,10 @@ public class LeagueService extends Thread//implements Runnable
         }
     }
 
+    /**
+     * To initiate downloading data for teams - updating state of teams counter
+     */
+
     private void getTeams() throws InterruptedException {
 
         for (String url : teamsUrls) {
@@ -97,6 +108,10 @@ public class LeagueService extends Thread//implements Runnable
         }
         controller.updateLeaguesCount();
     }
+
+    /**
+     * Print section - for debugging
+     */
 
     public void printTeamUrls() {
         for (String team : teamsUrls) {

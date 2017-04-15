@@ -4,11 +4,15 @@ import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+/**
+ * The last level of getting players data task.
+ * This time we collect data connected with player - personal data and stats.
+ */
 
 public class PlayerService {
     private String url;
@@ -79,6 +83,11 @@ public class PlayerService {
         this.controller = controller;
     }
 
+    /**
+     * First phase of getting player data.
+     * There are different structures for players pages - therefore, this function is quite expanded.
+     */
+
     void getPlayerData() throws InterruptedException {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
         try {
@@ -93,7 +102,6 @@ public class PlayerService {
                 DateFormat format = new SimpleDateFormat("dd.MM.yyyy");
                 date = format.parse(dateText);
                 getStats(name, reportsUrl);
-                //System.out.println("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName);
                 controller.log("Downloaded data concerning player: " + ID + " " + firstName + " " + lastName + " " + teamName, 0);
             }
         } catch (ParseException e) {
@@ -118,6 +126,10 @@ public class PlayerService {
             }
         }
     }
+
+    /**
+     * Downloading player stats - it is based on parsing player page with stats.
+     */
 
     private void getStats(String name, String url) {
         Document doc = HtmlService.getHtmlSource(url, false, controller);
@@ -166,6 +178,10 @@ public class PlayerService {
             }
         }
     }
+
+    /**
+     * Print section - for debugging
+     */
 
     public void printPlayerData() {
         if (firstName != null)
