@@ -158,8 +158,8 @@ public class LeagueView extends JFrame {
         leagueChoice.setSelectedIndex(-1);
     }
 
-    public void delFromTable(int rowIndex){
-        tableModel.removeRow(rowIndex);
+    public void delFromTable(int id){
+        tableModel.removeRow(getRowWithValue(id));
     }
 
     boolean editMode(){

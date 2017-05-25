@@ -173,7 +173,7 @@ public class LayoutInit {
                         Map.Entry tmp = (Map.Entry) it.next();
                         Pair tmppair = (Pair)tmp.getKey();
                         if(delFromDatabase((int)tmppair.getKey(), (String)tmppair.getValue())){
-                            leagueView.delFromTable((int)tmp.getValue());
+                            leagueView.delFromTable((int)tmppair.getKey());
                             leagueView.refresh();
                         }
                         else log("Error while deleting from database.", 2);
