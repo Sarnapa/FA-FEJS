@@ -382,10 +382,11 @@ public class LayoutInit {
                 int redCards = insertModeWindow.getRedCards();
                 Player player = new Player(id, firstName, lastName, birthdate);
                 player.addPlayerRow(team, apps, firstSquad, minutes, goals, yellowCards, redCards, currentLeague);
-                insertToDatabase(player);
-                Object[] temp = {id, firstName, lastName, birthdate, team, apps, firstName, minutes, goals, yellowCards, redCards};
-                leagueView.addToPlayersTable(temp);
-                leagueView.refresh();
+                if(insertToDatabase(player)){
+                    Object[] temp = {id, firstName, lastName, birthdate, team, apps, firstName, minutes, goals, yellowCards, redCards};
+                    leagueView.addToPlayersTable(temp);
+                    leagueView.refresh();
+                }
                 insertModeWindow.dispatchEvent(new WindowEvent(insertModeWindow, WindowEvent.WINDOW_CLOSING));
             }
         }
@@ -421,11 +422,13 @@ public class LayoutInit {
         return false;
     }
 
-    private void insertToDatabase(Player player)
+    private boolean insertToDatabase(Player player)
     {
         DatabaseConnection db = new DatabaseConnection();
-        if(!db.createConnection())
+        if(!db.createConnection()) {
             showDialog("Database Error", "Cannot connect to database.", 0, 0);
+            return false;
+        }
         else
         {
             try
@@ -435,13 +438,16 @@ public class LayoutInit {
             catch (SQLIntegrityConstraintViolationException e1)
             {
                 showDialog("Database Error", "Cannot insert player " + player.getFirstName() + " " + player.getLastName() + " to database due to SQLIntegrityConstraintViolationException.", 0, 0);
+                return false;
             }
             catch (SQLException e2)
             {
                 showDialog("Database Error", "Cannot insert player " + player.getFirstName() + " " + player.getLastName() + " to database. Reason: " + e2.getMessage(), 0, 0);
+                return false;
             }
             if (!db.shutdown())
                 showDialog("Database Error", "Cannot shutdown database.", 0, 0);
+            return true;
         }
     }
 
