@@ -1,5 +1,7 @@
 package Layout;
 
+import javafx.util.Pair;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.LineBorder;
@@ -120,13 +122,15 @@ public class LeagueView extends JFrame {
         return result;
     }
 
-    HashMap<Integer, Integer> getSelectedPlayers() {
-        HashMap<Integer, Integer> tmp = new HashMap<>();
+    HashMap<Pair<Integer, String>, Integer> getSelectedPlayers() {
+        HashMap<Pair<Integer, String>, Integer> selectedPlayers = new HashMap<>();
+        Pair tmppair;
         int[] players = playersTable.getSelectedRows();
         for (int player : players) {
-            tmp.put((int) playersTable.getValueAt(player, 0), (player));
+            tmppair = new Pair(playersTable.getValueAt(player, 0), playersTable.getValueAt(player, 1));
+            selectedPlayers.put(tmppair, (player));
         }
-        return tmp;
+        return selectedPlayers;
     }
 
     void disableUpdateButton() {

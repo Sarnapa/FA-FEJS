@@ -4,6 +4,8 @@ import DataService.FolderContentReader;
 import DataService.LeaguesLinks;
 import DatabaseService.DatabaseConnection;
 import DatabaseService.Player;
+import javafx.util.Pair;
+
 import javax.swing.*;
 import javax.swing.table.TableModel;
 import java.awt.event.*;
@@ -165,11 +167,12 @@ public class LayoutInit {
             SwingWorker myWorker = new SwingWorker<String, Void>() {
                 @Override
                 protected String doInBackground() throws Exception {
-                    Map<Integer, Integer> selected = leagueView.getSelectedPlayers();
+                    Map<Pair<Integer, String>, Integer> selected = leagueView.getSelectedPlayers();
                     Iterator it = selected.entrySet().iterator();
                     while (it.hasNext()) {
                         Map.Entry tmp = (Map.Entry) it.next();
-                        if(delFromDatabase((int)tmp.getKey())){
+                        Pair tmppair = (Pair)tmp.getKey();
+                        if(delFromDatabase((int)tmppair.getKey())){
                             leagueView.delFromTable((int)tmp.getValue());
                             leagueView.refresh();
                         }
@@ -295,14 +298,15 @@ public class LayoutInit {
     class AddPlayersListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            Map<Integer, Integer> selected = leagueView.getSelectedPlayers();
+            Map<Pair<Integer, String>, Integer> selected = leagueView.getSelectedPlayers();
             Iterator it = selected.entrySet().iterator();
             while (it.hasNext()) {
                 Map.Entry tmp = (Map.Entry) it.next();
-                if (playersIDs.containsKey(tmp.getKey())) {    //remove
-                    playersIDs.remove(tmp.getKey());
+                Pair tmppair = (Pair)tmp.getKey();
+                if (playersIDs.containsKey(tmppair.getKey())) {    //remove
+                    playersIDs.remove(tmppair.getKey());
                 } else {                                       //add
-                    playersIDs.put((int) tmp.getKey(), (int) tmp.getValue());
+                    playersIDs.put((int) tmppair.getKey(), (int) tmp.getValue());
                 }
             }
             leagueView.refresh();
