@@ -73,12 +73,13 @@ class DatabaseUpdateContent
             throw new SQLException(e);
         }
     }
-    void deletePlayer(int ID, String leagueName) throws SQLException
+    void deletePlayer(int ID, String team, String leagueName) throws SQLException
     {
-        String statement = "DELETE FROM TABLENAME WHERE ID = ?";
+        String statement = "DELETE FROM TABLENAME WHERE ID = ? AND TEAM = ?";
         statement = statement.replace("TABLENAME", "APP.\"" + leagueName + "\"");
         PreparedStatement pstmt = conn.prepareStatement(statement);
         pstmt.setInt(1, ID);
+        pstmt.setString(2, team);
         pstmt.execute();
 
         List<String> leaguesNames = getTableNames();

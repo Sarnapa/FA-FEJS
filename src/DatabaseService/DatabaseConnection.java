@@ -75,11 +75,11 @@ public class DatabaseConnection {
      * To delete player from database. User choose this player in 'Edit Mode'.
      */
 
-    public synchronized  boolean deletePlayer(int ID, String leagueName)
+    public synchronized  boolean deletePlayer(int ID, String team, String leagueName)
     {
         try
         {
-            duc.deletePlayer(ID, leagueName);
+            duc.deletePlayer(ID, team, leagueName);
         }
         catch(SQLException e)
         {

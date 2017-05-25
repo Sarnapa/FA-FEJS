@@ -172,7 +172,7 @@ public class LayoutInit {
                     while (it.hasNext()) {
                         Map.Entry tmp = (Map.Entry) it.next();
                         Pair tmppair = (Pair)tmp.getKey();
-                        if(delFromDatabase((int)tmppair.getKey())){
+                        if(delFromDatabase((int)tmppair.getKey(), (String)tmppair.getValue())){
                             leagueView.delFromTable((int)tmp.getValue());
                             leagueView.refresh();
                         }
@@ -402,14 +402,14 @@ public class LayoutInit {
      * Main window functions
      **/
 
-    private boolean delFromDatabase(int ID)
+    private boolean delFromDatabase(int ID, String team)
     {
         DatabaseConnection db = new DatabaseConnection();
         if(!db.createConnection())
             showDialog("Database Error", "Cannot connect to database.", 0, 0);
         else
         {
-            if (db.deletePlayer(ID, currentLeague))
+            if (db.deletePlayer(ID, team, currentLeague))
             {
                 if (!db.shutdown())
                     showDialog("Database Error", "Cannot shutdown database.", 0, 0);

@@ -127,7 +127,7 @@ public class LeagueView extends JFrame {
         Pair tmppair;
         int[] players = playersTable.getSelectedRows();
         for (int player : players) {
-            tmppair = new Pair(playersTable.getValueAt(player, 0), playersTable.getValueAt(player, 1));
+            tmppair = new Pair(playersTable.getValueAt(player, 0), playersTable.getValueAt(player, 4));
             selectedPlayers.put(tmppair, (player));
         }
         return selectedPlayers;
