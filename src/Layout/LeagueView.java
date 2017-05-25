@@ -62,6 +62,7 @@ public class LeagueView extends JFrame {
         };
         tableModel.setColumnIdentifiers(columnNames);
         playersTable = new JTable(tableModel);
+        playersTable.getTableHeader().setReorderingAllowed(false);
         playersTable.setDefaultRenderer(Object.class, new MyTableCellRenderer());
         glassPane = new MyGlassPane();
         //changes selection method. there's no need to hold ctrl.

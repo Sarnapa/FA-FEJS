@@ -482,7 +482,10 @@ public class LayoutInit {
     private List<String> getLeaguesNames() {
         DatabaseConnection db = new DatabaseConnection();
         if(!db.createConnection())
+        {
             showDialog("Database Error", "Cannot connect to database.", 0, 0);
+            System.exit(1);
+        }
         else
         {
             List<String> names = db.getTablesNames();
