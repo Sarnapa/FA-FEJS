@@ -105,12 +105,12 @@ public class LayoutInit {
                         DateFormat format = new SimpleDateFormat("yyyy-mm-dd");
                         try {
                             String dateString = newValue.toString();
-                            System.out.println("DateString: " + dateString);
+                            //System.out.println("DateString: " + dateString);
                             if (validator.isValidDate(newValue.toString()))
                             {
                                 java.util.Date tmp = format.parse(dateString);
                                 newValue = new java.sql.Date(tmp.getTime());
-                                System.out.println(newValue);
+                                //System.out.println(newValue);
                                 isCorrect = true;
                             }
                             else
