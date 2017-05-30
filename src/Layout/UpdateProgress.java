@@ -56,7 +56,7 @@ public class UpdateProgress extends JFrame {
         LeaguesDoneCount.setText(Integer.toString(LeaguesDone));
     }
 
-    void disableUpdateButton() {
+    void disableStopUpdateButton() {
         stopButton.setEnabled(false);
     }
 

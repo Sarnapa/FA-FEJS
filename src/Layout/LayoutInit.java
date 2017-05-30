@@ -31,6 +31,7 @@ public class LayoutInit {
     private final static String pdfsFolderDst = "./pdfs";
     private String currentLeague;
     private InsertModeInputVerifier verifier;
+    private boolean isUpdateCancelled = false;
 
     /**
      * Main window listeners
@@ -331,7 +332,7 @@ public class LayoutInit {
             if (selectedLeagues.size() > 0) {
                 updateView.disableView();
                 progress = new UpdateProgress();
-                progress.addProgressListener(new ProgressListener());
+                progress.addProgressListener(new ProgressCancelButtonListener());
                 startUpdate(updateView.getSelectedLeagues());
             }
         }
@@ -341,10 +342,11 @@ public class LayoutInit {
      * Progress window listeners
      **/
 
-    class ProgressListener implements ActionListener {
+    class ProgressCancelButtonListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            progress.disableUpdateButton();
+            isUpdateCancelled = true;
+            progress.disableStopUpdateButton();
             SwingWorker myWorker = new SwingWorker<String, Void>() {
                 @Override
                 protected String doInBackground() throws Exception {
@@ -536,6 +538,14 @@ public class LayoutInit {
 
     public void log(String s, int c) {
         progress.log(s, c);
+    }
+
+    public void updateEnded(){
+        if(!isUpdateCancelled) {
+            progress.log("Update finished succesfully", 1);
+            progress.disableStopUpdateButton();
+            progress.changeCloseOperation();
+        }
     }
 
     /**
