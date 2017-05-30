@@ -123,10 +123,10 @@ public class TeamService {
                 ++i;
             }
             if (i == 5) {
-                controller.log("Failed inserting row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName(), 2);
+                controller.log("Failed inserting row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName() + "(" + tableName +  ").", 2);
                 ++failsCount;
             } else {
-                controller.log("Inserted row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName(), 0);
+                controller.log("Inserted row concerning player: " + player.getID() + " " + player.getFirstName() + " " + player.getLastName() + " " + player.getTeamName() + "(" + tableName +  ").", 0);
                 failsCount = 0;
             }
             if (failsCount == 5) {

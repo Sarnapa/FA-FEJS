@@ -356,6 +356,7 @@ public class LayoutInit {
                     updateView.enableView();
                     log("Data update completed! You can now close this window.", 1);
                     progress.changeCloseOperation();
+                    isUpdateCancelled = false;
                     return null;
                 }
             };
@@ -542,8 +543,9 @@ public class LayoutInit {
 
     public void updateEnded(){
         if(!isUpdateCancelled) {
-            progress.log("Update finished succesfully", 1);
+            progress.log("Update finished succesfully.", 1);
             progress.disableStopUpdateButton();
+            updateView.enableView();
             progress.changeCloseOperation();
         }
     }

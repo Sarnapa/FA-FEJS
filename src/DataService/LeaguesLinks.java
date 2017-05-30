@@ -81,6 +81,20 @@ public class LeaguesLinks implements Runnable {
             get4LeagueUrls();
             getYouthLeagueUrls();
             getLeagues();
+            for (LeagueService t : threadsList)
+            {
+                try
+                {
+                    t.join();
+                }
+                catch (InterruptedException e)
+                {
+                    Thread.currentThread().interrupt();
+                    controller.showDialog("Error", "The application will be closed.", 0, 2);
+                    System.exit(1);
+                }
+            }
+            controller.updateEnded();
         }
     }
 
