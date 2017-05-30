@@ -19,7 +19,7 @@ public class LeaguesLinks implements Runnable {
     private HashMap<String, String> leaguesMap = new HashMap<>(); // <table_name, url> - Ekstraklasa, 1 Liga, 2 Liga, 3 Liga, CLJ
     private HashMap<String, String> fourthDivision = new HashMap<>(); // <table_name, url>
     private HashMap<String, String> youthDivision = new HashMap<>(); // <table_name, url
-    private static final int THREADS_NUMBER = 10;
+    private static final int THREADS_NUMBER = 3;
     private List<LeagueService> threadsList = new ArrayList<>();
     private static final Object someObject = new Object();
     private List<String> selectedLeagues;
@@ -165,7 +165,7 @@ public class LeaguesLinks implements Runnable {
     /**
      * Threads service code section.
      * Due to problems associated with overloading website, we have to limit count of concurrently running threads
-     * to 10 threads.
+     * to 3 threads.
      */
 
     private void getLeagues() {
