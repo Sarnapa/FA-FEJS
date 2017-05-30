@@ -4,9 +4,8 @@ import Layout.LayoutInit;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
+
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.*;
@@ -111,32 +110,41 @@ public class LeaguesLinks implements Runnable {
      */
 
     private void get4LeagueUrls() {
-        getDataFromFile("4liga.txt");
+        getDataFromFile("/4liga.txt");
     }
 
     private void getYouthLeagueUrls() {
-        getDataFromFile("ligi_mlodziezowe.txt");
+        getDataFromFile("/ligi_mlodziezowe.txt");
     }
 
     private void getDataFromFile(String fileName) {
         try {
-            File file = new File(fileName);
-            Scanner fileReading = new Scanner(file);
-            String tableName, url;
-            while (fileReading.hasNextLine()) {
-                String line = fileReading.nextLine();
+            //File file = new File(fileName);
+            //Scanner fileReading = new Scanner(file);
+            InputStream in = getClass().getResourceAsStream(fileName);
+            BufferedReader fileReading  = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            String tableName, url, line;
+            while ((line = fileReading.readLine()) != null) {
                 int firstColonIndex = line.indexOf(':');
                 tableName = line.substring(0, firstColonIndex).toUpperCase();
                 url = line.substring(firstColonIndex + 1, line.length());
                 if (selectedLeagues.contains(tableName)) {
-                    if (fileName.equals("4liga.txt"))
+                    if (fileName.equals("/4liga.txt"))
                         fourthDivision.put(tableName, url);
                     else
                         youthDivision.put(tableName, url);
                 }
             }
-        } catch (FileNotFoundException e) {
+            fileReading.close();
+            in.close();
+        }
+        catch (FileNotFoundException e)
+        {
             controller.log("File " + fileName + " not found.", 1);
+        }
+        catch(IOException ioe)
+        {
+            controller.log("Error associated with reading file " + fileName + ".", 1);
         }
     }
 
