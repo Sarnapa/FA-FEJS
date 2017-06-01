@@ -543,6 +543,7 @@ public class LayoutInit {
 
     public void updateEnded(){
         if(!isUpdateCancelled) {
+            leaguesLinks.clear();
             progress.log("Update finished succesfully.", 1);
             progress.disableStopUpdateButton();
             updateView.enableView();

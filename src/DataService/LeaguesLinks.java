@@ -39,6 +39,7 @@ public class LeaguesLinks implements Runnable {
         fourthDivision.clear();
         youthDivision.clear();
         threadsList.clear();
+        selectedLeagues.clear();
     }
 
     public void run() {
